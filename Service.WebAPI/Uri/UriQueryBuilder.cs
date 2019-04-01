@@ -66,7 +66,10 @@ namespace Framework.Service.WebAPI.Uri
 
                 sb.Append(filter.Item1);
                 sb.Append(@"=");
-                sb.Append(filter.Item2.ToUriAsQuery());
+                if (filter.Item2 != null)
+                {
+                    sb.Append(filter.Item2.ToUriAsQuery());
+                }
             }
 
             return sb.ToString();

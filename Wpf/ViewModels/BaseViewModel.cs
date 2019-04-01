@@ -28,7 +28,7 @@ namespace Framework.Wpf.ViewModels
         #region ModalDialogs
 
         /// <summary>
-        /// Close this window an set DialogResult to true
+        /// Close this window and set DialogResult to true
         /// </summary>
         public Action DialogOKAction { get; set; }
 

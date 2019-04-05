@@ -14,6 +14,8 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+
 namespace Framework.WebAPI.Controller
 {
     using System;
@@ -68,28 +70,29 @@ namespace Framework.WebAPI.Controller
             return controller.Ok(obj);
         }
 
+        public static async Task<ActionResult<IEnumerable<T>>> NotFoundOrOk<T>(this Controller controller, IEnumerable<T> list)
+        {
+            if (list == null)
+            {
+                await Task.CompletedTask; // avoid CS1998
+                return controller.NotFound();
+            }
+
+            return controller.Ok(list);
+        }
+
         #region Get/GetAll
 
         public static async Task<ActionResult<T>> Get<T, TKey>(this Controller controller, IGetManager<T, TKey> manager, TKey id) where T : class where TKey : IComparable
         {
             var dto = await manager.Get(id);
-            if (dto == null)
-            {
-                return controller.NotFound();
-            }
-
-            return controller.Ok(dto);
+            return await controller.NotFoundOrOk(dto);
         }
 
         public static async Task<ActionResult<IEnumerable<T>>> GetAll<T, TKey>(this Controller controller, IGetManager<T, TKey> manager) where T : class where TKey : IComparable
         {
             var dtos = await manager.GetAll();
-            if (dtos == null)
-            {
-                return controller.NotFound();
-            }
-
-            return controller.Ok(dtos);
+            return await controller.NotFoundOrOk(dtos);
         }
 
         #endregion

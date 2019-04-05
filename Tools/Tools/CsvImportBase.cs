@@ -236,7 +236,7 @@ namespace Framework.Tools.Tools
                 var enumValue = Enum.Parse(enumType, excelField);
                 return enumValue;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 throw;
             }

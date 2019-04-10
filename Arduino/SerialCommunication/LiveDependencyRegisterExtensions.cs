@@ -23,7 +23,7 @@ namespace Framework.Arduino.SerialCommunication
     {
         public static IDependencyContainer RegisterSerialCommunication(this IDependencyContainer container)
         {
-            Dependency.Container.RegisterTypesIncludingInternals(typeof(Framework.Arduino.SerialCommunication.Serial).Assembly);
+            container.RegisterTypesIncludingInternals(DependencyLivetime.Transient, typeof(Framework.Arduino.SerialCommunication.Serial).Assembly);
             return container;
         }
     }

@@ -14,6 +14,9 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
+using Framework.Arduino.SerialCommunication.Abstraction;
+using Framework.Pattern;
+
 namespace Framework.Arduino.SerialCommunication
 {
     using Dependency;
@@ -23,7 +26,9 @@ namespace Framework.Arduino.SerialCommunication
     {
         public static IDependencyContainer RegisterSerialCommunication(this IDependencyContainer container)
         {
-            container.RegisterTypesIncludingInternals(DependencyLivetime.Transient, typeof(Framework.Arduino.SerialCommunication.Serial).Assembly);
+            container
+                .RegisterTypesIncludingInternals(DependencyLivetime.Transient, typeof(Framework.Arduino.SerialCommunication.Serial).Assembly)
+                .RegisterType<IFactory<ISerialPort>, FactoryResolve<ISerialPort>>();
             return container;
         }
     }

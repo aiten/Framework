@@ -56,16 +56,15 @@ namespace Framework.Dependency
         }
 
         /// <inheritdoc />
-        public IDependencyContainer RegisterType(Type typeFrom, Type typeTo)
+        public IDependencyContainer RegisterType(Type typeFrom, Type typeTo, DependencyLivetime lifeTime)
         {
-            _container.AddTransient(typeFrom, typeTo);
-            return this;
-        }
-
-        /// <inheritdoc />
-        public IDependencyContainer RegisterTypeScoped(Type typeFrom, Type typeTo)
-        {
-            _container.AddScoped(typeFrom, typeTo);
+            switch (lifeTime)
+            {
+                case DependencyLivetime.Scoped: _container.AddScoped(typeFrom, typeTo); break;
+                case DependencyLivetime.Singleton: _container.AddSingleton(typeFrom, typeTo); break; 
+                case DependencyLivetime.Transient: _container.AddTransient(typeFrom, typeTo); break;
+                default: throw new ArgumentOutOfRangeException(nameof(lifeTime), lifeTime, null);
+            }
             return this;
         }
 

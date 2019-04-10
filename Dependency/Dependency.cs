@@ -42,7 +42,7 @@ namespace Framework.Dependency
         /// Initializes the class.
         /// </summary>
         /// <param name="provider">Class that provides the dependency container.</param>
-        public static void Initialize(IDependencyProvider provider)
+        public static IDependencyContainer Initialize(IDependencyProvider provider)
         {
             if (_provider != null)
             {
@@ -50,6 +50,8 @@ namespace Framework.Dependency
             }
 
             _provider = provider;
+
+            return Container;
         }
 
         /// <summary>

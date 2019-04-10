@@ -19,6 +19,13 @@ namespace Framework.Dependency.Abstraction
     using System;
     using System.Collections.Generic;
 
+    public enum DependencyLivetime
+    {
+        Scoped,
+        Singleton,
+        Transient
+    }
+
     /// <summary>
     /// Inversion of Control container, which enables Dependency Injection. 
     /// </summary>
@@ -43,15 +50,7 @@ namespace Framework.Dependency.Abstraction
         /// <param name="typeFrom">Type from.</param>
         /// <param name="typeTo">Type to.</param>
         /// <returns></returns>
-        IDependencyContainer RegisterType(Type typeFrom, Type typeTo);
-
-        /// <summary>
-        /// Register typeFrom to typeTo.
-        /// </summary>
-        /// <param name="typeFrom">Type from.</param>
-        /// <param name="typeTo">Type to.</param>
-        /// <returns></returns>
-        IDependencyContainer RegisterTypeScoped(Type typeFrom, Type typeTo);
+        IDependencyContainer RegisterType(Type typeFrom, Type typeTo, DependencyLivetime lifeTime);
 
         /// <summary>
         /// This can be called in unit tests to reset the container to an empty state. 

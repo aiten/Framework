@@ -24,6 +24,8 @@ namespace Framework.Dependency
 
     public static class DependencyContainerExtensions
     {
+        #region Instance
+
         /// <summary>
         /// Registers the given object for the interface. 
         /// </summary>
@@ -37,7 +39,9 @@ namespace Framework.Dependency
             return container;
         }
 
-        #region perInstance
+        #endregion
+
+        #region AllLifeTime
 
         /// <summary>
         /// Registers a type for the given interface.
@@ -46,9 +50,9 @@ namespace Framework.Dependency
         /// <typeparam name="TInterface">Interface that can be later resolved.</typeparam>
         /// <typeparam name="TType">Type that implements interface. On Resolve&lt;TInterface&gt;() calls a new instance is returned every time.</typeparam>
         /// <returns>This instance.</returns>
-        public static IDependencyContainer RegisterType<TInterface, TType>(this IDependencyContainer container) where TType : TInterface
+        public static IDependencyContainer RegisterType<TInterface, TType>(this IDependencyContainer container, DependencyLivetime liveTime = DependencyLivetime.Transient) where TType : TInterface
         {
-            container.RegisterType(typeof(TInterface), typeof(TType));
+            container.RegisterType(typeof(TInterface), typeof(TType), liveTime);
             return container;
         }
 
@@ -56,23 +60,29 @@ namespace Framework.Dependency
         /// Registers a type for the given interface.
         /// </summary>
         /// <param name="container">Dependency container.</param>
+        /// <param name="liveTime">Optional lifetime.</param>
         /// <returns>This instance.</returns>
         /// <typeparam name="TType">Type that implements interface.</typeparam>
-        public static IDependencyContainer RegisterType<TType>(this IDependencyContainer container)
+        public static IDependencyContainer RegisterType<TType>(this IDependencyContainer container, DependencyLivetime liveTime = DependencyLivetime.Transient)
         {
-            container.RegisterType(typeof(TType), typeof(TType));
+            container.RegisterType(typeof(TType), typeof(TType), liveTime);
             return container;
         }
+
+        #endregion
+
+        #region Transient
 
         /// <summary>
         /// Registers public and internal types of the given assemblies with the unity container. This is necessary
         /// to workaround the internals visible to hacks in the code base.
         /// </summary>
         /// <param name="container">Dependency container.</param>
+        /// <param name="liveTime"></param>
         /// <param name="assemblies">List of assemblies in which all types should be registered with their interfaces. 
         /// This includes internal types. </param>
         /// <returns>This instance.</returns>
-        public static IDependencyContainer RegisterTypesIncludingInternals(this IDependencyContainer container, params Assembly[] assemblies)
+        public static IDependencyContainer RegisterTypesIncludingInternals(this IDependencyContainer container, DependencyLivetime liveTime, params Assembly[] assemblies)
         {
             foreach (var assembly in assemblies)
             {
@@ -82,7 +92,7 @@ namespace Framework.Dependency
                     var    interfaceType = type.GetInterface(interfaceName);
                     if (interfaceType != null)
                     {
-                        container.RegisterType(interfaceType, type);
+                        container.RegisterType(interfaceType, type, liveTime);
                     }
                 }
             }
@@ -90,7 +100,7 @@ namespace Framework.Dependency
             return container;
         }
 
-        public static IDependencyContainer RegisterTypesByName(this IDependencyContainer container, Func<string, bool> checkName, params Assembly[] assemblies)
+        public static IDependencyContainer RegisterTypesByName(this IDependencyContainer container, Func<string, bool> checkName, DependencyLivetime liveTime, params Assembly[] assemblies)
         {
             foreach (var assembly in assemblies)
             {
@@ -98,7 +108,7 @@ namespace Framework.Dependency
                 {
                     if (checkName(type.Name))
                     {
-                        container.RegisterType(type, type);
+                        container.RegisterType(type, type, liveTime);
                     }
                 }
             }
@@ -108,7 +118,7 @@ namespace Framework.Dependency
 
         #endregion
 
-        #region perScope
+        #region Scope
 
         /// <summary>
         /// Registers a type for the given interface.
@@ -119,7 +129,7 @@ namespace Framework.Dependency
         /// <returns>This instance.</returns>
         public static IDependencyContainer RegisterTypeScoped<TInterface, TType>(this IDependencyContainer container) where TType : TInterface
         {
-            container.RegisterTypeScoped(typeof(TInterface), typeof(TType));
+            container.RegisterType(typeof(TInterface), typeof(TType), DependencyLivetime.Scoped);
             return container;
         }
 
@@ -131,49 +141,7 @@ namespace Framework.Dependency
         /// <typeparam name="TType">Type that implements interface.</typeparam>
         public static IDependencyContainer RegisterTypeScoped<TType>(this IDependencyContainer container)
         {
-            container.RegisterTypeScoped(typeof(TType), typeof(TType));
-            return container;
-        }
-
-        /// <summary>
-        /// Registers public and internal types of the given assemblies with the unity container. This is necessary
-        /// to workaround the internals visible to hacks in the code base.
-        /// </summary>
-        /// <param name="container">Dependency container.</param>
-        /// <param name="assemblies">List of assemblies in which all types should be registered with their interfaces. 
-        /// This includes internal types. </param>
-        /// <returns>This instance.</returns>
-        public static IDependencyContainer RegisterTypesIncludingInternalsScoped(this IDependencyContainer container, params Assembly[] assemblies)
-        {
-            foreach (var assembly in assemblies)
-            {
-                foreach (var type in assembly.GetTypes().Where(t => t.IsClass && !t.IsAbstract))
-                {
-                    string interfaceName = "I" + type.Name;
-                    var    interfaceType = type.GetInterface(interfaceName);
-                    if (interfaceType != null)
-                    {
-                        container.RegisterTypeScoped(interfaceType, type);
-                    }
-                }
-            }
-
-            return container;
-        }
-
-        public static IDependencyContainer RegisterTypesByNameScoped(this IDependencyContainer container, Func<string, bool> checkName, params Assembly[] assemblies)
-        {
-            foreach (var assembly in assemblies)
-            {
-                foreach (var type in assembly.GetTypes().Where(t => t.IsClass && !t.IsAbstract))
-                {
-                    if (checkName(type.Name))
-                    {
-                        container.RegisterTypeScoped(type, type);
-                    }
-                }
-            }
-
+            container.RegisterType(typeof(TType), typeof(TType), DependencyLivetime.Scoped);
             return container;
         }
 

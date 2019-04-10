@@ -28,7 +28,7 @@ namespace Framework.Mapper
             mapperConfiguration.AssertConfigurationIsValid();
 
             IMapper mapper = mapperConfiguration.CreateMapper();
-            Dependency.Container.RegisterInstance(mapper);
+            container.RegisterInstance(mapper);
 
             return container;
         }

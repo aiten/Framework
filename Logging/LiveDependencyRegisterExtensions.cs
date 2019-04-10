@@ -26,7 +26,7 @@ namespace Framework.Logging
         public static IDependencyContainer RegisterFrameWorkLogging(this IDependencyContainer container)
         {
             container.RegisterType<ILoggerFactory, LoggerFactory>();
-            container.RegisterType(typeof(ILogger<>), typeof(Logger<>));
+            container.RegisterType(typeof(ILogger<>), typeof(Logger<>), DependencyLivetime.Transient);
 
             return container;
         }

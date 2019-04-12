@@ -26,6 +26,10 @@ namespace Framework.Logging
         {
             return new Logger(type);
         }
+        public ILogger<T> CreateLogger<T>()
+        {
+            return new Logger<T>();
+        }
 
         public ILogger CreateLogger(string key)
         {

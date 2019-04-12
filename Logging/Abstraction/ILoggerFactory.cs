@@ -21,6 +21,7 @@ namespace Framework.Logging.Abstraction
     public interface ILoggerFactory
     {
         ILogger CreateLogger(Type   type);
+        ILogger<T> CreateLogger<T>();
         ILogger CreateLogger(string key);
     }
 }

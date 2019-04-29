@@ -30,77 +30,67 @@ namespace Framework.Service.WebAPI
 
         public string BaseApi { get; set; }
 
-        protected virtual HttpClient CreateHttpClient()
+        protected virtual HttpClient GetHttpClient()
         {
-            var client = new HttpClient() { BaseAddress = new System.Uri(BaseUri) };
-            return ConfigureHttpClient(client);
+            var httpClient = HttpClientFactory.Instance.GetHttpClient(BaseUri);
+            return httpClient;
         }
 
-        protected virtual HttpClient ConfigureHttpClient(HttpClient client)
+        public async Task<IList<T>> ReadList<T>(string uri)
         {
-            client.DefaultRequestHeaders.Accept.Clear();
-            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            return client;
-        }
+            var client = GetHttpClient();
 
-        public async Task<IList<T>> CreateHttpClientAndReadList<T>(string uri)
-        {
-            using (var client = CreateHttpClient())
+            HttpResponseMessage response = await client.GetAsync(uri);
+            if (response.IsSuccessStatusCode)
             {
-                HttpResponseMessage response = await client.GetAsync(uri);
-                if (response.IsSuccessStatusCode)
-                {
-                    var items = await response.Content.ReadAsAsync<IList<T>>();
-                    return items;
-                }
-
-                return null;
+                var items = await response.Content.ReadAsAsync<IList<T>>();
+                return items;
             }
+
+            return null;
         }
 
-        public async Task<IList<T>> CreateHttpClientAndReadList<T>(UriPathBuilder pathBuilder)
+        public async Task<IList<T>> ReadList<T>(UriPathBuilder pathBuilder)
         {
-            return await CreateHttpClientAndReadList<T>(pathBuilder.Build());
+            return await ReadList<T>(pathBuilder.Build());
         }
 
-        public async Task<T> CreateHttpClientAndRead<T>(string uri)
+        public async Task<T> Read<T>(string uri)
         {
-            using (var client = CreateHttpClient())
+            var client = GetHttpClient();
+
+            HttpResponseMessage response = await client.GetAsync(uri);
+            if (response.IsSuccessStatusCode)
             {
-                HttpResponseMessage response = await client.GetAsync(uri);
-                if (response.IsSuccessStatusCode)
-                {
-                    var item = await response.Content.ReadAsAsync<T>();
-                    return item;
-                }
-
-                return default(T);
+                var item = await response.Content.ReadAsAsync<T>();
+                return item;
             }
+
+            return default(T);
         }
 
-        public async Task<string> CreateHttpClientAndReadString(UriPathBuilder pathBuilder)
+        public async Task<string> ReadString(UriPathBuilder pathBuilder)
         {
-            return await CreateHttpClientAndReadString(pathBuilder.Build());
+            return await ReadString(pathBuilder.Build());
         }
 
-        public async Task<string> CreateHttpClientAndReadString(string uri)
+        public async Task<string> ReadString(string uri)
         {
-            using (var client = CreateHttpClient())
+            var client = GetHttpClient();
+
+            HttpResponseMessage response = await client.GetAsync(uri);
+            if (response.IsSuccessStatusCode)
             {
-                HttpResponseMessage response = await client.GetAsync(uri);
-                if (response.IsSuccessStatusCode)
-                {
-                    var item = await response.Content.ReadAsStringAsync();
-                    return item;
-                }
-
-                return null;
+                var item = await response.Content.ReadAsStringAsync();
+                return item;
             }
+
+            return null;
         }
 
-        public async Task<T> CreateHttpClientAndRead<T>(UriPathBuilder pathBuilder)
+        public async Task<T> Read<T>(UriPathBuilder pathBuilder)
         {
-            return await CreateHttpClientAndRead<T>(pathBuilder.Build());
+            return await Read<T>(pathBuilder.Build());
         }
 
         public UriPathBuilder CreatePathBuilder()

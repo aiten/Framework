@@ -29,14 +29,13 @@ namespace Framework.Service.WebAPI
 
         public async Task<T> Get(TKey id)
         {
-            using (HttpClient client = CreateHttpClient())
+            var client = GetHttpClient();
+
+            HttpResponseMessage response = await client.GetAsync(CreatePathBuilder().AddPath(id.ToString()).Build());
+            if (response.IsSuccessStatusCode)
             {
-                HttpResponseMessage response = await client.GetAsync(CreatePathBuilder().AddPath(id.ToString()).Build());
-                if (response.IsSuccessStatusCode)
-                {
-                    T value = await response.Content.ReadAsAsync<T>();
-                    return value;
-                }
+                T value = await response.Content.ReadAsAsync<T>();
+                return value;
             }
 
             return null;
@@ -49,32 +48,30 @@ namespace Framework.Service.WebAPI
 
         public async Task<IEnumerable<T>> GetAll()
         {
-            using (HttpClient client = CreateHttpClient())
-            {
-                HttpResponseMessage response = await client.GetAsync(CreatePathBuilder().Build());
-                if (response.IsSuccessStatusCode)
-                {
-                    IEnumerable<T> dtos = await response.Content.ReadAsAsync<IEnumerable<T>>();
-                    return dtos;
-                }
+            var client = GetHttpClient();
 
-                return null;
+            HttpResponseMessage response = await client.GetAsync(CreatePathBuilder().Build());
+            if (response.IsSuccessStatusCode)
+            {
+                IEnumerable<T> dtos = await response.Content.ReadAsAsync<IEnumerable<T>>();
+                return dtos;
             }
+
+            return null;
         }
 
         public async Task<TKey> Add(T value)
         {
-            using (HttpClient client = CreateHttpClient())
+            var client = GetHttpClient();
+
+            HttpResponseMessage response = await client.PostAsJsonAsync(CreatePathBuilder().Build(), value);
+
+            if (!response.IsSuccessStatusCode)
             {
-                HttpResponseMessage response = await client.PostAsJsonAsync(CreatePathBuilder().Build(), value);
-
-                if (!response.IsSuccessStatusCode)
-                {
-                    return default(TKey);
-                }
-
-                return GetKey(await response.Content.ReadAsAsync<T>());
+                return default(TKey);
             }
+
+            return GetKey(await response.Content.ReadAsAsync<T>());
         }
 
         public Task<IEnumerable<TKey>> Add(IEnumerable<T> values)
@@ -94,17 +91,16 @@ namespace Framework.Service.WebAPI
 
         public async Task Delete(TKey key)
         {
-            using (HttpClient client = CreateHttpClient())
+            var client = GetHttpClient();
+
+            HttpResponseMessage response = await client.DeleteAsync(CreatePathBuilder().AddPath(key.ToString()).Build());
+
+            if (response.IsSuccessStatusCode)
             {
-                HttpResponseMessage response = await client.DeleteAsync(CreatePathBuilder().AddPath(key.ToString()).Build());
-
-                if (response.IsSuccessStatusCode)
-                {
-                    //return RedirectToAction("Index");
-                }
-
-                //return HttpNotFound();
+                //return RedirectToAction("Index");
             }
+
+            //return HttpNotFound();
         }
 
         public Task Delete(IEnumerable<TKey> keys)
@@ -114,10 +110,9 @@ namespace Framework.Service.WebAPI
 
         public async Task Update(T value)
         {
-            using (HttpClient client = CreateHttpClient())
-            {
-                HttpResponseMessage response = await client.PutAsJsonAsync(CreatePathBuilder().AddPath(GetKey(value).ToString()).Build(), value);
-            }
+            var client = GetHttpClient();
+
+            HttpResponseMessage response = await client.PutAsJsonAsync(CreatePathBuilder().AddPath(GetKey(value).ToString()).Build(), value);
         }
 
         public Task Update(IEnumerable<T> values)

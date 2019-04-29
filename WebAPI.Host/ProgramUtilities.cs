@@ -1,0 +1,68 @@
+﻿/*
+  This file is part of CNCLib - A library for stepper motors.
+
+  Copyright (c) Herbert Aitenbichler
+
+  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), 
+  to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, 
+  and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+  The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, 
+  WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
+*/
+
+using System;
+using System.Diagnostics;
+using System.Runtime.InteropServices;
+
+namespace Framework.WebAPI.Host
+{
+    public static class ProgramUtilities
+    {
+        public static bool RunsAsService()
+        {
+            var commandline = System.Environment.CommandLine;
+
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) && Microsoft.Azure.Web.DataProtection.Util.IsAzureEnvironment() == false)
+            {
+                if (IsUnderIisExpress())
+                {
+                    return false;
+                }
+
+                return CheckForConsoleWindow();
+            }
+
+            return false; // never can be a windows service
+        }
+
+        public static bool IsUnderIisExpress()
+        {
+            var currentProcess = Process.GetCurrentProcess();
+            if (string.CompareOrdinal(currentProcess.ProcessName, "iisexpress") == 0)
+            {
+                return true;
+            }
+
+            var parentProcess = currentProcess.Parent();
+            if (string.CompareOrdinal(parentProcess.ProcessName,    "iisexpress") == 0
+                || string.CompareOrdinal(parentProcess.ProcessName, "VSIISExeLauncher") == 0)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        [DllImport("kernel32.dll")]
+        private static extern IntPtr GetConsoleWindow();
+
+        private static bool CheckForConsoleWindow()
+        {
+            return GetConsoleWindow() == IntPtr.Zero;
+        }
+    }
+}

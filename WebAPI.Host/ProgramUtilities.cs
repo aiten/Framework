@@ -16,12 +16,35 @@
 
 using System;
 using System.Diagnostics;
+using System.IO;
+using System.Reflection;
 using System.Runtime.InteropServices;
+using System.ServiceProcess;
+
+using Microsoft.AspNetCore.Hosting;
+
+using NLog;
 
 namespace Framework.WebAPI.Host
 {
     public static class ProgramUtilities
     {
+        private static string BaseDirectory => Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+
+        public static void StartWebService(string[] args, Func<string[], IWebHostBuilder> buildWebHost)
+        {
+            if (RunsAsService())
+            {
+                Environment.CurrentDirectory = BaseDirectory;
+                ServiceBase.Run(new ServiceBase[] { new WebAPiService() { WebHostBuilder = buildWebHost } });
+            }
+            else
+            {
+                buildWebHost(args).Build().Run();
+                LogManager.Shutdown();
+            }
+        }
+
         public static bool RunsAsService()
         {
             var commandline = System.Environment.CommandLine;

@@ -56,7 +56,7 @@ namespace Framework.WebAPI.Host
                     return false;
                 }
 
-                return CheckForConsoleWindow();
+                return CheckForConsoleWindow() && IsUnderWindowsServiceManager();
             }
 
             return false; // never can be a windows service
@@ -65,19 +65,27 @@ namespace Framework.WebAPI.Host
         public static bool IsUnderIisExpress()
         {
             var currentProcess = Process.GetCurrentProcess();
-            if (string.CompareOrdinal(currentProcess.ProcessName, "iisexpress") == 0)
+            if (string.CompareOrdinal(currentProcess.ProcessName, @"iisexpress") == 0)
             {
                 return true;
             }
 
             var parentProcess = currentProcess.Parent();
-            if (string.CompareOrdinal(parentProcess.ProcessName,    "iisexpress") == 0
-                || string.CompareOrdinal(parentProcess.ProcessName, "VSIISExeLauncher") == 0)
+            if (parentProcess != null &&
+                (string.CompareOrdinal(parentProcess.ProcessName, @"iisexpress") == 0 ||
+                 string.CompareOrdinal(parentProcess.ProcessName, @"VSIISExeLauncher") == 0))
             {
                 return true;
             }
 
             return false;
+        }
+
+        public static bool IsUnderWindowsServiceManager()
+        {
+            var currentProcess = Process.GetCurrentProcess();
+            var parentProcess = currentProcess.Parent();
+            return (parentProcess != null && parentProcess.ProcessName == @"services");
         }
 
         [DllImport("kernel32.dll")]

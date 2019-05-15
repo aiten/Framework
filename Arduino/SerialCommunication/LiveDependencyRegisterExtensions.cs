@@ -17,18 +17,19 @@
 using Framework.Arduino.SerialCommunication.Abstraction;
 using Framework.Pattern;
 
+using Microsoft.Extensions.DependencyInjection;
+
 namespace Framework.Arduino.SerialCommunication
 {
     using Dependency;
-    using Dependency.Abstraction;
 
     public static class LiveDependencyRegisterExtensions
     {
-        public static IDependencyContainer RegisterSerialCommunication(this IDependencyContainer container)
+        public static IServiceCollection RegisterSerialCommunication(this IServiceCollection container)
         {
             container
-                .RegisterTypesIncludingInternals(DependencyLivetime.Transient, typeof(Framework.Arduino.SerialCommunication.Serial).Assembly)
-                .RegisterType<IFactory<ISerialPort>, FactoryResolve<ISerialPort>>();
+                .RegisterTypesIncludingInternals(ServiceLifetime.Transient, typeof(Framework.Arduino.SerialCommunication.Serial).Assembly)
+                .AddTransient<IFactory<ISerialPort>, FactoryResolve<ISerialPort>>();
             return container;
         }
     }

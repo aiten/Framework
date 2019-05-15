@@ -14,18 +14,12 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.Dependency.Abstraction
-{
-    using System;
+using Microsoft.Extensions.DependencyInjection;
 
-    /// <summary>
-    /// Compare with IServiceScope (aspNetCore). 
-    /// </summary>
-    public interface IDependencyScope : IDisposable
+namespace Framework.Dependency
+{
+    public static class GlobalServiceCollection
     {
-        /// <summary>
-        /// Gets an instance of IDependencyResolver to resolve services (objects).
-        /// </summary>
-        IDependencyResolver Resolver { get; }
+        public static IServiceCollection Instance { get; set; }
     }
 }

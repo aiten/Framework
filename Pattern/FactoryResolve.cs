@@ -14,26 +14,27 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
+using Framework.Dependency;
+
+using Microsoft.Extensions.DependencyInjection;
+
 namespace Framework.Pattern
 {
-    using Dependency;
-    using Dependency.Abstraction;
-
     // Factory/Scope using Resolve of dependencyInjection
 
     public class FactoryResolve<T> : IFactory<T> where T : class
     {
-        private readonly IDependencyContainer _container;
+        private readonly IServiceCollection _container;
 
         public FactoryResolve()
         {
-            _container = Dependency.Container;
+            _container = GlobalServiceCollection.Instance;
         }
 
         public IScope<T> Create()
         {
-            var childContainer = _container.GetResolver().CreateScope();
-            return new ScopeResolve<T>(childContainer, childContainer.Resolver.Resolve<T>());
+            var childContainer = _container.BuildServiceProvider().CreateScope();
+            return new ScopeResolve<T>(childContainer, childContainer.ServiceProvider.GetService<T>());
         }
     }
 }

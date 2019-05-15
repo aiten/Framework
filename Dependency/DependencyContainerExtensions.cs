@@ -14,65 +14,16 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
+using Microsoft.Extensions.DependencyInjection;
+
 namespace Framework.Dependency
 {
     using System;
     using System.Linq;
     using System.Reflection;
 
-    using Abstraction;
-
     public static class DependencyContainerExtensions
     {
-        #region Instance
-
-        /// <summary>
-        /// Registers the given object for the interface. 
-        /// </summary>
-        /// <typeparam name="TInterface">Interface that can be later resolved.</typeparam>
-        /// <param name="container">Dependency container.</param>
-        /// <param name="obj">Object that should be returned for Resolve&lt;TInterface&gt;() calls.</param>
-        /// <returns>This instance.</returns>
-        public static IDependencyContainer RegisterInstance<TInterface>(this IDependencyContainer container, TInterface obj)
-        {
-            container.RegisterInstance(typeof(TInterface), obj);
-            return container;
-        }
-
-        #endregion
-
-        #region AllLifeTime
-
-        /// <summary>
-        /// Registers a type for the given interface.
-        /// </summary>
-        /// <param name="container">Dependency container.</param>
-        /// <typeparam name="TInterface">Interface that can be later resolved.</typeparam>
-        /// <typeparam name="TType">Type that implements interface. On Resolve&lt;TInterface&gt;() calls a new instance is returned every time.</typeparam>
-        /// <returns>This instance.</returns>
-        public static IDependencyContainer RegisterType<TInterface, TType>(this IDependencyContainer container, DependencyLivetime liveTime = DependencyLivetime.Transient) where TType : TInterface
-        {
-            container.RegisterType(typeof(TInterface), typeof(TType), liveTime);
-            return container;
-        }
-
-        /// <summary>
-        /// Registers a type for the given interface.
-        /// </summary>
-        /// <param name="container">Dependency container.</param>
-        /// <param name="liveTime">Optional lifetime.</param>
-        /// <returns>This instance.</returns>
-        /// <typeparam name="TType">Type that implements interface.</typeparam>
-        public static IDependencyContainer RegisterType<TType>(this IDependencyContainer container, DependencyLivetime liveTime = DependencyLivetime.Transient)
-        {
-            container.RegisterType(typeof(TType), typeof(TType), liveTime);
-            return container;
-        }
-
-        #endregion
-
-        #region Transient
-
         /// <summary>
         /// Registers public and internal types of the given assemblies with the unity container. This is necessary
         /// to workaround the internals visible to hacks in the code base.
@@ -82,7 +33,7 @@ namespace Framework.Dependency
         /// <param name="assemblies">List of assemblies in which all types should be registered with their interfaces. 
         /// This includes internal types. </param>
         /// <returns>This instance.</returns>
-        public static IDependencyContainer RegisterTypesIncludingInternals(this IDependencyContainer container, DependencyLivetime liveTime, params Assembly[] assemblies)
+        public static IServiceCollection RegisterTypesIncludingInternals(this IServiceCollection container, ServiceLifetime liveTime, params Assembly[] assemblies)
         {
             foreach (var assembly in assemblies)
             {
@@ -92,7 +43,7 @@ namespace Framework.Dependency
                     var    interfaceType = type.GetInterface(interfaceName);
                     if (interfaceType != null)
                     {
-                        container.RegisterType(interfaceType, type, liveTime);
+                        container.Add(new ServiceDescriptor(interfaceType, type, liveTime));
                     }
                 }
             }
@@ -100,7 +51,7 @@ namespace Framework.Dependency
             return container;
         }
 
-        public static IDependencyContainer RegisterTypesByName(this IDependencyContainer container, Func<string, bool> checkName, DependencyLivetime liveTime, params Assembly[] assemblies)
+        public static IServiceCollection RegisterTypesByName(this IServiceCollection container, Func<string, bool> checkName, ServiceLifetime liveTime, params Assembly[] assemblies)
         {
             foreach (var assembly in assemblies)
             {
@@ -108,7 +59,7 @@ namespace Framework.Dependency
                 {
                     if (checkName(type.Name))
                     {
-                        container.RegisterType(type, type, liveTime);
+                        container.Add(new ServiceDescriptor(type, type, liveTime));
                     }
                 }
             }
@@ -116,52 +67,23 @@ namespace Framework.Dependency
             return container;
         }
 
-        #endregion
-
-        #region Scope
-
-        /// <summary>
-        /// Registers a type for the given interface.
-        /// </summary>
-        /// <typeparam name="TInterface">Interface that can be later resolved.</typeparam>
-        /// <typeparam name="TType">Type that implements interface. On Resolve&lt;TInterface&gt;() calls a new instance is returned every time.</typeparam>
-        /// <param name="container">Dependency container.</param>
-        /// <returns>This instance.</returns>
-        public static IDependencyContainer RegisterTypeScoped<TInterface, TType>(this IDependencyContainer container) where TType : TInterface
-        {
-            container.RegisterType(typeof(TInterface), typeof(TType), DependencyLivetime.Scoped);
-            return container;
-        }
-
-        /// <summary>
-        /// Registers a type for the given interface.
-        /// </summary>
-        /// <param name="container">Dependency container.</param>
-        /// <returns>This instance.</returns>
-        /// <typeparam name="TType">Type that implements interface.</typeparam>
-        public static IDependencyContainer RegisterTypeScoped<TType>(this IDependencyContainer container)
-        {
-            container.RegisterType(typeof(TType), typeof(TType), DependencyLivetime.Scoped);
-            return container;
-        }
-
-        #endregion
-
+/*
         /// <summary>
         /// Resolves the interface to a specific type that was registered earlier. 
         /// </summary>
         /// <param name="container">Dependency container.</param>
         /// <typeparam name="TInterface">Interface for which the registered type is looked up.</typeparam>
         /// <returns>An instance of the interface that was registered with the container earlier.</returns>
-        public static TInterface Resolve<TInterface>(this IDependencyContainer container)
+        public static TInterface Resolve<TInterface>(this IServiceCollection container)
         {
             object obj = container.GetResolver().Resolve(typeof(TInterface));
             return (TInterface)obj;
         }
 
-        public static TInterface Resolve<TInterface>(this IDependencyResolver resolver)
+        public static TInterface Resolve<TInterface>(this IServiceCollection resolver)
         {
             return (TInterface)resolver.Resolve(typeof(TInterface));
         }
+*/
     }
 }

@@ -18,14 +18,13 @@ namespace Framework.Tools
 {
     using Abstraction;
 
-    using Dependency;
-    using Dependency.Abstraction;
+    using Microsoft.Extensions.DependencyInjection;
 
     public static class LiveDependencyRegisterExtensions
     {
-        public static IDependencyContainer RegisterFrameWorkTools(this IDependencyContainer container)
+        public static IServiceCollection RegisterFrameWorkTools(this IServiceCollection container)
         {
-            container.RegisterType<ICurrentDateTime, CurrentDateTime>();
+            container.AddTransient<ICurrentDateTime, CurrentDateTime>();
 
             return container;
         }

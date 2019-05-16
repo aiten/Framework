@@ -14,23 +14,27 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-using Framework.Arduino.SerialCommunication.Abstraction;
-using Framework.Pattern;
+using System.Net.Http;
+using System.Net.Http.Headers;
 
-using Microsoft.Extensions.DependencyInjection;
-
-namespace Framework.Arduino.SerialCommunication
+namespace Framework.Service.WebAPI
 {
-    using Dependency;
-
-    public static class LiveServicCollectionExtensions
+    public static class HttpClientHelper
     {
-        public static IServiceCollection AddSerialCommunication(this IServiceCollection services)
+        public static void PrepareHttpClient(HttpClient httpClient, string baseUri)
         {
-            services
-                .AddAssembylIncludingInternals(ServiceLifetime.Transient, typeof(Framework.Arduino.SerialCommunication.Serial).Assembly)
-                .AddTransient<IFactory<ISerialPort>, FactoryResolve<ISerialPort>>();
-            return services;
+            httpClient.BaseAddress = new System.Uri(baseUri);
+            httpClient.DefaultRequestHeaders.Accept.Clear();
+            httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+        }
+
+        public static HttpClientHandler CreateHttpClientHandlerIgnoreSSLCertificatesError()
+        {
+            return new HttpClientHandler
+            {
+                ClientCertificateOptions                  = ClientCertificateOption.Manual,
+                ServerCertificateCustomValidationCallback = (httpRequestMessage, cert, cetChain, policyErrors) => { return true; }
+            };
         }
     }
 }

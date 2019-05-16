@@ -25,15 +25,15 @@ namespace Framework.Dependency
     public static class ServiceCollectionExtensions
     {
         /// <summary>
-        /// Registers public and internal types of the given assemblies with the unity container. This is necessary
+        /// Registers public and internal types of the given assemblies with the unity services. This is necessary
         /// to workaround the internals visible to hacks in the code base.
         /// </summary>
-        /// <param name="container">Dependency container.</param>
+        /// <param name="services">Dependency services.</param>
         /// <param name="liveTime"></param>
         /// <param name="assemblies">List of assemblies in which all types should be registered with their interfaces. 
         /// This includes internal types. </param>
         /// <returns>This instance.</returns>
-        public static IServiceCollection AddAssembylIncludingInternals(this IServiceCollection container, ServiceLifetime liveTime, params Assembly[] assemblies)
+        public static IServiceCollection AddAssembylIncludingInternals(this IServiceCollection services, ServiceLifetime liveTime, params Assembly[] assemblies)
         {
             foreach (var assembly in assemblies)
             {
@@ -43,15 +43,15 @@ namespace Framework.Dependency
                     var    interfaceType = type.GetInterface(interfaceName);
                     if (interfaceType != null)
                     {
-                        container.Add(new ServiceDescriptor(interfaceType, type, liveTime));
+                        services.Add(new ServiceDescriptor(interfaceType, type, liveTime));
                     }
                 }
             }
 
-            return container;
+            return services;
         }
 
-        public static IServiceCollection AddAssemblyByName(this IServiceCollection container, Func<string, bool> checkName, ServiceLifetime liveTime, params Assembly[] assemblies)
+        public static IServiceCollection AddAssemblyByName(this IServiceCollection services, Func<string, bool> checkName, ServiceLifetime liveTime, params Assembly[] assemblies)
         {
             foreach (var assembly in assemblies)
             {
@@ -59,17 +59,17 @@ namespace Framework.Dependency
                 {
                     if (checkName(type.Name))
                     {
-                        container.Add(new ServiceDescriptor(type, type, liveTime));
+                        services.Add(new ServiceDescriptor(type, type, liveTime));
                     }
                 }
             }
 
-            return container;
+            return services;
         }
 
-        public static TInterface Resolve<TInterface>(this IServiceCollection container)
+        public static TInterface Resolve<TInterface>(this IServiceCollection services)
         {
-            return (TInterface)container.BuildServiceProvider().GetService(typeof(TInterface));
+            return (TInterface)services.BuildServiceProvider().GetService(typeof(TInterface));
         }
     }
 }

@@ -25,6 +25,11 @@ namespace Framework.Service.WebAPI
     {
         protected abstract TKey GetKey(T value);
 
+        protected CRUDServiceBase(HttpClient httpClient) : base(httpClient)
+        {
+
+        }
+
         public async Task<T> Get(TKey id)
         {
             var client = GetHttpClient();

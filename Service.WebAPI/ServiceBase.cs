@@ -25,14 +25,18 @@ namespace Framework.Service.WebAPI
 {
     public class ServiceBase : DisposeWrapper
     {
-        public string BaseUri { get; set; }
-
         public string BaseApi { get; set; }
+
+        private HttpClient _httpClient;
+
+        protected ServiceBase(HttpClient httpClient)
+        {
+            _httpClient = httpClient;
+        }
 
         protected virtual HttpClient GetHttpClient()
         {
-            var httpClient = HttpClientFactory.Instance.GetHttpClient(BaseUri);
-            return httpClient;
+            return _httpClient;
         }
 
         public async Task<IList<T>> ReadList<T>(string uri)

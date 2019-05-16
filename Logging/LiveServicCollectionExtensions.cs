@@ -22,12 +22,12 @@ namespace Framework.Logging
 
     public static class LiveServicCollectionExtensions
     {
-        public static IServiceCollection AddFrameworkLogging(this IServiceCollection container)
+        public static IServiceCollection AddFrameworkLogging(this IServiceCollection services)
         {
-            container.AddTransient<ILoggerFactory, LoggerFactory>();
-            container.AddTransient(typeof(ILogger<>), typeof(Logger<>));
+            services.AddTransient<ILoggerFactory, LoggerFactory>();
+            services.AddTransient(typeof(ILogger<>), typeof(Logger<>));
 
-            return container;
+            return services;
         }
     }
 }

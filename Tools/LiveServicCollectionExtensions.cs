@@ -22,11 +22,11 @@ namespace Framework.Tools
 
     public static class LiveServicCollectionExtensions
     {
-        public static IServiceCollection AddFrameWorkTools(this IServiceCollection container)
+        public static IServiceCollection AddFrameWorkTools(this IServiceCollection services)
         {
-            container.AddTransient<ICurrentDateTime, CurrentDateTime>();
+            services.AddTransient<ICurrentDateTime, CurrentDateTime>();
 
-            return container;
+            return services;
         }
     }
 }

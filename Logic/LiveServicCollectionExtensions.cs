@@ -22,14 +22,14 @@ namespace Framework.Mapper
 
     public static class LiveServicCollectionExtensions
     {
-        public static IServiceCollection AddMapper(this IServiceCollection container, MapperConfiguration mapperConfiguration)
+        public static IServiceCollection AddMapper(this IServiceCollection services, MapperConfiguration mapperConfiguration)
         {
             mapperConfiguration.AssertConfigurationIsValid();
 
             IMapper mapper = mapperConfiguration.CreateMapper();
-            container.AddSingleton(mapper);
+            services.AddSingleton(mapper);
 
-            return container;
+            return services;
         }
     }
 }

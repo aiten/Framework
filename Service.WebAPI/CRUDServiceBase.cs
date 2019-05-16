@@ -19,8 +19,6 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
 
-using Framework.Service.WebAPI.Uri;
-
 namespace Framework.Service.WebAPI
 {
     public abstract class CRUDServiceBase<T, TKey> : ServiceBase where T : class where TKey : IComparable

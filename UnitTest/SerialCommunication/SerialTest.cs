@@ -25,7 +25,6 @@ namespace Framework.UnitTest.SerialCommunication
 
     using Framework.Arduino.SerialCommunication;
     using Framework.Arduino.SerialCommunication.Abstraction;
-    using Framework.Dependency;
     using Framework.Logging;
     using Framework.Logging.Abstraction;
     using Framework.Pattern;

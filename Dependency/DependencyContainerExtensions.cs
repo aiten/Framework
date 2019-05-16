@@ -67,23 +67,9 @@ namespace Framework.Dependency
             return container;
         }
 
-/*
-        /// <summary>
-        /// Resolves the interface to a specific type that was registered earlier. 
-        /// </summary>
-        /// <param name="container">Dependency container.</param>
-        /// <typeparam name="TInterface">Interface for which the registered type is looked up.</typeparam>
-        /// <returns>An instance of the interface that was registered with the container earlier.</returns>
         public static TInterface Resolve<TInterface>(this IServiceCollection container)
         {
-            object obj = container.GetResolver().Resolve(typeof(TInterface));
-            return (TInterface)obj;
+            return (TInterface)container.BuildServiceProvider().GetService(typeof(TInterface));
         }
-
-        public static TInterface Resolve<TInterface>(this IServiceCollection resolver)
-        {
-            return (TInterface)resolver.Resolve(typeof(TInterface));
-        }
-*/
     }
 }

@@ -31,7 +31,7 @@ namespace Framework.WebAPI.Filter
         {
             var logger    = CreateLogger(exceptionContext);
             var exception = exceptionContext.Exception;
-            logger.LogError(exception.Message, exception);
+            logger.LogError(exception, exception.Message);
 
             return new ExceptionResponse(HttpStatusCode.InternalServerError, exception);
         }

@@ -16,18 +16,16 @@
 
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Framework.Mapper
+namespace Framework.Logging
 {
-    using AutoMapper;
+    using Abstraction;
 
-    public static class LiveDependencyRegisterExtensions
+    public static class LiveServicCollectionExtensions
     {
-        public static IServiceCollection RegisterMapper(this IServiceCollection container, MapperConfiguration mapperConfiguration)
+        public static IServiceCollection AddFrameworkLogging(this IServiceCollection container)
         {
-            mapperConfiguration.AssertConfigurationIsValid();
-
-            IMapper mapper = mapperConfiguration.CreateMapper();
-            container.AddSingleton(mapper);
+            container.AddTransient<ILoggerFactory, LoggerFactory>();
+            container.AddTransient(typeof(ILogger<>), typeof(Logger<>));
 
             return container;
         }

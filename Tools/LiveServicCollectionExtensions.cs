@@ -14,18 +14,17 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-using Microsoft.Extensions.DependencyInjection;
-
-namespace Framework.Logging
+namespace Framework.Tools
 {
     using Abstraction;
 
-    public static class LiveDependencyRegisterExtensions
+    using Microsoft.Extensions.DependencyInjection;
+
+    public static class LiveServicCollectionExtensions
     {
-        public static IServiceCollection RegisterFrameWorkLogging(this IServiceCollection container)
+        public static IServiceCollection AddFrameWorkTools(this IServiceCollection container)
         {
-            container.AddTransient<ILoggerFactory, LoggerFactory>();
-            container.AddTransient(typeof(ILogger<>), typeof(Logger<>));
+            container.AddTransient<ICurrentDateTime, CurrentDateTime>();
 
             return container;
         }

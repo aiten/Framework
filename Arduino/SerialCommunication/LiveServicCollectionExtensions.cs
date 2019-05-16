@@ -23,9 +23,9 @@ namespace Framework.Arduino.SerialCommunication
 {
     using Dependency;
 
-    public static class LiveDependencyRegisterExtensions
+    public static class LiveServicCollectionExtensions
     {
-        public static IServiceCollection RegisterSerialCommunication(this IServiceCollection container)
+        public static IServiceCollection AddSerialCommunication(this IServiceCollection container)
         {
             container
                 .AddAssembylIncludingInternals(ServiceLifetime.Transient, typeof(Framework.Arduino.SerialCommunication.Serial).Assembly)

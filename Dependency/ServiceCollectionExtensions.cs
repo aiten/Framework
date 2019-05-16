@@ -22,7 +22,7 @@ namespace Framework.Dependency
     using System.Linq;
     using System.Reflection;
 
-    public static class DependencyContainerExtensions
+    public static class ServiceCollectionExtensions
     {
         /// <summary>
         /// Registers public and internal types of the given assemblies with the unity container. This is necessary
@@ -33,7 +33,7 @@ namespace Framework.Dependency
         /// <param name="assemblies">List of assemblies in which all types should be registered with their interfaces. 
         /// This includes internal types. </param>
         /// <returns>This instance.</returns>
-        public static IServiceCollection RegisterTypesIncludingInternals(this IServiceCollection container, ServiceLifetime liveTime, params Assembly[] assemblies)
+        public static IServiceCollection AddAssembylIncludingInternals(this IServiceCollection container, ServiceLifetime liveTime, params Assembly[] assemblies)
         {
             foreach (var assembly in assemblies)
             {
@@ -51,7 +51,7 @@ namespace Framework.Dependency
             return container;
         }
 
-        public static IServiceCollection RegisterTypesByName(this IServiceCollection container, Func<string, bool> checkName, ServiceLifetime liveTime, params Assembly[] assemblies)
+        public static IServiceCollection AddAssemblyByName(this IServiceCollection container, Func<string, bool> checkName, ServiceLifetime liveTime, params Assembly[] assemblies)
         {
             foreach (var assembly in assemblies)
             {

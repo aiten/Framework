@@ -28,7 +28,7 @@ namespace Framework.Arduino.SerialCommunication
         public static IServiceCollection RegisterSerialCommunication(this IServiceCollection container)
         {
             container
-                .RegisterTypesIncludingInternals(ServiceLifetime.Transient, typeof(Framework.Arduino.SerialCommunication.Serial).Assembly)
+                .AddAssembylIncludingInternals(ServiceLifetime.Transient, typeof(Framework.Arduino.SerialCommunication.Serial).Assembly)
                 .AddTransient<IFactory<ISerialPort>, FactoryResolve<ISerialPort>>();
             return container;
         }

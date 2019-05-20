@@ -10,4 +10,7 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="5.0.0-rc2" />
     <PackageReference Include="System.Text.RegularExpressions" Version="4.3.1" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\WinAPI\WinAPI.csproj" />
+  </ItemGroup>
 </Project>

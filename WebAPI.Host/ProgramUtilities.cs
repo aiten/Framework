@@ -20,7 +20,7 @@ using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.ServiceProcess;
-
+using Framework.WinAPI;
 using Microsoft.AspNetCore.Hosting;
 
 using NLog;
@@ -56,7 +56,7 @@ namespace Framework.WebAPI.Host
                     return false;
                 }
 
-                return CheckForConsoleWindow() && IsUnderWindowsServiceManager();
+                return WinAPIWrapper.CheckForConsoleWindow() && IsUnderWindowsServiceManager();
             }
 
             return false; // never can be a windows service
@@ -86,14 +86,6 @@ namespace Framework.WebAPI.Host
             var currentProcess = Process.GetCurrentProcess();
             var parentProcess = currentProcess.Parent();
             return (parentProcess != null && parentProcess.ProcessName == @"services");
-        }
-
-        [DllImport("kernel32.dll")]
-        private static extern IntPtr GetConsoleWindow();
-
-        private static bool CheckForConsoleWindow()
-        {
-            return GetConsoleWindow() == IntPtr.Zero;
         }
     }
 }

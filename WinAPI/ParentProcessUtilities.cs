@@ -19,7 +19,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 
-namespace Framework.WebAPI.Host
+namespace Framework.WinAPI
 {
     public static class ParentProcessUtilities
     {

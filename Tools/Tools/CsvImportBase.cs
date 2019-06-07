@@ -122,6 +122,16 @@ namespace Framework.Tools.Tools
             return int.Parse(excelField);
         }
 
+        public long ExcelLong(string excelField)
+        {
+            return long.Parse(excelField);
+        }
+
+        public float ExcelFloat(string excelField)
+        {
+            return float.Parse(excelField);
+        }
+
         public byte ExcelByte(string excelField)
         {
             return byte.Parse(excelField);

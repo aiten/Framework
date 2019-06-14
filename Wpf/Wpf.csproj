@@ -8,6 +8,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Prism.Core" Version="7.2.0.1233-pre" />
+    <PackageReference Include="Prism.Core" Version="7.2.0.1347-pre" />
   </ItemGroup>
 </Project>

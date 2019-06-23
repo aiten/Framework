@@ -45,32 +45,19 @@ namespace Framework.Repository
 
         public async Task<int> ExecuteSqlCommand(string sql)
         {
-            return await Context.Database.ExecuteSqlCommandAsync(sql);
+            return await Context.Database.ExecuteSqlRawAsync(sql);
         }
 
         public async Task<int> ExecuteSqlCommand(string sql, params object[] parameters)
         {
-            return await Context.Database.ExecuteSqlCommandAsync(sql, parameters);
+            return await Context.Database.ExecuteSqlRawAsync(sql, parameters);
         }
 
         #region Transaction
 
-        public bool IsInTransaction { get; private set; }
-
         public ITransaction BeginTransaction()
         {
-            if (IsInTransaction)
-            {
-                throw new ArgumentException();
-            }
-
-            IsInTransaction = true;
             return new Transaction(this, Context.Database.BeginTransaction());
-        }
-
-        public void FinishTransaction(ITransaction trans)
-        {
-            IsInTransaction = false;
         }
 
         #endregion

@@ -55,8 +55,18 @@ namespace Framework.Repository
 
         #region Transaction
 
+        public bool IsInTransaction()
+        {
+            return Context.Database.CurrentTransaction != null;
+        }
+
         public ITransaction BeginTransaction()
         {
+            if (IsInTransaction())
+            {
+                throw new NotSupportedException(@"Nested transaction are not supported");
+            }
+
             return new Transaction(this, Context.Database.BeginTransaction());
         }
 

@@ -14,22 +14,12 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.Dependency.Abstraction
+using Microsoft.Extensions.DependencyInjection;
+
+namespace Framework.Dependency
 {
-    using System;
-
-    /// <summary>
-    /// Inversion of Control container, which enables Dependency Injection. 
-    /// </summary>
-    public interface IDependencyResolver
+    public static class GlobalServiceCollection
     {
-        /// <summary>
-        /// Resolve an instance of the default requested type from the container. 
-        /// </summary>
-        /// <param name="t">Type for which a specific instance should be resolved.</param>
-        /// <returns>An object that implements type t.</returns>
-        object Resolve(Type t);
-
-        IDependencyScope CreateScope();
+        public static IServiceCollection Instance { get; set; }
     }
 }

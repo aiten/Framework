@@ -94,6 +94,10 @@ namespace Framework.Tools.Tools
                 {
                     pi.SetValue(obj, ExcelInt(valueAsString));
                 }
+                else if (pi.PropertyType == typeof(long))
+                {
+                    pi.SetValue(obj, ExcelLong(valueAsString));
+                }
                 else if (pi.PropertyType == typeof(short))
                 {
                     pi.SetValue(obj, ExcelShort(valueAsString));
@@ -125,6 +129,10 @@ namespace Framework.Tools.Tools
                 else if (pi.PropertyType == typeof(int?))
                 {
                     pi.SetValue(obj, string.IsNullOrEmpty(valueAsString) ? (int?)null : ExcelInt(valueAsString));
+                }
+                else if (pi.PropertyType == typeof(long?))
+                {
+                    pi.SetValue(obj, string.IsNullOrEmpty(valueAsString) ? (long?)null : ExcelLong(valueAsString));
                 }
                 else if (pi.PropertyType == typeof(short?))
                 {

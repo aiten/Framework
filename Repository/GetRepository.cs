@@ -46,29 +46,44 @@ namespace Framework.Repository
 
         #region Get
 
+        protected async Task<IList<TEntity>> GetAll(IQueryable<TEntity> query)
+        {
+            return await query.ToListAsync();
+        }
+
+        protected async Task<TEntity> Get(IQueryable<TEntity> query, TKey key)
+        {
+            return await AddPrimaryWhere(query, key).FirstOrDefaultAsync();
+        }
+
+        protected async Task<IList<TEntity>> Get(IQueryable<TEntity> query, IEnumerable<TKey> keys)
+        {
+            return await AddPrimaryWhereIn(query, keys).ToListAsync();
+        }
+
         public async Task<IList<TEntity>> GetAll()
         {
-            return await AddInclude(QueryWithOptional).ToListAsync();
+            return await GetAll(AddInclude(QueryWithOptional));
         }
 
         public async Task<TEntity> Get(TKey key)
         {
-            return await AddPrimaryWhere(QueryWithInclude, key).FirstOrDefaultAsync();
+            return await Get(QueryWithInclude, key);
         }
 
         public async Task<IList<TEntity>> Get(IEnumerable<TKey> keys)
         {
-            return await AddPrimaryWhereIn(QueryWithInclude, keys).ToListAsync();
+            return await Get(QueryWithInclude, keys);
         }
 
         public async Task<TEntity> GetTracking(TKey key)
         {
-            return await AddPrimaryWhere(TrackingQueryWithInclude, key).FirstOrDefaultAsync();
+            return await Get(TrackingQueryWithInclude, key);
         }
 
         public async Task<IList<TEntity>> GetTracking(IEnumerable<TKey> keys)
         {
-            return await AddPrimaryWhereIn(TrackingQueryWithInclude, keys).ToListAsync();
+            return await Get(TrackingQueryWithInclude, keys);
         }
 
         #endregion

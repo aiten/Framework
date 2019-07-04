@@ -14,23 +14,22 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
+using Microsoft.Extensions.DependencyInjection;
+
 namespace Framework.Pattern
 {
     using System;
-
-    using Dependency;
-    using Dependency.Abstraction;
 
     // Factory/Scope using Resolve of dependencyInjection
 
     public sealed class ScopeResolve<T> : IScope<T>, IDisposable where T : class
     {
-        private readonly IDependencyScope _scope;
+        private readonly IServiceScope    _scope;
         private readonly T                _instance;
 
         private bool _isDisposed;
 
-        public ScopeResolve(IDependencyScope scope, T instance)
+        public ScopeResolve(IServiceScope scope, T instance)
         {
             _scope    = scope;
             _instance = instance;

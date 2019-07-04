@@ -14,19 +14,40 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.Dependency.Abstraction
+using System;
+using System.ServiceProcess;
+
+using Microsoft.AspNetCore.Hosting;
+
+using NLog;
+
+namespace Framework.WebAPI.Host
 {
-    /// <summary>
-    /// Provides an IDependencyContainer implementation. 
-    /// </summary>
-    public interface IDependencyProvider
+    public class WebAPiService : ServiceBase
     {
-        /// <summary>
-        /// Gets an instance of an IDependencyContainer. 
-        /// In live this is always a singleton for the whole application. 
-        /// In unit tests this may be a TaskLocal container which allows tests
-        /// to run parallel without interfering with each other.
-        /// </summary>
-        IDependencyContainer Container { get; }
+        private IWebHost _webHost;
+        private ILogger  _logger = LogManager.GetCurrentClassLogger();
+
+        public Func<string[], IWebHostBuilder> WebHostBuilder { get; set; }
+
+        protected override void OnStart(string[] args)
+        {
+            try
+            {
+                _webHost = WebHostBuilder(args).Build();
+                _webHost.Start();
+            }
+            catch (Exception e)
+            {
+                _logger.Fatal(e);
+                throw;
+            }
+        }
+
+        protected override void OnStop()
+        {
+            LogManager.Shutdown();
+            _webHost.Dispose();
+        }
     }
 }

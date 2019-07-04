@@ -21,6 +21,8 @@ namespace Framework.WinAPI
 
     public class WinAPIWrapper
     {
+        #region Thread
+
         [Flags]
         public enum EXECUTION_STATE : uint
         {
@@ -57,5 +59,19 @@ namespace Framework.WinAPI
         {
             OsSetThreadExecutionState(EXECUTION_STATE.ES_NONE);
         }
+
+        #endregion
+
+        #region Console Window
+
+        [DllImport("kernel32.dll")]
+        private static extern IntPtr GetConsoleWindow();
+
+        public static bool CheckForConsoleWindow()
+        {
+            return GetConsoleWindow() == IntPtr.Zero;
+        }
+
+        #endregion
     }
 }

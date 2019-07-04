@@ -14,18 +14,27 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.Dependency.Abstraction
-{
-    using System;
+using System.Net.Http;
+using System.Net.Http.Headers;
 
-    /// <summary>
-    /// Compare with IServiceScope (aspNetCore). 
-    /// </summary>
-    public interface IDependencyScope : IDisposable
+namespace Framework.Service.WebAPI
+{
+    public static class HttpClientHelper
     {
-        /// <summary>
-        /// Gets an instance of IDependencyResolver to resolve services (objects).
-        /// </summary>
-        IDependencyResolver Resolver { get; }
+        public static void PrepareHttpClient(HttpClient httpClient, string baseUri)
+        {
+            httpClient.BaseAddress = new System.Uri(baseUri);
+            httpClient.DefaultRequestHeaders.Accept.Clear();
+            httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+        }
+
+        public static HttpClientHandler CreateHttpClientHandlerIgnoreSSLCertificatesError()
+        {
+            return new HttpClientHandler
+            {
+                ClientCertificateOptions                  = ClientCertificateOption.Manual,
+                ServerCertificateCustomValidationCallback = (httpRequestMessage, cert, cetChain, policyErrors) => { return true; }
+            };
+        }
     }
 }

@@ -14,12 +14,11 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-
 namespace Framework.WebAPI.Controller
 {
     using System;
     using System.Collections.Generic;
+    using System.IO;
     using System.Linq;
     using System.Threading.Tasks;
 
@@ -212,6 +211,46 @@ namespace Framework.WebAPI.Controller
         {
             await manager.Delete(ids);
             return controller.NoContent();
+        }
+
+        #endregion
+
+        #region Upload/Download
+
+        public static async Task<IActionResult> GetFile(this Controller controller, string fileName, MemoryStream memoryStream)
+        {
+            memoryStream.Position = 0;
+
+            var path = Path.Combine(
+                Directory.GetCurrentDirectory(),
+                "wwwroot", fileName);
+
+            return controller.File(memoryStream, controller.GetContentType(path), Path.GetFileName(path));
+        }
+
+        public static string GetContentType(this Controller controller, string path)
+        {
+            var types = controller.GetMimeTypes();
+            var ext = Path.GetExtension(path).ToLowerInvariant();
+            return types[ext];
+        }
+
+        public static Dictionary<string, string> GetMimeTypes(this Controller controller)
+        {
+            return new Dictionary<string, string>
+            {
+                {".txt", "text/plain"},
+                {".pdf", "application/pdf"},
+                {".doc", "application/vnd.ms-word"},
+                {".docx", "application/vnd.ms-word"},
+                {".xls", "application/vnd.ms-excel"},
+                {".xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"},
+                {".png", "image/png"},
+                {".jpg", "image/jpeg"},
+                {".jpeg", "image/jpeg"},
+                {".gif", "image/gif"},
+                {".csv", "text/csv"}
+            };
         }
 
         #endregion

@@ -14,41 +14,23 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.Dependency
+using Framework.Arduino.SerialCommunication.Abstraction;
+using Framework.Pattern;
+
+using Microsoft.Extensions.DependencyInjection;
+
+namespace Framework.Arduino.SerialCommunication
 {
-    using System;
+    using Dependency;
 
-    using Abstraction;
-
-    using Microsoft.Extensions.DependencyInjection;
-
-    /// <summary>
-    /// Dependency container for use in Live. Throws an exception when a Type cannot be resolved.
-    /// </summary>
-    public class MsDependencyResolver : IDependencyResolver
+    public static class LiveServicCollectionExtensions
     {
-        private readonly IServiceProvider _serviceProvider;
-
-        public MsDependencyResolver(IServiceProvider serviceProvider)
+        public static IServiceCollection AddSerialCommunication(this IServiceCollection services)
         {
-            _serviceProvider = serviceProvider;
-        }
-
-        public IDependencyScope CreateScope()
-        {
-            return new MsDependencyScope(_serviceProvider.CreateScope());
-        }
-
-        public virtual object Resolve(Type t)
-        {
-            try
-            {
-                return _serviceProvider.GetService(t);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Resolution for {t.FullName} failed", ex);
-            }
+            services
+                .AddAssembylIncludingInternals(ServiceLifetime.Transient, typeof(Framework.Arduino.SerialCommunication.Serial).Assembly)
+                .AddTransient<IFactory<ISerialPort>, FactoryResolve<ISerialPort>>();
+            return services;
         }
     }
 }

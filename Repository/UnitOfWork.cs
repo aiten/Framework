@@ -45,32 +45,29 @@ namespace Framework.Repository
 
         public async Task<int> ExecuteSqlCommand(string sql)
         {
-            return await Context.Database.ExecuteSqlCommandAsync(sql);
+            return await Context.Database.ExecuteSqlRawAsync(sql);
         }
 
         public async Task<int> ExecuteSqlCommand(string sql, params object[] parameters)
         {
-            return await Context.Database.ExecuteSqlCommandAsync(sql, parameters);
+            return await Context.Database.ExecuteSqlRawAsync(sql, parameters);
         }
 
         #region Transaction
 
-        public bool IsInTransaction { get; private set; }
+        public bool IsInTransaction()
+        {
+            return Context.Database.CurrentTransaction != null;
+        }
 
         public ITransaction BeginTransaction()
         {
-            if (IsInTransaction)
+            if (IsInTransaction())
             {
-                throw new ArgumentException();
+                throw new NotSupportedException(@"Nested transaction are not supported");
             }
 
-            IsInTransaction = true;
             return new Transaction(this, Context.Database.BeginTransaction());
-        }
-
-        public void FinishTransaction(ITransaction trans)
-        {
-            IsInTransaction = false;
         }
 
         #endregion

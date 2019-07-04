@@ -14,20 +14,22 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.Tools
+using Microsoft.Extensions.DependencyInjection;
+
+namespace Framework.Mapper
 {
-    using Abstraction;
+    using AutoMapper;
 
-    using Dependency;
-    using Dependency.Abstraction;
-
-    public static class LiveDependencyRegisterExtensions
+    public static class LiveServicCollectionExtensions
     {
-        public static IDependencyContainer RegisterFrameWorkTools(this IDependencyContainer container)
+        public static IServiceCollection AddMapper(this IServiceCollection services, MapperConfiguration mapperConfiguration)
         {
-            container.RegisterType<ICurrentDateTime, CurrentDateTime>();
+            mapperConfiguration.AssertConfigurationIsValid();
 
-            return container;
+            IMapper mapper = mapperConfiguration.CreateMapper();
+            services.AddSingleton(mapper);
+
+            return services;
         }
     }
 }

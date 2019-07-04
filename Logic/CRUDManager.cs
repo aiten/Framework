@@ -57,18 +57,9 @@ namespace Framework.Logic
                     AddEntity(entity);
                 }
 
-                try
-                {
-                    _repository.AddRange(entities);
-                    await trans.CommitTransactionAsync();
-                }
-                catch (Exception)
-                {
-                    // Console.WriteLine(e);
-                    throw;
-                }
+                _repository.AddRange(entities);
 
-                await Modified();
+                await CommitTransaction(trans);
 
                 return entities.Select(GetKey);
             }
@@ -91,17 +82,9 @@ namespace Framework.Logic
                     DeleteEntity(entity);
                 }
 
-                try
-                {
-                    _repository.DeleteRange(entities);
-                    await trans.CommitTransactionAsync();
-                }
-                catch (Exception)
-                {
-                    // for debugging
-                    // Console.WriteLine(e);
-                    throw;
-                }
+                _repository.DeleteRange(entities);
+
+                await CommitTransaction(trans);
             }
         }
 
@@ -122,8 +105,8 @@ namespace Framework.Logic
                 }
 
                 _repository.DeleteRange(entities);
-                await trans.CommitTransactionAsync();
-                await Modified();
+
+                await CommitTransaction(trans);
             }
         }
 
@@ -154,16 +137,22 @@ namespace Framework.Logic
                     UpdateEntity(merged.EntityInDb, merged.Entity);
                 }
 
-                try
-                {
-                    await trans.CommitTransactionAsync();
-                    await Modified();
-                }
-                catch (Exception)
-                {
-                    // Console.WriteLine(e);
-                    throw;
-                }
+                await CommitTransaction(trans);
+            }
+        }
+
+        protected async Task CommitTransaction(ITransaction trans)
+        {
+            try
+            {
+                await Modifying();
+                await trans.CommitTransactionAsync();
+                await Modified();
+            }
+            catch (Exception)
+            {
+                // Console.WriteLine(e);
+                throw;
             }
         }
 
@@ -202,6 +191,9 @@ namespace Framework.Logic
             _repository.SetValueGraph(entityInDb, values);
         }
 
+        protected virtual async Task Modifying()
+        {
+        }
         protected virtual async Task Modified()
         {
         }

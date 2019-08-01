@@ -14,6 +14,8 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
+using NLog;
+
 namespace Framework.UnitTest.SerialCommunication
 {
     using System.IO;
@@ -25,9 +27,9 @@ namespace Framework.UnitTest.SerialCommunication
 
     using Framework.Arduino.SerialCommunication;
     using Framework.Arduino.SerialCommunication.Abstraction;
-    using Framework.Logging;
-    using Framework.Logging.Abstraction;
     using Framework.Pattern;
+
+    using Microsoft.Extensions.Logging;
 
     using NSubstitute;
 
@@ -97,7 +99,7 @@ namespace Framework.UnitTest.SerialCommunication
 
         private ILogger<Serial> CreateLogger()
         {
-            return new Logger<Serial>();
+            return LogManager.CreateNullLogger() as ILogger<Serial>;
         }
 
         [Fact]

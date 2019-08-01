@@ -16,13 +16,12 @@
 
 using Framework.Arduino.SerialCommunication.Abstraction;
 using Framework.Pattern;
+using Framework.Dependency;
 
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Framework.Arduino.SerialCommunication
 {
-    using Dependency;
-
     public static class LiveServicCollectionExtensions
     {
         public static IServiceCollection AddSerialCommunication(this IServiceCollection services)

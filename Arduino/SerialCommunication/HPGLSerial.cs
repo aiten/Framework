@@ -14,16 +14,16 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
+using System;
+using System.Collections.Generic;
+
+using Framework.Pattern;
+using Framework.Arduino.SerialCommunication.Abstraction;
+
+using Microsoft.Extensions.Logging;
+
 namespace Framework.Arduino.SerialCommunication
 {
-    using System;
-    using System.Collections.Generic;
-
-    using Framework.Pattern;
-    using Framework.Arduino.SerialCommunication.Abstraction;
-
-    using Logging.Abstraction;
-
     public class HPGLSerial : Serial
     {
         readonly int maxMessageLength = 128;

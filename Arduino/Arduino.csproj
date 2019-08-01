@@ -3,10 +3,10 @@
     <TargetFramework>$(TargetFrameworkForProjects)</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="System.IO.Ports" Version="4.6.0-preview6.19303.8" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="3.0.0-preview7.19362.4" />
+    <PackageReference Include="System.IO.Ports" Version="4.6.0-preview7.19362.9" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Logging\Logging.csproj" />
     <ProjectReference Include="..\Pattern\Pattern.csproj" />
     <ProjectReference Include="..\WinAPI\WinAPI.csproj" />
   </ItemGroup>

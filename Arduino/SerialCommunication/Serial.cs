@@ -14,24 +14,24 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Diagnostics;
+
+using Framework.Arduino.SerialCommunication.Abstraction;
+
+using Microsoft.Extensions.Logging;
+
+using Framework.WinAPI;
+using Framework.Pattern;
+
 namespace Framework.Arduino.SerialCommunication
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
-    using System.IO;
-    using System.Threading;
-    using System.Threading.Tasks;
-    using System.Diagnostics;
-
-    using Arduino.SerialCommunication.Abstraction;
-
-    using Logging.Abstraction;
-
-    using WinAPI;
-    using Framework.Pattern;
-
     public class Serial : ISerial
     {
         #region Private Members
@@ -51,7 +51,7 @@ namespace Framework.Arduino.SerialCommunication
 
         public Serial(IFactory<ISerialPort> serialPortFactory, ILogger<Serial> logger)
         {
-            Logger = logger;
+            Logger             = logger;
             _serialPortFactory = serialPortFactory ?? throw new ArgumentException();
         }
 
@@ -133,7 +133,7 @@ namespace Framework.Arduino.SerialCommunication
         public async Task ConnectAsync(string portName)
         {
             await Task.Delay(0); // avoid CS1998
-            Logger?.Trace($@"Connect: {portName}");
+            Logger?.LogTrace($@"Connect: {portName}");
 
             // Create a new SerialPort object with default settings.
             Aborted = false;
@@ -197,7 +197,7 @@ namespace Framework.Arduino.SerialCommunication
         private async Task Disconnect(bool join)
         {
             await Task.Delay(5);
-            Logger?.Trace($"Disconnecting: {join.ToString()}");
+            Logger?.LogTrace($"Disconnecting: {join.ToString()}");
             Aborted = true;
             _serialPortCancellationTokenSource?.Cancel();
 
@@ -243,7 +243,7 @@ namespace Framework.Arduino.SerialCommunication
                 _serialPortCancellationTokenSource = null;
             }
 
-            Logger?.Trace($"Disconnected: {join.ToString()}");
+            Logger?.LogTrace($"Disconnected: {join.ToString()}");
         }
 
         /// <summary>
@@ -296,7 +296,7 @@ namespace Framework.Arduino.SerialCommunication
         protected virtual void SetupCom(string portName)
         {
             _serialPortScope = _serialPortFactory.Create();
-            _serialPort = _serialPortScope.Instance;
+            _serialPort      = _serialPortScope.Instance;
 
             _serialPort.PortName  = portName;
             _serialPort.BaudRate  = BaudRate;
@@ -464,7 +464,7 @@ namespace Framework.Arduino.SerialCommunication
                 queueLength++;
             }
 
-            Logger?.Trace($"Queue: {cmd}");
+            Logger?.LogTrace($"Queue: {cmd}");
             OnCommandQueueChanged(new SerialEventArgs(queueLength, c));
             return c;
         }
@@ -526,7 +526,7 @@ namespace Framework.Arduino.SerialCommunication
 
         private bool WriteSerial(string commandText, bool addNewLine)
         {
-            Logger?.Trace($"Write: {commandText}");
+            Logger?.LogTrace($"Write: {commandText}");
             try
             {
                 if (addNewLine)
@@ -539,17 +539,17 @@ namespace Framework.Arduino.SerialCommunication
             }
             catch (InvalidOperationException e)
             {
-                Logger?.Error($"WriteInvalidOperationException: {commandText} => {e.Message}");
+                Logger?.LogError($"WriteInvalidOperationException: {commandText} => {e.Message}");
                 Disconnect(false).ConfigureAwait(false).GetAwaiter().GetResult();
             }
             catch (IOException e)
             {
-                Logger?.Error($"WriteIOException: {commandText} => {e.Message}");
+                Logger?.LogError($"WriteIOException: {commandText} => {e.Message}");
                 ErrorSerial();
             }
             catch (Exception e)
             {
-                Logger?.Error($"WriteException: {commandText} => {e.GetType()} {e.Message}");
+                Logger?.LogError($"WriteException: {commandText} => {e.GetType()} {e.Message}");
             }
 
             return false;
@@ -749,7 +749,7 @@ namespace Framework.Arduino.SerialCommunication
                 }
                 catch (InvalidOperationException e)
                 {
-                    Logger?.Error($"ReadInvalidOperationException: {e.Message}");
+                    Logger?.LogError($"ReadInvalidOperationException: {e.Message}");
                     Thread.Sleep(250);
                 }
                 catch (ThreadAbortException)
@@ -759,12 +759,12 @@ namespace Framework.Arduino.SerialCommunication
                 }
                 catch (IOException e)
                 {
-                    Logger?.Error($"ReadIOException: {e.Message}");
+                    Logger?.LogError($"ReadIOException: {e.Message}");
                     Thread.Sleep(250);
                 }
                 catch (Exception e)
                 {
-                    Logger?.Error($"ReadException: {e.Message}");
+                    Logger?.LogError($"ReadException: {e.Message}");
                     Thread.Sleep(250);
                 }
 
@@ -794,7 +794,7 @@ namespace Framework.Arduino.SerialCommunication
 
             if (string.IsNullOrEmpty(message) == false)
             {
-                Logger?.Trace($"Read: {message.Replace("\n", @"\n").Replace("\r", @"\r").Replace("\t", @"\t")}");
+                Logger?.LogTrace($"Read: {message.Replace("\n", @"\n").Replace("\r", @"\r").Replace("\t", @"\t")}");
 
                 bool endCommand = false;
 

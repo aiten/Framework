@@ -17,10 +17,10 @@
 // see: https://github.com/scottksmith95/LINQKit
 
 using System;
-using System.Linq.Expressions;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq.Expressions;
 
-namespace Framework.Repository
+namespace Framework.Repository.Linq
 {
     /// <summary> The Predicate Operator </summary>
     public enum PredicateOperator

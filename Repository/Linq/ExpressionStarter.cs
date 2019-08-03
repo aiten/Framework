@@ -17,16 +17,16 @@
 // see: https://github.com/scottksmith95/LINQKit
 
 using System;
-using System.Collections.ObjectModel;
-using System.Linq.Expressions;
-using System.Diagnostics.CodeAnalysis;
-#if !(NET35 || WINDOWS_APP || NETSTANDARD || PORTABLE40 || UAP)
 using System.Collections.Generic;
-using System.Reflection.Emit;
+using System.Collections.ObjectModel;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
+#if !(NET35 || WINDOWS_APP || NETSTANDARD || PORTABLE40 || UAP)
+
 #endif
 
-namespace Framework.Repository
+namespace Framework.Repository.Linq
 {
     /// <summary>
     /// ExpressionStarter{T} which eliminates the default 1=0 or 1=1 stub expressions

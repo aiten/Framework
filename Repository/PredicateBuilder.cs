@@ -14,33 +14,96 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
+// see: https://github.com/scottksmith95/LINQKit
+
+using System;
+using System.Linq.Expressions;
+using System.Diagnostics.CodeAnalysis;
+
 namespace Framework.Repository
 {
-    using System;
-    using System.Linq.Expressions;
+    /// <summary> The Predicate Operator </summary>
+    public enum PredicateOperator
+    {
+        Or,
+        And
+    }
 
     public static class PredicateBuilder
     {
-        public static Expression<Func<T, bool>> True<T>()
+        private class RebindParameterVisitor : ExpressionVisitor
         {
-            return f => true;
+            private readonly ParameterExpression _oldParameter;
+            private readonly ParameterExpression _newParameter;
+
+            public RebindParameterVisitor(ParameterExpression oldParameter, ParameterExpression newParameter)
+            {
+                _oldParameter = oldParameter;
+                _newParameter = newParameter;
+            }
+
+            protected override Expression VisitParameter(ParameterExpression node)
+            {
+                if (node == _oldParameter)
+                {
+                    return _newParameter;
+                }
+
+                return base.VisitParameter(node);
+            }
         }
 
-        public static Expression<Func<T, bool>> False<T>()
+        /// <summary> Start an expression </summary>
+        public static ExpressionStarter<T> New<T>(Expression<Func<T, bool>> expr = null)
         {
-            return f => false;
+            return new ExpressionStarter<T>(expr);
         }
 
-        public static Expression<Func<T, bool>> Or<T>(this Expression<Func<T, bool>> expr1, Expression<Func<T, bool>> expr2)
+        /// <summary> Create an expression with a stub expression true or false to use when the expression is not yet started. </summary>
+        public static ExpressionStarter<T> New<T>(bool defaultExpression)
         {
-            var invokedExpr = Expression.Invoke(expr2, expr1.Parameters);
-            return Expression.Lambda<Func<T, bool>>(Expression.OrElse(expr1.Body, invokedExpr), expr1.Parameters);
+            return new ExpressionStarter<T>(defaultExpression);
         }
 
-        public static Expression<Func<T, bool>> And<T>(this Expression<Func<T, bool>> expr1, Expression<Func<T, bool>> expr2)
+        public static Expression<Func<T, bool>> Or<T>([NotNull] this Expression<Func<T, bool>> expr1, [NotNull] Expression<Func<T, bool>> expr2)
         {
-            var invokedExpr = Expression.Invoke(expr2, expr1.Parameters);
-            return Expression.Lambda<Func<T, bool>>(Expression.AndAlso(expr1.Body, invokedExpr), expr1.Parameters);
+            var expr2Body = new RebindParameterVisitor(expr2.Parameters[0], expr1.Parameters[0]).Visit(expr2.Body);
+            return Expression.Lambda<Func<T, bool>>(Expression.OrElse(expr1.Body, expr2Body), expr1.Parameters);
+        }
+
+        public static Expression<Func<T, bool>> And<T>([NotNull] this Expression<Func<T, bool>> expr1, [NotNull] Expression<Func<T, bool>> expr2)
+        {
+            var expr2Body = new RebindParameterVisitor(expr2.Parameters[0], expr1.Parameters[0]).Visit(expr2.Body);
+            return Expression.Lambda<Func<T, bool>>(Expression.AndAlso(expr1.Body, expr2Body), expr1.Parameters);
+        }
+
+        /// <summary>
+        /// Extends the specified source Predicate with another Predicate and the specified PredicateOperator.
+        /// </summary>
+        /// <typeparam name="T">The type</typeparam>
+        /// <param name="first">The source Predicate.</param>
+        /// <param name="second">The second Predicate.</param>
+        /// <param name="operator">The Operator (can be "And" or "Or").</param>
+        /// <returns>Expression{Func{T, bool}}</returns>
+        public static Expression<Func<T, bool>> Extend<T>(
+            [NotNull] this Expression<Func<T, bool>> first,
+            [NotNull]      Expression<Func<T, bool>> second,
+            PredicateOperator                        @operator = PredicateOperator.Or)
+        {
+            return @operator == PredicateOperator.Or ? first.Or(second) : first.And(second);
+        }
+
+        /// <summary>
+        /// Extends the specified source Predicate with another Predicate and the specified PredicateOperator.
+        /// </summary>
+        /// <typeparam name="T">The type</typeparam>
+        /// <param name="first">The source Predicate.</param>
+        /// <param name="second">The second Predicate.</param>
+        /// <param name="operator">The Operator (can be "And" or "Or").</param>
+        /// <returns>Expression{Func{T, bool}}</returns>
+        public static Expression<Func<T, bool>> Extend<T>([NotNull] this ExpressionStarter<T> first, [NotNull] Expression<Func<T, bool>> second, PredicateOperator @operator = PredicateOperator.Or)
+        {
+            return @operator == PredicateOperator.Or ? first.Or(second) : first.And(second);
         }
     }
 }

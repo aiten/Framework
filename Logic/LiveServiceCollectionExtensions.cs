@@ -14,13 +14,13 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
+using AutoMapper;
+
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Framework.Mapper
+namespace Framework.Logic
 {
-    using AutoMapper;
-
-    public static class LiveServicCollectionExtensions
+    public static class LiveServiceCollectionExtensions
     {
         public static IServiceCollection AddMapper(this IServiceCollection services, MapperConfiguration mapperConfiguration)
         {

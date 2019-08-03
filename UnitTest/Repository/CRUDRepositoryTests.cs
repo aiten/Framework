@@ -135,7 +135,7 @@ namespace Framework.UnitTest.Repository
                 await ctx.UnitOfWork.SaveChangesAsync();
                 await trans.CommitTransactionAsync();
 
-                keys = entitiesToAdd.Select(GetEntityKey);
+                keys = entitiesToAdd.Select(GetEntityKey).ToList();
             }
 
             var allWithAdd = await GetAll();

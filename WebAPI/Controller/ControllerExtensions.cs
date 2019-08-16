@@ -225,7 +225,7 @@ namespace Framework.WebAPI.Controller
                 Directory.GetCurrentDirectory(),
                 "wwwroot", fileName);
 
-            return controller.File(memoryStream, controller.GetContentType(path), Path.GetFileName(path));
+            return await Task.FromResult(controller.File(memoryStream, controller.GetContentType(path), Path.GetFileName(path)));
         }
 
         public static string GetContentType(this Controller controller, string path)

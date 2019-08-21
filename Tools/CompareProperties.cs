@@ -36,7 +36,7 @@ namespace Framework.Tools
         private static bool AreObjectsPropertiesEqual(object objectA, object objectB, HashSet<object> compared, params string[] ignoreList)
         {
             // check for circles e.g. ClassA => ICollection<ClassB> => classA
-            if (compared.Contains(objectA)) // 
+            if (compared.Contains(objectA))
             {
                 return true;
             }
@@ -59,10 +59,9 @@ namespace Framework.Tools
                             return false;
                         }
                     }
-
-                    // if it implements IEnumerable, then scan any items
                     else if (typeof(IEnumerable).IsAssignableFrom(propertyInfo.PropertyType))
                     {
+                        // if it implements IEnumerable, then scan any items
                         if (valueA == null && valueB != null || valueA != null && valueB == null)
                         {
                             return false;

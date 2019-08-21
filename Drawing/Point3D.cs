@@ -29,9 +29,9 @@ namespace Framework.Drawing
 
         public Point3D()
         {
-            //X = new decimal?();
-            //Y = new decimal?();
-            //Z = new decimal?();
+            // X = new decimal?();
+            // Y = new decimal?();
+            // Z = new decimal?();
         }
 
         public double? X { get; set; }

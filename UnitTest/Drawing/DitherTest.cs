@@ -35,7 +35,7 @@ namespace Framework.UnitTest.Drawing
                 {
                     for (int x = 0; x < Width; x++)
                     {
-                        //Color currentPixel = GetPixel(x, y);
+                        // Color currentPixel = GetPixel(x, y);
 
                         if ((x + y) % 2 == 0)
                         {

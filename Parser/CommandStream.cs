@@ -123,8 +123,8 @@ namespace Framework.Parser
                 i++;
             }
 
-            //           if (!Line.StartsWith(cmd)) => slow
-            //               return false;
+//          if (!Line.StartsWith(cmd)) => slow
+//              return false;
 
             _idx += cmd.Length;
             return true;

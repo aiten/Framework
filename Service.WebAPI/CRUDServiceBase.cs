@@ -100,10 +100,10 @@ namespace Framework.Service.WebAPI
 
             if (response.IsSuccessStatusCode)
             {
-                //return RedirectToAction("Index");
+                // return RedirectToAction("Index");
             }
 
-            //return HttpNotFound();
+            // return HttpNotFound();
         }
 
         public Task Delete(IEnumerable<TKey> keys)

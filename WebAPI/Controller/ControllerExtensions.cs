@@ -223,7 +223,8 @@ namespace Framework.WebAPI.Controller
 
             var path = Path.Combine(
                 Directory.GetCurrentDirectory(),
-                "wwwroot", fileName);
+                "wwwroot",
+                fileName);
 
             return await Task.FromResult(controller.File(memoryStream, controller.GetContentType(path), Path.GetFileName(path)));
         }
@@ -231,7 +232,7 @@ namespace Framework.WebAPI.Controller
         public static string GetContentType(this Controller controller, string path)
         {
             var types = controller.GetMimeTypes();
-            var ext = Path.GetExtension(path).ToLowerInvariant();
+            var ext   = Path.GetExtension(path).ToLowerInvariant();
             return types[ext];
         }
 
@@ -239,17 +240,17 @@ namespace Framework.WebAPI.Controller
         {
             return new Dictionary<string, string>
             {
-                {".txt", "text/plain"},
-                {".pdf", "application/pdf"},
-                {".doc", "application/vnd.ms-word"},
-                {".docx", "application/vnd.ms-word"},
-                {".xls", "application/vnd.ms-excel"},
-                {".xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"},
-                {".png", "image/png"},
-                {".jpg", "image/jpeg"},
-                {".jpeg", "image/jpeg"},
-                {".gif", "image/gif"},
-                {".csv", "text/csv"}
+                { ".txt", "text/plain" },
+                { ".pdf", "application/pdf" },
+                { ".doc", "application/vnd.ms-word" },
+                { ".docx", "application/vnd.ms-word" },
+                { ".xls", "application/vnd.ms-excel" },
+                { ".xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" },
+                { ".png", "image/png" },
+                { ".jpg", "image/jpeg" },
+                { ".jpeg", "image/jpeg" },
+                { ".gif", "image/gif" },
+                { ".csv", "text/csv" }
             };
         }
 

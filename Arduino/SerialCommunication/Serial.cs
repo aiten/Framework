@@ -98,7 +98,7 @@ namespace Framework.Arduino.SerialCommunication
             }
         }
 
-        //public bool IsConnected { get { return true; }  }
+        // public bool IsConnected { get { return true; }  }
         public bool IsConnected => _serialPort != null && _serialPort.IsOpen;
 
         public bool Aborted { get; protected set; }
@@ -162,7 +162,7 @@ namespace Framework.Arduino.SerialCommunication
                 _serialPort.WriteLine("");
             }
 
-            //_serialPort.DtrEnable = true;
+            // _serialPort.DtrEnable = true;
             _serialPort.RtsEnable = true;
 
             bool wasEmpty;

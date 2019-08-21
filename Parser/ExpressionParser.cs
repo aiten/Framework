@@ -133,7 +133,7 @@ namespace Framework.Parser
 
             FactorialFncSy,
             LastFunctionSy = FactorialFncSy
-        };
+        }
 
         protected struct SParserState
         {
@@ -143,7 +143,7 @@ namespace Framework.Parser
 
             public bool       _variableOK; // _number = variable with content
             public ETokenType _detailToken;
-        };
+        }
 
         protected SParserState _state;
 
@@ -774,6 +774,6 @@ namespace Framework.Parser
             return 0;
         }
 
-        //bool SaveAssign(char* buffer, char* current, char ch, uint8_t max);
+        // bool SaveAssign(char* buffer, char* current, char ch, uint8_t max);
     }
 }

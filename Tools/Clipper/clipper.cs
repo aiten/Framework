@@ -3756,8 +3756,6 @@ namespace Framework.Tools.Clipper
                         }
                     }
 
-                    ;
-
                     if ((dir == Direction.dLeftToRight && e.Curr.X > horzRight) || (dir == Direction.dRightToLeft && e.Curr.X < horzLeft))
                     {
                         break;
@@ -4764,8 +4762,6 @@ namespace Framework.Tools.Clipper
                     op2.Pt = Pt;
                     op2b   = DupOutPt(op2, !DiscardLeft);
                 }
-
-                ;
             }
             else
             {
@@ -4786,11 +4782,7 @@ namespace Framework.Tools.Clipper
                     op2.Pt = Pt;
                     op2b   = DupOutPt(op2, DiscardLeft);
                 }
-
-                ;
             }
-
-            ;
 
             if ((Dir1 == Direction.dLeftToRight) == DiscardLeft)
             {
@@ -4981,7 +4973,6 @@ namespace Framework.Tools.Clipper
                     }
                 }
 
-                ;
                 op2b = op2.Next;
                 while ((op2b.Pt == op2.Pt) && (op2b != op2))
                 {

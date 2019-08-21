@@ -22,6 +22,7 @@ using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
+
 #if !(NET35 || WINDOWS_APP || NETSTANDARD || PORTABLE40 || UAP)
 
 #endif
@@ -32,10 +33,11 @@ namespace Framework.Repository.Linq
     /// ExpressionStarter{T} which eliminates the default 1=0 or 1=1 stub expressions
     /// </summary>
     /// <typeparam name="T">The type</typeparam>
-
     public class ExpressionStarter<T>
     {
-        internal ExpressionStarter() : this(false) { }
+        internal ExpressionStarter() : this(false)
+        {
+        }
 
         internal ExpressionStarter(bool defaultExpression)
         {
@@ -93,6 +95,7 @@ namespace Framework.Repository.Linq
         }
 
         #region Implicit Operators
+
         /// <summary>
         /// Allows this object to be implicitely converted to an Expression{Func{T, bool}}.
         /// </summary>
@@ -119,15 +122,25 @@ namespace Framework.Repository.Linq
         {
             return right == null ? null : new ExpressionStarter<T>(right);
         }
+
         #endregion
 
         #region Implement Expression<TDelagate> methods and properties
 
-        public Func<T, bool> Compile() { return Predicate.Compile(); }
+        public Func<T, bool> Compile()
+        {
+            return Predicate.Compile();
+        }
 
-        public Func<T, bool> Compile(DebugInfoGenerator debugInfoGenerator) { return Predicate.Compile(debugInfoGenerator); }
+        public Func<T, bool> Compile(DebugInfoGenerator debugInfoGenerator)
+        {
+            return Predicate.Compile(debugInfoGenerator);
+        }
 
-        public Expression<Func<T, bool>> Update(Expression body, IEnumerable<ParameterExpression> parameters) { return Predicate.Update(body, parameters); }
+        public Expression<Func<T, bool>> Update(Expression body, IEnumerable<ParameterExpression> parameters)
+        {
+            return Predicate.Update(body, parameters);
+        }
 
         #endregion
 
@@ -152,7 +165,7 @@ namespace Framework.Repository.Linq
         #region Implement Expression methods and properties
 
         public virtual bool CanReduce => Predicate.CanReduce;
-        
+
         #endregion
     }
 }

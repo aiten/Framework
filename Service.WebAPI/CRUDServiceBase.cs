@@ -27,7 +27,6 @@ namespace Framework.Service.WebAPI
 
         protected CRUDServiceBase(HttpClient httpClient) : base(httpClient)
         {
-
         }
 
         public async Task<T> Get(TKey id)

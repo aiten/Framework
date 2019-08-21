@@ -22,7 +22,7 @@ namespace Framework.Service.WebAPI.Uri
 {
     public class UriPathBuilder
     {
-        public string Path { get; set; }
+        public string Path  { get; set; }
         public string Query { get; set; }
 
         public string Build()

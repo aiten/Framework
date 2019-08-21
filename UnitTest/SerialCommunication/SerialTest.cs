@@ -40,9 +40,9 @@ namespace Framework.UnitTest.SerialCommunication
         int  _resultIdx;
         bool _sendReply;
 
-        string _OkTag     = @"ok";
-        string _errorTag  = @"error:";
-        string _infoTag   = @"info:";
+        string _OkTag    = @"ok";
+        string _errorTag = @"error:";
+        string _infoTag  = @"info:";
 
         public SerialTest()
         {

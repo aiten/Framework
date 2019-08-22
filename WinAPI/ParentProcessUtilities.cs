@@ -72,11 +72,11 @@ namespace Framework.WinAPI
 
         [DllImport("ntdll.dll")]
         private static extern int NtQueryInformationProcess(
-            IntPtr processHandle,
-            int processInformationClass,
+            IntPtr                 processHandle,
+            int                    processInformationClass,
             ref ProcessInformation processInformation,
-            int processInformationLength,
-            out int returnLength);
+            int                    processInformationLength,
+            out int                returnLength);
 
         /// <summary>
         /// Used in the NtQueryInformationProcess call.

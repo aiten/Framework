@@ -24,8 +24,8 @@ namespace Framework.Pattern
 
     public sealed class ScopeResolve<T> : IScope<T>, IDisposable where T : class
     {
-        private readonly IServiceScope    _scope;
-        private readonly T                _instance;
+        private readonly IServiceScope _scope;
+        private readonly T             _instance;
 
         private bool _isDisposed;
 

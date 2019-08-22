@@ -194,6 +194,7 @@ namespace Framework.Logic
         protected virtual async Task Modifying()
         {
         }
+
         protected virtual async Task Modified()
         {
         }

@@ -23,16 +23,16 @@ namespace Framework.Wpf.Helpers
     {
         public static readonly DependencyProperty PasswordProperty =
             DependencyProperty.RegisterAttached("Password",
-            typeof(string), typeof(PasswordHelper),
-            new FrameworkPropertyMetadata(string.Empty, OnPasswordPropertyChanged));
+                typeof(string), typeof(PasswordHelper),
+                new FrameworkPropertyMetadata(string.Empty, OnPasswordPropertyChanged));
 
         public static readonly DependencyProperty AttachProperty =
             DependencyProperty.RegisterAttached("Attach",
-            typeof(bool), typeof(PasswordHelper), new PropertyMetadata(false, Attach));
+                typeof(bool), typeof(PasswordHelper), new PropertyMetadata(false, Attach));
 
         private static readonly DependencyProperty IsUpdatingProperty =
-           DependencyProperty.RegisterAttached("IsUpdating", typeof(bool),
-           typeof(PasswordHelper));
+            DependencyProperty.RegisterAttached("IsUpdating", typeof(bool),
+                typeof(PasswordHelper));
 
 
         public static void SetAttach(DependencyObject dp, bool value)
@@ -66,7 +66,7 @@ namespace Framework.Wpf.Helpers
         }
 
         private static void OnPasswordPropertyChanged(DependencyObject sender,
-            DependencyPropertyChangedEventArgs e)
+            DependencyPropertyChangedEventArgs                         e)
         {
             PasswordBox passwordBox = sender as PasswordBox;
             passwordBox.PasswordChanged -= PasswordChanged;
@@ -75,11 +75,12 @@ namespace Framework.Wpf.Helpers
             {
                 passwordBox.Password = (string)e.NewValue;
             }
+
             passwordBox.PasswordChanged += PasswordChanged;
         }
 
         private static void Attach(DependencyObject sender,
-            DependencyPropertyChangedEventArgs e)
+            DependencyPropertyChangedEventArgs      e)
         {
             PasswordBox passwordBox = sender as PasswordBox;
 

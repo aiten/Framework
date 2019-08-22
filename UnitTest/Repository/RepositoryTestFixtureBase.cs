@@ -29,6 +29,7 @@ namespace Framework.UnitTest.Repository
         {
             ScriptDir = $"{Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)}\\Repository\\SQL\\";
         }
+
 /*
         public void InitializeDatabase()
         {

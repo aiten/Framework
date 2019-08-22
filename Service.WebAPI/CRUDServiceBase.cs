@@ -27,7 +27,6 @@ namespace Framework.Service.WebAPI
 
         protected CRUDServiceBase(HttpClient httpClient) : base(httpClient)
         {
-
         }
 
         public async Task<T> Get(TKey id)
@@ -100,10 +99,10 @@ namespace Framework.Service.WebAPI
 
             if (response.IsSuccessStatusCode)
             {
-                //return RedirectToAction("Index");
+                // return RedirectToAction("Index");
             }
 
-            //return HttpNotFound();
+            // return HttpNotFound();
         }
 
         public Task Delete(IEnumerable<TKey> keys)

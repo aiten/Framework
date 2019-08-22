@@ -41,7 +41,7 @@ namespace Framework.Drawing
                     Color currentPixel = GetPixel(x, y);
                     currentPixel.Saturation();
 
-                    //Color bestColorRGB = FindNearestColorBW(currentPixel);
+                    // Color bestColorRGB = FindNearestColorBW(currentPixel);
                     Color bestColorRGB = FindNearestColorGrayScale(currentPixel);
                     SetPixel(x, y, bestColorRGB);
 

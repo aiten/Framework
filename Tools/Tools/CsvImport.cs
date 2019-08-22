@@ -171,15 +171,15 @@ namespace Framework.Tools.Tools
                     pi.SetValue(obj, string.IsNullOrEmpty(valueAsString) ? null : ExcelEnum(pi.PropertyType.GenericTypeArguments[0], valueAsString));
                 }
 /*
-                                                else if (pi.PropertyType == typeof(byte[]))
-                                                {
-                                                    if (!string.IsNullOrEmpty(ip.Value))
-                                                    {
-                                                        byte[] bytes = System.Convert.FromBase64String(ip.Value);
-                                                        pi.SetValue(obj, bytes);
-                                                    }
-                                                }
-                */
+                else if (pi.PropertyType == typeof(byte[]))
+                {
+                    if (!string.IsNullOrEmpty(ip.Value))
+                    {
+                        byte[] bytes = System.Convert.FromBase64String(ip.Value);
+                        pi.SetValue(obj, bytes);
+                    }
+                }
+*/
                 else
                 {
                     throw new NotImplementedException();

@@ -379,7 +379,6 @@ namespace Framework.Parser
             // something unknown is found, wrong characters -> a syntax error
             _state._detailToken = ETokenType.UnknownSy;
             Error(MESSAGE_EXPR_SYNTAX_ERROR);
-            return;
         }
 
         protected virtual string ReadIdent()

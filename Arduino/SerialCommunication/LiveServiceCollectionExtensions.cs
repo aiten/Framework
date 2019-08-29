@@ -22,12 +22,12 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Framework.Arduino.SerialCommunication
 {
-    public static class LiveServicCollectionExtensions
+    public static class LiveServiceCollectionExtensions
     {
         public static IServiceCollection AddSerialCommunication(this IServiceCollection services)
         {
             services
-                .AddAssembylIncludingInternals(ServiceLifetime.Transient, typeof(Framework.Arduino.SerialCommunication.Serial).Assembly)
+                .AddAssembylIncludingInternals(ServiceLifetime.Transient, typeof(Serial).Assembly)
                 .AddTransient<IFactory<ISerialPort>, FactoryResolve<ISerialPort>>();
             return services;
         }

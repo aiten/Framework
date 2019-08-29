@@ -20,7 +20,9 @@ using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.ServiceProcess;
+
 using Framework.WinAPI;
+
 using Microsoft.AspNetCore.Hosting;
 
 using NLog;
@@ -84,7 +86,7 @@ namespace Framework.WebAPI.Host
         public static bool IsUnderWindowsServiceManager()
         {
             var currentProcess = Process.GetCurrentProcess();
-            var parentProcess = currentProcess.Parent();
+            var parentProcess  = currentProcess.Parent();
             return (parentProcess != null && parentProcess.ProcessName == @"services");
         }
     }

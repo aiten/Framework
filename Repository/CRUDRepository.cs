@@ -80,9 +80,9 @@ namespace Framework.Repository
 
         #endregion
 
-        public void Sync(ICollection<TEntity> inDb, ICollection<TEntity> toDb, Func<TEntity, TEntity, bool> predicate)
+        public void Sync(ICollection<TEntity> inDb, ICollection<TEntity> toDb, Func<TEntity, TEntity, bool> compareEntity, Action<TEntity> prepareForAdd)
         {
-            Sync<TEntity>(inDb, toDb, predicate);
+            Sync<TEntity>(inDb, toDb, compareEntity, prepareForAdd);
         }
     }
 }

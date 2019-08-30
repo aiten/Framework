@@ -35,7 +35,7 @@ namespace Framework.Repository
         /// </summary>
         protected TDbContext Context { get; private set; }
 
-        public void Sync<TEntity>(ICollection<TEntity> inDb, ICollection<TEntity> toDb, Func<TEntity, TEntity, bool> predicate)
+        public void Sync<TEntity>(ICollection<TEntity> inDb, ICollection<TEntity> toDb, Func<TEntity, TEntity, bool> compareEntities, Action<TEntity> prepareForAdd)
             where TEntity : class
         {
             //// 1. DeleteEntity from DB (in DB) and update
@@ -43,8 +43,8 @@ namespace Framework.Repository
 
             foreach (var entityInDb in inDb)
             {
-                var entityToDb = toDb.FirstOrDefault(x => predicate(x, entityInDb));
-                if (entityToDb != null && predicate(entityToDb, entityInDb))
+                var entityToDb = toDb.FirstOrDefault(x => compareEntities(x, entityInDb));
+                if (entityToDb != null && compareEntities(entityToDb, entityInDb))
                 {
                     SetValue(entityInDb, entityToDb);
                 }
@@ -62,9 +62,10 @@ namespace Framework.Repository
             //// 2. AddEntity To DB
             foreach (var entityToDb in toDb)
             {
-                var entityInDb = inDb.FirstOrDefault(x => predicate(x, entityToDb));
-                if (entityInDb == null || predicate(entityToDb, entityInDb) == false)
+                var entityInDb = inDb.FirstOrDefault(x => compareEntities(x, entityToDb));
+                if (entityInDb == null || compareEntities(entityToDb, entityInDb) == false)
                 {
+                    prepareForAdd(entityToDb);
                     AddEntity(entityToDb);
                 }
             }

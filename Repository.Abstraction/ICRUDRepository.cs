@@ -36,6 +36,6 @@ namespace Framework.Repository.Abstraction
 
         void SetState(TEntity entity, EntityState state);
 
-        void Sync(ICollection<TEntity> inDb, ICollection<TEntity> toDb, Func<TEntity, TEntity, bool> predicate);
+        void Sync(ICollection<TEntity> inDb, ICollection<TEntity> toDb, Func<TEntity, TEntity, bool> compareEntities, Action<TEntity> prepareForAdd);
     }
 }

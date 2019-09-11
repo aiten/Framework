@@ -24,6 +24,7 @@ using FluentAssertions;
 using Framework.Arduino.SerialCommunication;
 using Framework.Arduino.SerialCommunication.Abstraction;
 using Framework.Pattern;
+using Framework.UnitTest;
 
 using Microsoft.Extensions.Logging;
 
@@ -33,7 +34,7 @@ using NSubstitute;
 
 using Xunit;
 
-namespace Framework.UnitTest.SerialCommunication
+namespace Framework.MyUnitTest.SerialCommunication
 {
     public class SerialTest : UnitTestBase
     {

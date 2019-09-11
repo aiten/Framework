@@ -5,23 +5,13 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="FluentAssertions" Version="5.9.0" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.3.0-preview-20190828-03" />
     <PackageReference Include="NLog" Version="4.6.7" />
     <PackageReference Include="NSubstitute" Version="4.2.1" />
-    <PackageReference Include="System.Drawing.Common" Version="4.6.0-preview9.19421.4" />
     <PackageReference Include="xunit" Version="2.4.1" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.1">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
-    </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Arduino\Arduino.csproj" />
     <ProjectReference Include="..\Dependency\Dependency.csproj" />
-    <ProjectReference Include="..\Drawing\Drawing.csproj" />
     <ProjectReference Include="..\Logic\Logic.csproj" />
-    <ProjectReference Include="..\Parser\Parser.csproj" />
     <ProjectReference Include="..\Repository\Repository.csproj" />
-    <ProjectReference Include="..\Tools\Tools.csproj" />
   </ItemGroup>
 </Project>

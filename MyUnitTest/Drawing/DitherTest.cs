@@ -14,17 +14,10 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.UnitTest.Drawing
+using Framework.Drawing;
+
+namespace Framework.MyUnitTest.Drawing
 {
-    using System.Drawing;
-    using System.Drawing.Imaging;
-
-    using FluentAssertions;
-
-    using Framework.Drawing;
-
-    using Xunit;
-
     public class DitherTest
     {
         public class DitherTestClass : DitherBase

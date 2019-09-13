@@ -14,19 +14,24 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.Tools.Tools
-{
-    using System;
-    using System.Collections.Generic;
-    using System.Globalization;
-    using System.IO;
-    using System.Text;
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Globalization;
+using System.IO;
+using System.Text;
 
+namespace Framework.Tools.Csv
+{
     public class CsvImportBase
     {
         private readonly NumberFormatInfo _nfi;
 
         public Encoding Encoding { get; set; } = Encoding.Default;
+
+        public event EventHandler<IList<string>> ReadFirstLine;
+
+        public string NewLineInString { get; set; } = "\n";
 
         public CsvImportBase()
         {
@@ -45,19 +50,42 @@ namespace Framework.Tools.Tools
 
         public IList<IList<string>> ReadStringMatrixFromCsv(string[] lines, bool skipTitleLine)
         {
-            var  elements  = new List<IList<string>>();
-            bool firstLine = skipTitleLine;
 
-            foreach (var line in lines)
+            var elements       = new List<IList<string>>();
+            var lineIdx        = 0;
+            var readLineIdx = 0;
+            var compareLineIdx = skipTitleLine ? 1 : 0;
+
+
+            while (true)
             {
-                if (firstLine)
+                var row = ReadLine(() =>
                 {
-                    firstLine = false;
-                }
-                else
+                    if (readLineIdx >= lines.Length)
+                    {
+                        return null;
+                    }
+
+                    return lines[readLineIdx++];
+                });
+
+                if (row == null)
                 {
-                    elements.Add(ReadLine(line));
+                    break;
                 }
+
+                if (lineIdx == 0)
+                {
+                    ReadFirstLine?.Invoke(this, row);
+                }
+
+                if (lineIdx >= compareLineIdx)
+                {
+                    elements.Add(row);
+                }
+
+                lineIdx++;
+
             }
 
             return elements;
@@ -69,8 +97,14 @@ namespace Framework.Tools.Tools
             return ReadStringMatrixFromCsv(lines, skipTitleLine);
         }
 
-        private IList<string> ReadLine(string line)
+        private IList<string> ReadLine(Func<string> getNextLine)
         {
+            var line = getNextLine();
+            if (line == null)
+            {
+                return null;
+            }
+
             // remark: newline in Quote not implemented 
             var columns = new List<string>();
 
@@ -79,27 +113,39 @@ namespace Framework.Tools.Tools
             char quoteChar   = noQuoteChar;
             char lastCh      = noQuoteChar;
 
-            foreach (var ch in line)
+            while (true)
             {
-                if (ch == quoteChar)
+                foreach (var ch in line)
                 {
-                    quoteChar = noQuoteChar;
-                }
-                else if (quoteChar == noQuoteChar && lastCh != '\\' && (ch == '\'' || ch == '"'))
-                {
-                    quoteChar = ch;
-                }
-                else if (quoteChar == noQuoteChar && (ch == ';'))
-                {
-                    columns.Add(sb.ToString());
-                    sb.Clear();
-                }
-                else
-                {
-                    sb.Append(ch);
+                    if (ch == quoteChar)
+                    {
+                        quoteChar = noQuoteChar;
+                    }
+                    else if (quoteChar == noQuoteChar && lastCh != '\\' && (ch == '\'' || ch == '"'))
+                    {
+                        quoteChar = ch;
+                    }
+                    else if (quoteChar == noQuoteChar && (ch == ';'))
+                    {
+                        columns.Add(sb.ToString());
+                        sb.Clear();
+                    }
+                    else
+                    {
+                        sb.Append(ch);
+                    }
+
+                    lastCh = ch;
                 }
 
-                lastCh = ch;
+                if (quoteChar == noQuoteChar)
+                {
+                    break;
+                }
+
+                sb.Append(NewLineInString);
+
+                line = getNextLine();
             }
 
             columns.Add(sb.ToString());

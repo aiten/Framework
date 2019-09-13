@@ -209,5 +209,34 @@ namespace Framework.MyUnitTest.Tools
         }
 
         #endregion
+
+        #region Select
+
+        private class SelectTest
+        {
+            public int Property1 { get; set; }
+            public double Property2 { get; set; }
+        }
+
+        [Fact]
+        public void SelectPropertyTest()
+        {
+            var testArray = new SelectTest[] { new SelectTest() { Property1 = 1, Property2 = 1.1 }, new SelectTest() { Property1 = 2, Property2 = 2.2 } };
+
+            var pi1 = typeof(SelectTest).GetProperty("Property1");
+            var pi2 = typeof(SelectTest).GetProperty("Property2");
+
+            var intOfProperty1    = testArray.Select<int>(pi1);
+            var doubleOfProperty2 = testArray.Select<double>(pi2);
+
+            intOfProperty1.Should().HaveCount(2);
+            intOfProperty1.Should().Contain(new int[] { 1, 2 });
+
+            doubleOfProperty2.Should().HaveCount(2);
+            doubleOfProperty2.Should().Contain(new double[] { 1.1, 2.2 });
+
+        }
+
+        #endregion
     }
 }

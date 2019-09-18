@@ -17,6 +17,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Text;
@@ -111,17 +112,27 @@ namespace Framework.Tools.Csv
             var  sb          = new StringBuilder(line.Length);
             char noQuoteChar = '\0';
             char quoteChar   = noQuoteChar;
-            char lastCh      = noQuoteChar;
 
             while (true)
             {
-                foreach (var ch in line)
+                for (int idx = 0; idx < line.Length; idx++)
                 {
+                    var ch = line[idx];
+
                     if (ch == quoteChar)
-                    {
-                        quoteChar = noQuoteChar;
+                    {   
+                        // end of " or ""
+                        if ((idx+1) < line.Length && line[idx + 1] == quoteChar)
+                        {
+                            idx++;
+                            sb.Append(ch);
+                        }
+                        else
+                        {
+                            quoteChar = noQuoteChar;
+                        }
                     }
-                    else if (quoteChar == noQuoteChar && lastCh != '\\' && (ch == '\'' || ch == '"'))
+                    else if (quoteChar == noQuoteChar && ch == '"')
                     {
                         quoteChar = ch;
                     }
@@ -134,8 +145,6 @@ namespace Framework.Tools.Csv
                     {
                         sb.Append(ch);
                     }
-
-                    lastCh = ch;
                 }
 
                 if (quoteChar == noQuoteChar)

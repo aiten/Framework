@@ -63,7 +63,7 @@ namespace Framework.Service.WebAPI.Uri
         {
             if (!string.IsNullOrEmpty(Query))
             {
-                throw new ArgumentException();
+                throw new ArgumentException("\"Query\" must not be empty");
             }
 
             Query = query;

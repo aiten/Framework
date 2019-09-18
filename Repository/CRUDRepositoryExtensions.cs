@@ -44,7 +44,7 @@ namespace Framework.Repository
             TEntity entityInDb = await repository.GetTracking(key);
             if (entityInDb == default(TEntity))
             {
-                throw new DBConcurrencyException();
+                throw new DBConcurrencyException("(tracking-)entity not found.");
             }
 
             repository.SetValueGraph(entityInDb, values);

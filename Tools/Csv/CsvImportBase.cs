@@ -194,7 +194,7 @@ namespace Framework.Tools.Csv
                 case @"true":
                     return true;
                 default:
-                    throw new FormatException();
+                    throw new ArgumentOutOfRangeException(nameof(excelField), excelField, @"cannot convert to ""bool"".");
             }
         }
 

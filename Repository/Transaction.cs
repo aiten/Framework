@@ -43,7 +43,7 @@ namespace Framework.Repository
         {
             if (InTransaction == false)
             {
-                throw new ArgumentException();
+                throw new ArgumentException(@"Transaction not started.");
             }
 
             await UnitOfWork.SaveChangesAsync();
@@ -55,7 +55,7 @@ namespace Framework.Repository
         {
             if (InTransaction == false)
             {
-                throw new ArgumentException();
+                throw new ArgumentException(@"Transaction not started.");
             }
 
             _dbTran.Rollback();

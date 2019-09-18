@@ -76,6 +76,24 @@ namespace Framework.Repository
             Context.Entry(entity).State = state;
         }
 
+        protected IQueryable<T> QueryAsDbSet<T>()
+            where T : class
+        {
+            return Context.Set<T>();
+        }
+
+        /// <summary>
+        /// Returns an IQueryable of the Entity or query.
+        /// Override to use Context.Query instead of DbContext.Set
+        /// </summary>
+        /// <typeparam name="T">Entity for which to return the IQueryable.</typeparam>
+        /// <returns>Queryable with AsNoTracking() set.</returns>
+        protected virtual IQueryable<T> GetQuery<T>()
+            where T : class
+        {
+            return QueryAsDbSet<T>();
+        }
+
         /// <summary>
         /// Returns an IQueryable of the Entity with AsNoTracking set. This should be the default.
         /// </summary>
@@ -84,7 +102,7 @@ namespace Framework.Repository
         protected IQueryable<T> Query<T>()
             where T : class
         {
-            return Context.Set<T>().AsNoTracking();
+            return GetQuery<T>().AsNoTracking();
         }
 
         /// <summary>
@@ -95,7 +113,7 @@ namespace Framework.Repository
         protected IQueryable<T> TrackingQuery<T>()
             where T : class
         {
-            return Context.Set<T>();
+            return GetQuery<T>();
         }
 
         protected void SetEntityState<TEntity>(TEntity entity, EntityState state)

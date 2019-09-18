@@ -64,7 +64,7 @@ namespace Framework.Arduino.Linux.SerialCommunication
                 case Parity.Space: return RJCP.IO.Ports.Parity.Space;
             }
 
-            throw new ArgumentException();
+            throw new ArgumentOutOfRangeException(nameof(pt), pt, "illegal \"Parity\" value");
         }
 
         private RJCP.IO.Ports.Handshake ConvertTo(Handshake hs)
@@ -77,7 +77,7 @@ namespace Framework.Arduino.Linux.SerialCommunication
                 case Handshake.RequestToSendXOnXOff: return RJCP.IO.Ports.Handshake.RtsXOn;
             }
 
-            throw new ArgumentException();
+            throw new ArgumentOutOfRangeException(nameof(hs), hs, "illegal \"Handshake\" value");
         }
 
         private RJCP.IO.Ports.StopBits ConvertTo(StopBits sb)
@@ -89,7 +89,7 @@ namespace Framework.Arduino.Linux.SerialCommunication
                 case StopBits.OnePointFive: return RJCP.IO.Ports.StopBits.One5;
             }
 
-            throw new ArgumentException();
+            throw new ArgumentOutOfRangeException(nameof(sb), sb, "illegal \"StopBits\" value");
         }
 
         private StopBits ConvertTo(RJCP.IO.Ports.StopBits sb)
@@ -101,7 +101,7 @@ namespace Framework.Arduino.Linux.SerialCommunication
                 case RJCP.IO.Ports.StopBits.One5: return StopBits.OnePointFive;
             }
 
-            throw new ArgumentException();
+            throw new ArgumentOutOfRangeException(nameof(sb), sb, "illegal \"StopBits\" value");
         }
 
         public new string[] GetPortNames()

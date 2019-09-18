@@ -56,7 +56,7 @@ namespace Framework.Drawing
                     case 0:  return X;
                     case 1:  return Y;
                     case 2:  return Z;
-                    default: throw new ArgumentOutOfRangeException();
+                    default: throw new ArgumentOutOfRangeException(nameof(axis), axis, @"illegal axis");
                 }
             }
             set
@@ -72,7 +72,7 @@ namespace Framework.Drawing
                     case 2:
                         Z = value;
                         break;
-                    default: throw new ArgumentOutOfRangeException();
+                    default: throw new ArgumentOutOfRangeException(nameof(axis), axis, @"illegal axis");
                 }
             }
         }

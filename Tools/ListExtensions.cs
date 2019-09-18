@@ -14,6 +14,9 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
+using System.Collections;
+using System.Reflection;
+
 namespace Framework.Tools
 {
     using System;
@@ -88,6 +91,19 @@ namespace Framework.Tools
             }
 
             return listList;
+        }
+
+        public static IEnumerable<T> Select<T>(this IEnumerable list, PropertyInfo pi)
+        {
+            IList<T> returnList = new List<T>();
+
+            foreach (var element in list)
+            {
+                var val = (T) pi.GetValue(element);
+                returnList.Add(val);
+            }
+
+            return returnList;
         }
     }
 }

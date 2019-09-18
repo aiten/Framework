@@ -14,13 +14,13 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.Tools.Tools
-{
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Reflection;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 
+namespace Framework.Tools.Csv
+{
     public class CsvImport<T> : CsvImportBase where T : new()
     {
         public IList<T> Read(string[] csvLines)

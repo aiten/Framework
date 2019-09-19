@@ -16,8 +16,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Data;
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Text;
@@ -55,7 +53,6 @@ namespace Framework.Tools.Csv
             var lineIdx        = 0;
             var readLineIdx    = 0;
             var compareLineIdx = skipTitleLine ? 1 : 0;
-
 
             while (true)
             {
@@ -104,8 +101,7 @@ namespace Framework.Tools.Csv
                 return null;
             }
 
-            var columns = new List<string>();
-
+            var  columns     = new List<string>();
             var  sb          = new StringBuilder(line.Length);
             char noQuoteChar = '\0';
             char quoteChar   = noQuoteChar;

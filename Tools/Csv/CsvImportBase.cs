@@ -17,6 +17,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Text;
@@ -50,10 +51,9 @@ namespace Framework.Tools.Csv
 
         public IList<IList<string>> ReadStringMatrixFromCsv(string[] lines, bool skipTitleLine)
         {
-
             var elements       = new List<IList<string>>();
             var lineIdx        = 0;
-            var readLineIdx = 0;
+            var readLineIdx    = 0;
             var compareLineIdx = skipTitleLine ? 1 : 0;
 
 
@@ -85,7 +85,6 @@ namespace Framework.Tools.Csv
                 }
 
                 lineIdx++;
-
             }
 
             return elements;
@@ -105,23 +104,32 @@ namespace Framework.Tools.Csv
                 return null;
             }
 
-            // remark: newline in Quote not implemented 
             var columns = new List<string>();
 
             var  sb          = new StringBuilder(line.Length);
             char noQuoteChar = '\0';
             char quoteChar   = noQuoteChar;
-            char lastCh      = noQuoteChar;
 
             while (true)
             {
-                foreach (var ch in line)
+                for (int idx = 0; idx < line.Length; idx++)
                 {
+                    var ch = line[idx];
+
                     if (ch == quoteChar)
                     {
-                        quoteChar = noQuoteChar;
+                        // end of " or ""
+                        if ((idx + 1) < line.Length && line[idx + 1] == quoteChar)
+                        {
+                            idx++;
+                            sb.Append(ch);
+                        }
+                        else
+                        {
+                            quoteChar = noQuoteChar;
+                        }
                     }
-                    else if (quoteChar == noQuoteChar && lastCh != '\\' && (ch == '\'' || ch == '"'))
+                    else if (quoteChar == noQuoteChar && ch == '"')
                     {
                         quoteChar = ch;
                     }
@@ -134,8 +142,6 @@ namespace Framework.Tools.Csv
                     {
                         sb.Append(ch);
                     }
-
-                    lastCh = ch;
                 }
 
                 if (quoteChar == noQuoteChar)

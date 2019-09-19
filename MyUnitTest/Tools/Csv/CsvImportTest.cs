@@ -156,7 +156,7 @@ namespace Framework.Tools.Csv
 
             var csvList = new CsvImport<CsvImportStringClass>().Read(lines);
 
-            csvList.Should().HaveCount(lines.Length - 1);
+            csvList.Should().HaveCount(lines.Length - 3);
 
             csvList[0].Should().BeEquivalentTo(new CsvImportStringClass() { ColString1 = "No quote1", ColString2                     = "No quote2" });
             csvList[1].Should().BeEquivalentTo(new CsvImportStringClass() { ColString1 = "Single Quote1", ColString2                 = "Single Quote2" });

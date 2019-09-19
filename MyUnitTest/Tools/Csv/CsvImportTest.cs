@@ -132,7 +132,7 @@ namespace Framework.Tools.Csv
 
         #endregion
 
-        #region StringQuoating 
+        #region StringQuoting 
 
         public class CsvImportStringClass
         {
@@ -141,29 +141,29 @@ namespace Framework.Tools.Csv
         }
 
         [Fact]
-        public void CsvImportQoutedStringTest()
+        public void CsvImportQuotedStringTest()
         {
             var lines = new[]
             {
                 "ColString1;ColString2",
-                "No qoute1;No qoute2",
-                "\"Single Quoute1\";\"Single Quoute2\"",
-                "\"Semicolon in string ; Quouted1\";\"Semicolon in string ; Quouted2\"",
-                "\"newline in string ", "Quouted1\";\"newline in string ", "Quouted2\"",
+                "No quote1;No quote2",
+                "\"Single Quote1\";\"Single Quote2\"",
+                "\"Semicolon in string ; Quoted1\";\"Semicolon in string ; Quoted2\"",
+                "\"newline in string ", "Quoted1\";\"newline in string ", "Quoted2\"",
                 "\"Quote \"\"in\"\" string1\";\"Quote \"\"in\"\" string2\"",
                 "\"\"\"\"\"\"\"\";\"\"\"\""
             };
 
             var csvList = new CsvImport<CsvImportStringClass>().Read(lines);
 
-            csvList.Should().HaveCount(7 - 1);
+            csvList.Should().HaveCount(lines.Length - 1);
 
-            csvList[0].Should().BeEquivalentTo(new CsvImportStringClass() { ColString1 = "No qoute1", ColString2                      = "No qoute2" });
-            csvList[1].Should().BeEquivalentTo(new CsvImportStringClass() { ColString1 = "Single Quoute1", ColString2                 = "Single Quoute2" });
-            csvList[2].Should().BeEquivalentTo(new CsvImportStringClass() { ColString1 = "Semicolon in string ; Quouted1", ColString2 = "Semicolon in string ; Quouted2" });
-            csvList[3].Should().BeEquivalentTo(new CsvImportStringClass() { ColString1 = "newline in string \nQuouted1", ColString2   = "newline in string \nQuouted2" });
-            csvList[4].Should().BeEquivalentTo(new CsvImportStringClass() { ColString1 = "Quote \"in\" string1", ColString2           = "Quote \"in\" string2" });
-            csvList[5].Should().BeEquivalentTo(new CsvImportStringClass() { ColString1 = "\"\"\"", ColString2 = "\"" });
+            csvList[0].Should().BeEquivalentTo(new CsvImportStringClass() { ColString1 = "No quote1", ColString2                     = "No quote2" });
+            csvList[1].Should().BeEquivalentTo(new CsvImportStringClass() { ColString1 = "Single Quote1", ColString2                 = "Single Quote2" });
+            csvList[2].Should().BeEquivalentTo(new CsvImportStringClass() { ColString1 = "Semicolon in string ; Quoted1", ColString2 = "Semicolon in string ; Quoted2" });
+            csvList[3].Should().BeEquivalentTo(new CsvImportStringClass() { ColString1 = "newline in string \nQuoted1", ColString2   = "newline in string \nQuoted2" });
+            csvList[4].Should().BeEquivalentTo(new CsvImportStringClass() { ColString1 = "Quote \"in\" string1", ColString2          = "Quote \"in\" string2" });
+            csvList[5].Should().BeEquivalentTo(new CsvImportStringClass() { ColString1 = "\"\"\"", ColString2                        = "\"" });
         }
 
         #endregion

@@ -51,10 +51,9 @@ namespace Framework.Tools.Csv
 
         public IList<IList<string>> ReadStringMatrixFromCsv(string[] lines, bool skipTitleLine)
         {
-
             var elements       = new List<IList<string>>();
             var lineIdx        = 0;
-            var readLineIdx = 0;
+            var readLineIdx    = 0;
             var compareLineIdx = skipTitleLine ? 1 : 0;
 
 
@@ -86,7 +85,6 @@ namespace Framework.Tools.Csv
                 }
 
                 lineIdx++;
-
             }
 
             return elements;
@@ -106,7 +104,6 @@ namespace Framework.Tools.Csv
                 return null;
             }
 
-            // remark: newline in Quote not implemented 
             var columns = new List<string>();
 
             var  sb          = new StringBuilder(line.Length);
@@ -120,9 +117,9 @@ namespace Framework.Tools.Csv
                     var ch = line[idx];
 
                     if (ch == quoteChar)
-                    {   
+                    {
                         // end of " or ""
-                        if ((idx+1) < line.Length && line[idx + 1] == quoteChar)
+                        if ((idx + 1) < line.Length && line[idx + 1] == quoteChar)
                         {
                             idx++;
                             sb.Append(ch);

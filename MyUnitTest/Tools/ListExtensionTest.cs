@@ -214,7 +214,7 @@ namespace Framework.MyUnitTest.Tools
 
         private class SelectTest
         {
-            public int Property1 { get; set; }
+            public int    Property1 { get; set; }
             public double Property2 { get; set; }
         }
 
@@ -234,7 +234,6 @@ namespace Framework.MyUnitTest.Tools
 
             doubleOfProperty2.Should().HaveCount(2);
             doubleOfProperty2.Should().Contain(new double[] { 1.1, 2.2 });
-
         }
 
         #endregion

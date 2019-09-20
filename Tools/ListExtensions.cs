@@ -99,7 +99,7 @@ namespace Framework.Tools
 
             foreach (var element in list)
             {
-                var val = (T) pi.GetValue(element);
+                var val = (T)pi.GetValue(element);
                 returnList.Add(val);
             }
 

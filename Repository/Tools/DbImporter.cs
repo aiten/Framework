@@ -35,7 +35,9 @@ namespace Framework.Repository.Tools
             _context = context;
         }
 
-        protected Dictionary<TKey, TEntity> SeedCsvData<TKey,TEntity>(string fileName, Func<TEntity, TKey> getKey, Action<TEntity, TKey> setKey) where TEntity : class, new()
+        #region Csv Import
+
+        protected Dictionary<TKey, TEntity> ImportCsv<TKey, TEntity>(string fileName, Func<TEntity, TKey> getKey, Action<TEntity, TKey> setKey) where TEntity : class, new()
         {
             var entities = ReadFromCsv<TEntity>($@"{CsvDir}\{fileName}");
             return PrepareAndAdd<TKey, TEntity>(entities, getKey, setKey);
@@ -59,5 +61,19 @@ namespace Framework.Repository.Tools
             var items     = csvImport.Read(path).ToList();
             return items;
         }
+
+        #endregion
+
+        #region fill from Db
+
+        protected Dictionary<TKey, TEntity> ReadFromDb<TKey, TEntity>(Func<TEntity, TKey> getKey) where TEntity : class
+        {
+            var allEntities = _context.Set<TEntity>().ToList();
+            var keyMap      = allEntities.ToDictionary(getKey, x => x);
+
+            return keyMap;
+        }
+
+        #endregion
     }
 }

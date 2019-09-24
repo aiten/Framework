@@ -24,6 +24,6 @@ namespace Framework.Tools
     {
         public DateTime Now => DateTime.Now;
 
-        public DateTime ToDay => DateTime.Today;
+        public DateTime Today => DateTime.Today;
     }
 }

@@ -21,6 +21,6 @@ namespace Framework.Tools.Abstraction
     public interface ICurrentDateTime
     {
         DateTime Now   { get; }
-        DateTime ToDay { get; }
+        DateTime Today { get; }
     }
 }

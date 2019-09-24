@@ -25,17 +25,17 @@ namespace Framework.UnitTest
         public CurrentDateTimeMock(DateTime now)
         {
             Now   = now;
-            ToDay = now.Date;
+            Today = now.Date;
         }
 
         public CurrentDateTimeMock()
         {
             Now   = DateTime.Now;
-            ToDay = Now.Date;
+            Today = Now.Date;
         }
 
         public DateTime Now { get; private set; }
 
-        public DateTime ToDay { get; private set; }
+        public DateTime Today { get; private set; }
     }
 }

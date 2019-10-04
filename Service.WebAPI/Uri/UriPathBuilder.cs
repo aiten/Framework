@@ -35,6 +35,11 @@ namespace Framework.Service.WebAPI.Uri
             return $"{Path}?{Query}";
         }
 
+        public UriPathBuilder AddPath<T>(T path)
+        {
+            return AddPath(path.ToUriAsPath());
+        }
+
         public UriPathBuilder AddPath(string path)
         {
             if (string.IsNullOrEmpty(Path))

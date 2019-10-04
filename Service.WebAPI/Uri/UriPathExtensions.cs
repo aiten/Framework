@@ -35,5 +35,10 @@ namespace Framework.Service.WebAPI.Uri
 
             return HttpUtility.UrlEncode(val.ToString());
         }
+
+        public static string ToUriAsPath(this object val)
+        {
+            return val.ToUriAsQuery();
+        }
     }
 }

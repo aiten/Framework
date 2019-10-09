@@ -33,8 +33,8 @@ namespace Framework.Logic
 
         protected GetManager(IUnitOfWork unitOfWork, IGetRepository<TEntity, TKey> repository, IMapper mapper)
         {
-            _repository = repository ?? throw new ArgumentNullException();
-            _mapper     = mapper ?? throw new ArgumentNullException();
+            _repository = repository ?? throw new ArgumentNullException(nameof(repository));
+            _mapper     = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
         protected abstract TKey GetKey(TEntity entity);

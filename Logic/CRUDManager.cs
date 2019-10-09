@@ -35,9 +35,9 @@ namespace Framework.Logic
 
         protected CRUDManager(IUnitOfWork unitOfWork, ICRUDRepository<TEntity, TKey> repository, IMapper mapper) : base(unitOfWork, repository, mapper)
         {
-            _unitOfWork = unitOfWork ?? throw new ArgumentNullException();
-            _repository = repository ?? throw new ArgumentNullException();
-            _mapper     = mapper ?? throw new ArgumentNullException();
+            _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
+            _repository = repository ?? throw new ArgumentNullException(nameof(repository));
+            _mapper     = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
         public async Task<TKey> Add(T value)
@@ -129,7 +129,7 @@ namespace Framework.Logic
 
                 if (entities.Count() != entitiesInDb.Count || entities.Count() != mergeJoin.Count())
                 {
-                    throw new ArgumentException();
+                    throw new ArgumentException("join result is different");
                 }
 
                 foreach (var merged in mergeJoin)

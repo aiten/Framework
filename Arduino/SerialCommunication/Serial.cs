@@ -52,7 +52,7 @@ namespace Framework.Arduino.SerialCommunication
         public Serial(IFactory<ISerialPort> serialPortFactory, ILogger<Serial> logger)
         {
             Logger             = logger;
-            _serialPortFactory = serialPortFactory ?? throw new ArgumentNullException();
+            _serialPortFactory = serialPortFactory ?? throw new ArgumentNullException(nameof(serialPortFactory));
         }
 
         #region Events

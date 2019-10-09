@@ -15,6 +15,7 @@
 */
 
 using System.Collections.Generic;
+using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -39,18 +40,15 @@ namespace Framework.Service.WebAPI
             return _httpClient;
         }
 
+        #region Read / Get
+
         public async Task<IList<T>> ReadList<T>(string uri)
         {
             var client = GetHttpClient();
 
             HttpResponseMessage response = await client.GetAsync(uri);
-            if (response.IsSuccessStatusCode)
-            {
-                var items = await response.Content.ReadAsAsync<IList<T>>();
-                return items;
-            }
-
-            return null;
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadAsAsync<IList<T>>();
         }
 
         public async Task<IList<T>> ReadList<T>(UriPathBuilder pathBuilder)
@@ -63,13 +61,18 @@ namespace Framework.Service.WebAPI
             var client = GetHttpClient();
 
             HttpResponseMessage response = await client.GetAsync(uri);
-            if (response.IsSuccessStatusCode)
+            if (response.StatusCode == HttpStatusCode.NotFound)
             {
-                var item = await response.Content.ReadAsAsync<T>();
-                return item;
+                return default(T);
             }
 
-            return default(T);
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadAsAsync<T>();
+        }
+
+        public async Task<T> Read<T>(UriPathBuilder pathBuilder)
+        {
+            return await Read<T>(pathBuilder.Build());
         }
 
         public async Task<string> ReadString(UriPathBuilder pathBuilder)
@@ -82,19 +85,11 @@ namespace Framework.Service.WebAPI
             var client = GetHttpClient();
 
             HttpResponseMessage response = await client.GetAsync(uri);
-            if (response.IsSuccessStatusCode)
-            {
-                var item = await response.Content.ReadAsStringAsync();
-                return item;
-            }
-
-            return null;
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadAsStringAsync();
         }
 
-        public async Task<T> Read<T>(UriPathBuilder pathBuilder)
-        {
-            return await Read<T>(pathBuilder.Build());
-        }
+        #endregion
 
         public UriPathBuilder CreatePathBuilder()
         {

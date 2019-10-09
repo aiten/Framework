@@ -28,7 +28,7 @@ namespace Framework.Service.Logic
 
         protected GetService(ICRUDManager<T, TKey> manager)
         {
-            _manager = manager ?? throw new ArgumentNullException();
+            _manager = manager ?? throw new ArgumentNullException(nameof(manager));
         }
 
         public async Task<T> Get(TKey id)

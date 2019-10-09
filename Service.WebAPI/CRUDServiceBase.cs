@@ -31,16 +31,7 @@ namespace Framework.Service.WebAPI
 
         public async Task<T> Get(TKey id)
         {
-            var client = GetHttpClient();
-
-            HttpResponseMessage response = await client.GetAsync(CreatePathBuilder().AddPath(id.ToString()).Build());
-            if (response.IsSuccessStatusCode)
-            {
-                T value = await response.Content.ReadAsAsync<T>();
-                return value;
-            }
-
-            return null;
+            return await Read<T>(CreatePathBuilder().AddPath(id));
         }
 
         public Task<IEnumerable<T>> Get(IEnumerable<TKey> keys)
@@ -50,16 +41,7 @@ namespace Framework.Service.WebAPI
 
         public async Task<IEnumerable<T>> GetAll()
         {
-            var client = GetHttpClient();
-
-            HttpResponseMessage response = await client.GetAsync(CreatePathBuilder().Build());
-            if (response.IsSuccessStatusCode)
-            {
-                IEnumerable<T> dtos = await response.Content.ReadAsAsync<IEnumerable<T>>();
-                return dtos;
-            }
-
-            return null;
+            return await Read<IEnumerable<T>>(CreatePathBuilder());
         }
 
         public async Task<TKey> Add(T value)
@@ -67,12 +49,7 @@ namespace Framework.Service.WebAPI
             var client = GetHttpClient();
 
             HttpResponseMessage response = await client.PostAsJsonAsync(CreatePathBuilder().Build(), value);
-
-            if (!response.IsSuccessStatusCode)
-            {
-                return default(TKey);
-            }
-
+            response.EnsureSuccessStatusCode();
             return GetKey(await response.Content.ReadAsAsync<T>());
         }
 
@@ -95,14 +72,8 @@ namespace Framework.Service.WebAPI
         {
             var client = GetHttpClient();
 
-            HttpResponseMessage response = await client.DeleteAsync(CreatePathBuilder().AddPath(key.ToString()).Build());
-
-            if (response.IsSuccessStatusCode)
-            {
-                // return RedirectToAction("Index");
-            }
-
-            // return HttpNotFound();
+            HttpResponseMessage response = await client.DeleteAsync(CreatePathBuilder().AddPath(key).Build());
+            response.EnsureSuccessStatusCode();
         }
 
         public Task Delete(IEnumerable<TKey> keys)
@@ -114,7 +85,8 @@ namespace Framework.Service.WebAPI
         {
             var client = GetHttpClient();
 
-            HttpResponseMessage response = await client.PutAsJsonAsync(CreatePathBuilder().AddPath(GetKey(value).ToString()).Build(), value);
+            HttpResponseMessage response = await client.PutAsJsonAsync(CreatePathBuilder().AddPath(GetKey(value)).Build(), value);
+            response.EnsureSuccessStatusCode();
         }
 
         public Task Update(IEnumerable<T> values)

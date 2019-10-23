@@ -40,6 +40,8 @@ namespace Framework.Logic
             _mapper     = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
+        #region Add
+
         public async Task<TKey> Add(T value)
         {
             return (await Add(new List<T>() { value })).First();
@@ -64,6 +66,10 @@ namespace Framework.Logic
                 return entities.Select(GetKey);
             }
         }
+
+        #endregion
+
+        #region Delete
 
         public async Task Delete(T value)
         {
@@ -110,6 +116,10 @@ namespace Framework.Logic
             }
         }
 
+        #endregion
+
+        #region Update
+
         public async Task Update(T value)
         {
             await Update(new[] { value });
@@ -121,25 +131,30 @@ namespace Framework.Logic
             {
                 await ValidateDto(values, ValidationType.UpdateValidation);
 
-                var entities = MapFromDtos(values, ValidationType.UpdateValidation);
-
+                var entities     = MapFromDtos(values, ValidationType.UpdateValidation);
                 var entitiesInDb = await _repository.GetTracking(entities.Select(GetKey));
 
-                var mergeJoin = entitiesInDb.Join(entities, GetKey, GetKey, (entityInDb, entity) => new { EntityInDb = entityInDb, Entity = entity });
-
-                if (entities.Count() != entitiesInDb.Count || entities.Count() != mergeJoin.Count())
-                {
-                    throw new ArgumentException("join result is different");
-                }
-
-                foreach (var merged in mergeJoin)
-                {
-                    UpdateEntity(merged.EntityInDb, merged.Entity);
-                }
-
+                await Update(values, entitiesInDb, entities);
                 await CommitTransaction(trans);
             }
         }
+
+        protected async Task Update(IEnumerable<T> values, IList<TEntity> entitiesInDb, IEnumerable<TEntity> entities)
+        {
+            var mergeJoin = entitiesInDb.Join(entities, GetKey, GetKey, (entityInDb, entity) => new { EntityInDb = entityInDb, Entity = entity });
+
+            if (entities.Count() != entitiesInDb.Count || entities.Count() != mergeJoin.Count())
+            {
+                throw new ArgumentException("join result is different");
+            }
+
+            foreach (var merged in mergeJoin)
+            {
+                UpdateEntity(values, merged.EntityInDb, merged.Entity);
+            }
+        }
+
+        #endregion
 
         protected async Task CommitTransaction(ITransaction trans)
         {
@@ -178,12 +193,17 @@ namespace Framework.Logic
         {
         }
 
-        protected virtual void AddEntity(TEntity entityInDb)
+        protected virtual void AddEntity(TEntity entity)
         {
         }
 
         protected virtual void DeleteEntity(TEntity entityInDb)
         {
+        }
+
+        protected virtual void UpdateEntity(IEnumerable<T> dtos, TEntity entityInDb, TEntity entity)
+        {
+            UpdateEntity(entityInDb, entity);
         }
 
         protected virtual void UpdateEntity(TEntity entityInDb, TEntity values)

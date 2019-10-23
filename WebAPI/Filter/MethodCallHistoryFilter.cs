@@ -15,48 +15,42 @@
 */
 
 using System;
-using System.Linq;
-using System.Web;
 
-namespace Framework.Service.WebAPI.Uri
+using Framework.WebAPI.Tool;
+
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Filters;
+
+namespace Framework.WebAPI.Filter
 {
-    public static class UriPathExtensions
+    public sealed class MethodCallHistoryFilter : IActionFilter
     {
-        public static string ToUriAsQuery(this object val)
+        private MethodCallHistory _methodCallHistory;
+
+        public MethodCallHistoryFilter(MethodCallHistory methodCallHistory)
         {
-            if (val is DateTime dt)
-            {
-                if (dt.TimeOfDay != TimeSpan.Zero)
-                {
-                    return HttpUtility.UrlEncode(dt.ToString("o"));
-                }
-
-                return dt.ToString("yyyy-MM-dd");
-            }
-
-            Type[] _types =
-            {
-                typeof(string),
-                typeof(int),
-                typeof(uint),
-                typeof(byte),
-                typeof(long),
-                typeof(ulong),
-                typeof(short),
-                typeof(ushort),
-            };
-
-            if (_types.Contains(val.GetType()) == false)
-            {
-                throw new ArgumentException($"{nameof(val)}-{val.GetType().ToString()}: cannot be used for UrlEncode.");
-            }
-
-            return HttpUtility.UrlEncode(val.ToString());
+            _methodCallHistory = methodCallHistory ?? throw new ArgumentNullException(nameof(methodCallHistory));
         }
 
-        public static string ToUriAsPath(this object val)
+        public void OnActionExecuting(ActionExecutingContext context)
         {
-            return val.ToUriAsQuery();
+        }
+
+        public void OnActionExecuted(ActionExecutedContext context)
+        {
+            string userName = null;
+
+            if (context.Controller is Microsoft.AspNetCore.Mvc.Controller controller)
+            {
+                userName = controller.User?.Identity?.Name;
+            }
+
+            _methodCallHistory.Add(GetCurrentUri(context.HttpContext.Request), userName);
+        }
+
+        public string GetCurrentUri(HttpRequest request)
+        {
+            return $"{request.Method} {request.Scheme}://{request.Host}{request.Path}{request.QueryString}";
         }
     }
 }

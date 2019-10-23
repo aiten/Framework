@@ -14,23 +14,15 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.WebAPI.Filter
+using Microsoft.AspNetCore.Http;
+
+namespace Framework.WebAPI.Tool
 {
-    using Microsoft.AspNetCore.Mvc;
-    using Microsoft.AspNetCore.Mvc.Filters;
-
-    public sealed class ValidateRequestDataFilter : IActionFilter
+    public static class HttpRequestExtensions
     {
-        public void OnActionExecuting(ActionExecutingContext context)
+        public static string GetCurrentUri(this HttpRequest request)
         {
-            if (!context.ModelState.IsValid)
-            {
-                context.Result = new BadRequestObjectResult(context.ModelState);
-            }
-        }
-
-        public void OnActionExecuted(ActionExecutedContext context)
-        {
+            return $"{request.Scheme}://{request.Host}{request.Path}{request.QueryString}";
         }
     }
 }

@@ -14,6 +14,8 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
+using Framework.WebAPI.Tool;
+
 namespace Framework.WebAPI.Controller
 {
     using System;
@@ -36,7 +38,7 @@ namespace Framework.WebAPI.Controller
                 return "dummy";
             }
 
-            return $"{controller.Request.Scheme}://{controller.Request.Host}{controller.Request.Path}{controller.Request.QueryString}";
+            return controller.Request.GetCurrentUri();
         }
 
         public static string GetCurrentUri(this Controller controller, string removeTrailing)
@@ -47,7 +49,7 @@ namespace Framework.WebAPI.Controller
                 return "dummy";
             }
 
-            string totalUri = controller.GetCurrentUri();
+            string totalUri = controller.Request.GetCurrentUri();
 
             int filterIdx = totalUri.LastIndexOf('?');
             if (filterIdx > 0)

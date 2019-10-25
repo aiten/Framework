@@ -59,15 +59,7 @@ namespace Framework.Service.WebAPI
         public async Task<T> Read<T>(string uri)
         {
             var client = GetHttpClient();
-
-            HttpResponseMessage response = await client.GetAsync(uri);
-            if (response.StatusCode == HttpStatusCode.NotFound)
-            {
-                return default(T);
-            }
-
-            response.EnsureSuccessStatusCode();
-            return await response.Content.ReadAsAsync<T>();
+            return await Read<T>(await client.GetAsync(uri));
         }
 
         public async Task<T> Read<T>(UriPathBuilder pathBuilder)
@@ -87,6 +79,17 @@ namespace Framework.Service.WebAPI
             HttpResponseMessage response = await client.GetAsync(uri);
             response.EnsureSuccessStatusCode();
             return await response.Content.ReadAsStringAsync();
+        }
+
+        protected async Task<T> Read<T>(HttpResponseMessage response)
+        {
+            if (response.StatusCode == HttpStatusCode.NotFound)
+            {
+                return default(T);
+            }
+
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadAsAsync<T>();
         }
 
         #endregion

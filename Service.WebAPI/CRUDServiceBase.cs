@@ -46,9 +46,9 @@ namespace Framework.Service.WebAPI
 
         public async Task<TKey> Add(T value)
         {
-            var client = GetHttpClient();
+            var client   = GetHttpClient();
+            var response = await client.PostAsJsonAsync(CreatePathBuilder().Build(), value);
 
-            HttpResponseMessage response = await client.PostAsJsonAsync(CreatePathBuilder().Build(), value);
             response.EnsureSuccessStatusCode();
             return GetKey(await response.Content.ReadAsAsync<T>());
         }
@@ -70,9 +70,9 @@ namespace Framework.Service.WebAPI
 
         public async Task Delete(TKey key)
         {
-            var client = GetHttpClient();
+            var client   = GetHttpClient();
+            var response = await client.DeleteAsync(CreatePathBuilder().AddPath(key).Build());
 
-            HttpResponseMessage response = await client.DeleteAsync(CreatePathBuilder().AddPath(key).Build());
             response.EnsureSuccessStatusCode();
         }
 
@@ -83,9 +83,9 @@ namespace Framework.Service.WebAPI
 
         public async Task Update(T value)
         {
-            var client = GetHttpClient();
+            var client   = GetHttpClient();
+            var response = await client.PutAsJsonAsync(CreatePathBuilder().AddPath(GetKey(value)).Build(), value);
 
-            HttpResponseMessage response = await client.PutAsJsonAsync(CreatePathBuilder().AddPath(GetKey(value)).Build(), value);
             response.EnsureSuccessStatusCode();
         }
 

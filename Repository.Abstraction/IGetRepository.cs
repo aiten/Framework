@@ -27,9 +27,5 @@ namespace Framework.Repository.Abstraction
         Task<TEntity> Get(TKey key);
 
         Task<IList<TEntity>> Get(IEnumerable<TKey> keys);
-
-        Task<TEntity> GetTracking(TKey key);
-
-        Task<IList<TEntity>> GetTracking(IEnumerable<TKey> keys);
     }
 }

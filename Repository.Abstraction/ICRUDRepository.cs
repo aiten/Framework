@@ -14,6 +14,8 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
+using System.Threading.Tasks;
+
 namespace Framework.Repository.Abstraction
 {
     using System;
@@ -22,6 +24,12 @@ namespace Framework.Repository.Abstraction
     public interface ICRUDRepository<TEntity, TKey> : IGetRepository<TEntity, TKey>
         where TEntity : class
     {
+        Task<IList<TEntity>> GetTrackingAll();
+
+        Task<TEntity> GetTracking(TKey key);
+
+        Task<IList<TEntity>> GetTracking(IEnumerable<TKey> keys);
+
         void Add(TEntity entity);
 
         void AddRange(IEnumerable<TEntity> entities);

@@ -14,10 +14,13 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
+
 namespace Framework.Repository
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
+    using System.Threading.Tasks;
 
     using Microsoft.EntityFrameworkCore;
 
@@ -30,6 +33,28 @@ namespace Framework.Repository
             : base(dbContext)
         {
         }
+        protected IQueryable<TEntity> TrackingQueryWithInclude => AddInclude(TrackingQuery);
+
+        protected IQueryable<TEntity> TrackingQueryWithOptional => AddOptionalWhere(TrackingQuery);
+
+        #region Get Tracking
+
+        public async Task<IList<TEntity>> GetTrackingAll()
+        {
+            return await GetAll(AddInclude(TrackingQueryWithOptional));
+        }
+
+        public async Task<TEntity> GetTracking(TKey key)
+        {
+            return await Get(TrackingQueryWithInclude, key);
+        }
+
+        public async Task<IList<TEntity>> GetTracking(IEnumerable<TKey> keys)
+        {
+            return await Get(TrackingQueryWithInclude, keys);
+        }
+
+        #endregion
 
         #region CRUD
 

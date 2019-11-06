@@ -46,17 +46,6 @@ namespace Framework.UnitTest.Repository
             }
         }
 
-        public async Task<TEntity> GetTrackingOK(TKey key)
-        {
-            using (var ctx = CreateTestDbContext())
-            {
-                var entity = await ctx.Repository.GetTracking(key);
-                entity.Should().NotBeNull();
-                entity.Should().BeOfType(typeof(TEntity));
-                return entity;
-            }
-        }
-
         public async Task<TEntity> GetOK(TKey key)
         {
             using (var ctx = CreateTestDbContext())

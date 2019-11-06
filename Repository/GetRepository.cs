@@ -34,11 +34,7 @@ namespace Framework.Repository
 
         protected IQueryable<TEntity> QueryWithInclude => AddInclude(Query);
 
-        protected IQueryable<TEntity> TrackingQueryWithInclude => AddInclude(TrackingQuery);
-
         protected IQueryable<TEntity> QueryWithOptional => AddOptionalWhere(Query);
-
-        protected IQueryable<TEntity> TrackingQueryWithOptional => AddOptionalWhere(TrackingQuery);
 
         protected virtual FilterBuilder<TEntity, TKey> FilterBuilder { get; } = null;
 
@@ -74,16 +70,6 @@ namespace Framework.Repository
         public async Task<IList<TEntity>> Get(IEnumerable<TKey> keys)
         {
             return await Get(QueryWithInclude, keys);
-        }
-
-        public async Task<TEntity> GetTracking(TKey key)
-        {
-            return await Get(TrackingQueryWithInclude, key);
-        }
-
-        public async Task<IList<TEntity>> GetTracking(IEnumerable<TKey> keys)
-        {
-            return await Get(TrackingQueryWithInclude, keys);
         }
 
         #endregion

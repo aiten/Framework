@@ -33,6 +33,7 @@ namespace Framework.Repository
             : base(dbContext)
         {
         }
+
         protected IQueryable<TEntity> TrackingQueryWithInclude => AddInclude(TrackingQuery);
 
         protected IQueryable<TEntity> TrackingQueryWithOptional => AddOptionalWhere(TrackingQuery);

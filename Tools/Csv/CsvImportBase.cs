@@ -196,7 +196,7 @@ namespace Framework.Tools.Csv
                 case @"true":
                     return true;
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(excelField), excelField, @"cannot convert to ""bool"".");
+                    throw new ArgumentOutOfRangeException(nameof(excelField), excelField, $@"cannot convert '{excelField}' to 'bool'.");
             }
         }
 
@@ -299,10 +299,55 @@ namespace Framework.Tools.Csv
                 throw;
             }
         }
+
         public byte[] ExcelImage(string excelField)
         {
-            byte[] bytes = System.Convert.FromBase64String(excelField);
+            byte[] bytes;
+
+            if (excelField.StartsWith(@"0x"))
+            {
+                if ((excelField.Length % 2) == 1)
+                {
+                    throw new ArgumentException(nameof(excelField), @"string has odd length.");
+                }
+
+                int length = (excelField.Length - 2) / 2;
+                int chIdx  = 2;
+
+                bytes = new byte[length];
+
+                for (int i = 0; i < length; i++)
+                {
+                    bytes[i] =  (byte)(ToHex(excelField[chIdx]) * 16 + ToHex(excelField[chIdx + 1]));
+                    chIdx    += 2;
+                }
+            }
+            else
+            {
+                bytes = System.Convert.FromBase64String(excelField);
+            }
+
             return bytes;
+        }
+
+        private int ToHex(char ch)
+        {
+            if (ch >= '0' && ch <= '9')
+            {
+                return ch - '0';
+            }
+
+            if (ch >= 'a' && ch <= 'f')
+            {
+                return ch - 'a';
+            }
+
+            if (ch >= 'A' && ch <= 'F')
+            {
+                return ch - 'F';
+            }
+
+            throw new ArgumentException(nameof(ch), $@"'{ch}' is not a hex digit.");
         }
     }
 }

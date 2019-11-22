@@ -37,31 +37,31 @@ namespace Framework.Tools.Csv
                 EnumValue2
             }
 
-            public string    ColString                  { get; set; }
-            public int       ColInt                     { get; set; }
-            public short     ColShort                   { get; set; }
-            public decimal   ColDecimal                 { get; set; }
-            public byte      ColByte                    { get; set; }
-            public bool      ColBool                    { get; set; }
-            public long      ColLong                    { get; set; }
-            public double    ColDouble                  { get; set; }
-            public TestEnum  ColEnum                    { get; set; }
-            public DateTime  ColDate                    { get; set; }
-            public DateTime  ColDateAndTime             { get; set; }
-            public DateTime  ColDateAndTimeFraction     { get; set; }
-            public TimeSpan  ColTimeSpan                { get; set; }
-            public int?      ColIntNull                 { get; set; }
-            public short?    ColShortNull               { get; set; }
-            public decimal?  ColDecimalNull             { get; set; }
-            public byte?     ColByteNull                { get; set; }
-            public bool?     ColBoolNull                { get; set; }
-            public long?     ColLongNull                { get; set; }
-            public double?   ColDoubleNull              { get; set; }
-            public TestEnum? ColEnumNull                { get; set; }
-            public DateTime? ColDateNull                { get; set; }
-            public DateTime? ColDateAndTimeNull         { get; set; }
+            public string ColString { get; set; }
+            public int ColInt { get; set; }
+            public short ColShort { get; set; }
+            public decimal ColDecimal { get; set; }
+            public byte ColByte { get; set; }
+            public bool ColBool { get; set; }
+            public long ColLong { get; set; }
+            public double ColDouble { get; set; }
+            public TestEnum ColEnum { get; set; }
+            public DateTime ColDate { get; set; }
+            public DateTime ColDateAndTime { get; set; }
+            public DateTime ColDateAndTimeFraction { get; set; }
+            public TimeSpan ColTimeSpan { get; set; }
+            public int? ColIntNull { get; set; }
+            public short? ColShortNull { get; set; }
+            public decimal? ColDecimalNull { get; set; }
+            public byte? ColByteNull { get; set; }
+            public bool? ColBoolNull { get; set; }
+            public long? ColLongNull { get; set; }
+            public double? ColDoubleNull { get; set; }
+            public TestEnum? ColEnumNull { get; set; }
+            public DateTime? ColDateNull { get; set; }
+            public DateTime? ColDateAndTimeNull { get; set; }
             public DateTime? ColDateAndTimeFractionNull { get; set; }
-            public TimeSpan? ColTimeSpanNull            { get; set; }
+            public TimeSpan? ColTimeSpanNull { get; set; }
         }
 
         [Fact]
@@ -80,50 +80,50 @@ namespace Framework.Tools.Csv
 
             var csvObjectShouldBe = new CsvImportClass
             {
-                ColString                  = "Str",
-                ColInt                     = 1,
-                ColShort                   = 2,
-                ColDecimal                 = 2.5m,
-                ColByte                    = 127,
-                ColBool                    = true,
-                ColLong                    = 1234567890,
-                ColEnum                    = CsvImportClass.TestEnum.EnumValue1,
-                ColDate                    = 31.December(2018),
-                ColDateAndTime             = new DateTime(2018, 12, 31, 15, 56, 45),
-                ColDateAndTimeFraction     = new DateTime(2018, 12, 31, 15, 56, 45, 123),
-                ColTimeSpan                = new TimeSpan(15, 56, 45),
-                ColDouble                  = 34.12,
-                ColIntNull                 = 1,
-                ColShortNull               = 2,
-                ColDecimalNull             = 2.5m,
-                ColByteNull                = 127,
-                ColBoolNull                = false,
-                ColLongNull                = 9876543210,
-                ColEnumNull                = CsvImportClass.TestEnum.EnumValue1,
-                ColDateNull                = 31.December(2018),
-                ColDateAndTimeNull         = new DateTime(2018, 12, 31, 15, 56, 45),
+                ColString = "Str",
+                ColInt = 1,
+                ColShort = 2,
+                ColDecimal = 2.5m,
+                ColByte = 127,
+                ColBool = true,
+                ColLong = 1234567890,
+                ColEnum = CsvImportClass.TestEnum.EnumValue1,
+                ColDate = 31.December(2018),
+                ColDateAndTime = new DateTime(2018, 12, 31, 15, 56, 45),
+                ColDateAndTimeFraction = new DateTime(2018, 12, 31, 15, 56, 45, 123),
+                ColTimeSpan = new TimeSpan(15, 56, 45),
+                ColDouble = 34.12,
+                ColIntNull = 1,
+                ColShortNull = 2,
+                ColDecimalNull = 2.5m,
+                ColByteNull = 127,
+                ColBoolNull = false,
+                ColLongNull = 9876543210,
+                ColEnumNull = CsvImportClass.TestEnum.EnumValue1,
+                ColDateNull = 31.December(2018),
+                ColDateAndTimeNull = new DateTime(2018, 12, 31, 15, 56, 45),
                 ColDateAndTimeFractionNull = new DateTime(2018, 12, 31, 15, 56, 45, 123),
-                ColTimeSpanNull            = new TimeSpan(15, 56, 45),
-                ColDoubleNull              = 34.12
+                ColTimeSpanNull = new TimeSpan(15, 56, 45),
+                ColDoubleNull = 34.12
             };
             var csvObjectShouldBeNull = new CsvImportClass
             {
-                ColString              = string.Empty,
-                ColInt                 = 1,
-                ColShort               = 2,
-                ColDecimal             = 2.5m,
-                ColByte                = 127,
-                ColBool                = true,
-                ColLong                = 1234567890,
-                ColEnum                = CsvImportClass.TestEnum.EnumValue2,
-                ColDate                = 31.December(2018),
-                ColDateAndTime         = new DateTime(2018, 12, 31, 15, 56, 45),
+                ColString = string.Empty,
+                ColInt = 1,
+                ColShort = 2,
+                ColDecimal = 2.5m,
+                ColByte = 127,
+                ColBool = true,
+                ColLong = 1234567890,
+                ColEnum = CsvImportClass.TestEnum.EnumValue2,
+                ColDate = 31.December(2018),
+                ColDateAndTime = new DateTime(2018, 12, 31, 15, 56, 45),
                 ColDateAndTimeFraction = new DateTime(2018, 12, 31, 15, 56, 45, 123),
-                ColTimeSpan            = new TimeSpan(0, 15, 56, 45, 123),
-                ColDouble              = 34.12,
+                ColTimeSpan = new TimeSpan(0, 15, 56, 45, 123),
+                ColDouble = 34.12,
             };
 
-            var csvObject     = csvList[0];
+            var csvObject = csvList[0];
             var csvObjectNull = csvList[1];
 
             csvObject.Should().BeEquivalentTo(csvObjectShouldBe);
@@ -158,12 +158,52 @@ namespace Framework.Tools.Csv
 
             csvList.Should().HaveCount(lines.Length - 3);
 
-            csvList[0].Should().BeEquivalentTo(new CsvImportStringClass() { ColString1 = "No quote1", ColString2                     = "No quote2" });
-            csvList[1].Should().BeEquivalentTo(new CsvImportStringClass() { ColString1 = "Single Quote1", ColString2                 = "Single Quote2" });
+            csvList[0].Should().BeEquivalentTo(new CsvImportStringClass() { ColString1 = "No quote1", ColString2 = "No quote2" });
+            csvList[1].Should().BeEquivalentTo(new CsvImportStringClass() { ColString1 = "Single Quote1", ColString2 = "Single Quote2" });
             csvList[2].Should().BeEquivalentTo(new CsvImportStringClass() { ColString1 = "Semicolon in string ; Quoted1", ColString2 = "Semicolon in string ; Quoted2" });
-            csvList[3].Should().BeEquivalentTo(new CsvImportStringClass() { ColString1 = "newline in string \nQuoted1", ColString2   = "newline in string \nQuoted2" });
-            csvList[4].Should().BeEquivalentTo(new CsvImportStringClass() { ColString1 = "Quote \"in\" string1", ColString2          = "Quote \"in\" string2" });
-            csvList[5].Should().BeEquivalentTo(new CsvImportStringClass() { ColString1 = "\"\"\"", ColString2                        = "\"" });
+            csvList[3].Should().BeEquivalentTo(new CsvImportStringClass() { ColString1 = "newline in string \nQuoted1", ColString2 = "newline in string \nQuoted2" });
+            csvList[4].Should().BeEquivalentTo(new CsvImportStringClass() { ColString1 = "Quote \"in\" string1", ColString2 = "Quote \"in\" string2" });
+            csvList[5].Should().BeEquivalentTo(new CsvImportStringClass() { ColString1 = "\"\"\"", ColString2 = "\"" });
+        }
+
+        #endregion
+
+        #region Byte / Base64
+
+        [Fact]
+        public void CsvImageImportTest()
+        {
+            var csvImport = new CsvImportBase();
+
+            var img1 = csvImport.ExcelImage("0x");
+            img1.Should().HaveCount(0);
+
+            var img2 = csvImport.ExcelImage("0x12");
+            img2.Should().HaveCount(1);
+            img2[0].Should().Be(0x12);
+
+            var img3 = csvImport.ExcelImage("0x1234");
+            img3.Should().HaveCount(2);
+            img3[0].Should().Be(0x12);
+            img3[1].Should().Be(0x34);
+
+
+            Action act = () => csvImport.ExcelImage("0x12345");
+            act.Should().Throw<ArgumentException>().Where(e => e.Message.Contains("odd"));
+        }
+
+        [Fact]
+        public void CsvImageBase64ImportTest()
+        {
+            var csvImport = new CsvImportBase();
+
+            string fromBase64 = "Test base 64";
+            string toBase64 = Base64Helper.StringToBase64(fromBase64);
+
+            var img1 = csvImport.ExcelImage(toBase64);
+            var str2 = System.Text.Encoding.UTF8.GetString(img1);
+
+            str2.Should().Be(fromBase64);
         }
 
         #endregion

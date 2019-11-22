@@ -299,5 +299,10 @@ namespace Framework.Tools.Csv
                 throw;
             }
         }
+        public byte[] ExcelImage(string excelField)
+        {
+            byte[] bytes = System.Convert.FromBase64String(excelField);
+            return bytes;
+        }
     }
 }

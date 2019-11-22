@@ -14,27 +14,12 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-using System.Net.Http;
-using System.Net.Http.Headers;
-
-namespace Framework.Service.WebAPI
+namespace Framework.Logic.Abstraction
 {
-    public static class HttpClientHelper
-    {
-        public static void PrepareHttpClient(HttpClient httpClient, string baseUri)
-        {
-            httpClient.BaseAddress = new System.Uri(baseUri);
-            httpClient.DefaultRequestHeaders.Accept.Clear();
-            httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-        }
+    using System.Threading.Tasks;
 
-        public static HttpClientHandler CreateHttpClientHandlerIgnoreSSLCertificatesError()
-        {
-            return new HttpClientHandler
-            {
-                ClientCertificateOptions                  = ClientCertificateOption.Manual,
-                ServerCertificateCustomValidationCallback = (httpRequestMessage, cert, cetChain, policyErrors) => true
-            };
-        }
+    public interface IAuthenticationManager
+    {
+        Task<int?> Authenticate(string username, string password);
     }
 }

@@ -170,16 +170,13 @@ namespace Framework.Tools.Csv
                 {
                     pi.SetValue(obj, string.IsNullOrEmpty(valueAsString) ? null : ExcelEnum(pi.PropertyType.GenericTypeArguments[0], valueAsString));
                 }
-/*
                 else if (pi.PropertyType == typeof(byte[]))
                 {
-                    if (!string.IsNullOrEmpty(ip.Value))
+                    if (!string.IsNullOrEmpty(valueAsString))
                     {
-                        byte[] bytes = System.Convert.FromBase64String(ip.Value);
-                        pi.SetValue(obj, bytes);
+                        pi.SetValue(obj, ExcelImage(valueAsString));
                     }
                 }
-*/
                 else
                 {
                     throw new NotImplementedException();

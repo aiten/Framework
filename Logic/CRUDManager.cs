@@ -164,7 +164,7 @@ namespace Framework.Logic
                 await trans.CommitTransactionAsync();
                 await Modified();
             }
-            catch (Exception)
+            catch (Exception e)
             {
                 // Console.WriteLine(e);
                 throw;

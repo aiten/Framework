@@ -167,5 +167,45 @@ namespace Framework.Tools.Csv
         }
 
         #endregion
+
+        #region Byte / Base64
+
+        [Fact]
+        public void CsvImageImportTest()
+        {
+            var csvImport = new CsvImportBase();
+
+            var img1 = csvImport.ExcelImage("0x");
+            img1.Should().HaveCount(0);
+
+            var img2 = csvImport.ExcelImage("0x12");
+            img2.Should().HaveCount(1);
+            img2[0].Should().Be(0x12);
+
+            var img3 = csvImport.ExcelImage("0x1234");
+            img3.Should().HaveCount(2);
+            img3[0].Should().Be(0x12);
+            img3[1].Should().Be(0x34);
+
+
+            Action act = () => csvImport.ExcelImage("0x12345");
+            act.Should().Throw<ArgumentException>().Where(e => e.Message.Contains("odd"));
+        }
+
+        [Fact]
+        public void CsvImageBase64ImportTest()
+        {
+            var csvImport = new CsvImportBase();
+
+            string fromBase64 = "Test base 64";
+            string toBase64   = Base64Helper.StringToBase64(fromBase64);
+
+            var img1 = csvImport.ExcelImage(toBase64);
+            var str2 = System.Text.Encoding.UTF8.GetString(img1);
+
+            str2.Should().Be(fromBase64);
+        }
+
+        #endregion
     }
 }

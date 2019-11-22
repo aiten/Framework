@@ -22,7 +22,7 @@ using Xunit;
 
 namespace Framework.MyUnitTest.Tools
 {
-    public class HBase64HelperTest
+    public class Base64HelperTest
     {
         [Fact]
         public void Base64AsStringTest()

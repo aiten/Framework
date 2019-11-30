@@ -116,48 +116,48 @@ namespace Framework.Repository
             return GetQuery<T>();
         }
 
-        protected void SetEntityState<TEntity>(TEntity entity, EntityState state)
+        protected virtual void SetEntityState<TEntity>(TEntity entity, EntityState state)
             where TEntity : class
         {
             Context.Entry(entity).State = state;
         }
 
-        protected void SetValue<TEntity>(TEntity entity, object values)
+        protected virtual void SetValue<TEntity>(TEntity entity, object values)
             where TEntity : class
         {
             Context.Entry(entity).CurrentValues.SetValues(values);
         }
 
-        protected void SetModified<TEntity>(TEntity entity)
+        protected virtual void SetModified<TEntity>(TEntity entity)
             where TEntity : class
         {
             SetEntityState(entity, EntityState.Modified);
         }
 
-        protected void AddEntity<TEntity>(TEntity entity)
+        protected virtual void AddEntity<TEntity>(TEntity entity)
             where TEntity : class
         {
             Context.Add(entity);
         }
 
-        protected void AddEntities<TEntity>(IEnumerable<TEntity> entities)
+        protected virtual void AddEntities<TEntity>(IEnumerable<TEntity> entities)
             where TEntity : class
         {
             Context.AddRange(entities);
         }
 
-        protected void DeleteEntity<TEntity>(TEntity entity)
+        protected virtual void DeleteEntity<TEntity>(TEntity entity)
             where TEntity : class
         {
             SetEntityState(entity, EntityState.Deleted);
         }
 
-        protected void DeleteEntities<TEntity>(IEnumerable<TEntity> entities)
+        protected virtual void DeleteEntities<TEntity>(IEnumerable<TEntity> entities)
             where TEntity : class
         {
             foreach (var entity in entities)
             {
-                SetEntityState(entity, EntityState.Deleted);
+                DeleteEntity(entity);
             }
         }
     }

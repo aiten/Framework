@@ -25,6 +25,8 @@ namespace Framework.Repository
     public abstract class RepositoryBase<TDbContext>
         where TDbContext : DbContext
     {
+        #region Crt + Properties
+
         protected RepositoryBase(TDbContext dbContext)
         {
             Context = dbContext;
@@ -34,6 +36,8 @@ namespace Framework.Repository
         /// Gets the DbContext. Should be used rarely, instead use <see cref="Query{T}"/> and <see cref="TrackingQuery{T}"/>.
         /// </summary>
         protected TDbContext Context { get; private set; }
+
+        #endregion
 
         public void Sync<TEntity>(ICollection<TEntity> inDb, ICollection<TEntity> toDb, Func<TEntity, TEntity, bool> compareEntities, Action<TEntity> prepareForAdd)
             where TEntity : class
@@ -71,10 +75,7 @@ namespace Framework.Repository
             }
         }
 
-        public void SetState(object entity, EntityState state)
-        {
-            Context.Entry(entity).State = state;
-        }
+        #region Query
 
         protected IQueryable<T> QueryAsDbSet<T>()
             where T : class
@@ -116,16 +117,50 @@ namespace Framework.Repository
             return GetQuery<T>();
         }
 
+        #endregion
+
+        #region Entity
+
+        public Microsoft.EntityFrameworkCore.ChangeTracking.EntityEntry<TEntity> TrackingEntity<TEntity>(TEntity e)
+            where TEntity : class
+        {
+            return Context.Entry(e);
+        }
+
+        protected void SetEntityPropertyOriginalValue<TEntity, TProperty>(TEntity entity, System.Linq.Expressions.Expression<System.Func<TEntity, TProperty>> columnDescriptor, TProperty value)
+            where TEntity : class
+        {
+            TrackingEntity(entity).Property(columnDescriptor).OriginalValue = value;
+        }
+
+        protected TProperty GetEntityPropertyOriginalValue<TEntity, TProperty>(TEntity entity, System.Linq.Expressions.Expression<System.Func<TEntity, TProperty>> columnDescriptor)
+            where TEntity : class
+        {
+            return TrackingEntity(entity).Property(columnDescriptor).OriginalValue;
+        }
+
+        protected void SetEntityPropertyCurrentValue<TEntity, TProperty>(TEntity entity, System.Linq.Expressions.Expression<System.Func<TEntity, TProperty>> columnDescriptor, TProperty value)
+            where TEntity : class
+        {
+            TrackingEntity(entity).Property(columnDescriptor).CurrentValue = value;
+        }
+
+        protected TProperty GetEntityPropertyCurrentValue<TEntity, TProperty>(TEntity entity, System.Linq.Expressions.Expression<System.Func<TEntity, TProperty>> columnDescriptor)
+            where TEntity : class
+        {
+            return TrackingEntity(entity).Property(columnDescriptor).CurrentValue;
+        }
+
         protected virtual void SetEntityState<TEntity>(TEntity entity, EntityState state)
             where TEntity : class
         {
-            Context.Entry(entity).State = state;
+            TrackingEntity(entity).State = state;
         }
 
         protected virtual void SetValue<TEntity>(TEntity entity, object values)
             where TEntity : class
         {
-            Context.Entry(entity).CurrentValues.SetValues(values);
+            TrackingEntity(entity).CurrentValues.SetValues(values);
         }
 
         protected virtual void SetModified<TEntity>(TEntity entity)
@@ -160,5 +195,7 @@ namespace Framework.Repository
                 DeleteEntity(entity);
             }
         }
+
+        #endregion
     }
 }

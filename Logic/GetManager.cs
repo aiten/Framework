@@ -41,7 +41,7 @@ namespace Framework.Logic
 
         public async Task<IEnumerable<T>> GetAll()
         {
-            return MapToDto(await _repository.GetAll());
+            return MapToDto(await GetAllEntities());
         }
 
         public async Task<T> Get(TKey key)
@@ -52,6 +52,11 @@ namespace Framework.Logic
         public async Task<IEnumerable<T>> Get(IEnumerable<TKey> keys)
         {
             return MapToDto(await _repository.Get(keys));
+        }
+
+        protected async virtual Task<IList<TEntity>> GetAllEntities()
+        {
+            return await _repository.GetAll();
         }
 
         protected virtual T SetDto(T dto)

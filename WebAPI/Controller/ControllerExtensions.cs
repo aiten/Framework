@@ -219,18 +219,6 @@ namespace Framework.WebAPI.Controller
 
         #region Upload/Download
 
-        public static async Task<IActionResult> GetFile(this Controller controller, string fileName, MemoryStream memoryStream)
-        {
-            memoryStream.Position = 0;
-
-            var path = Path.Combine(
-                Directory.GetCurrentDirectory(),
-                "wwwroot",
-                fileName);
-
-            return await Task.FromResult(controller.File(memoryStream, controller.GetContentType(path), Path.GetFileName(path)));
-        }
-
         public static string GetContentType(this Controller controller, string path)
         {
             var types = controller.GetMimeTypes();

@@ -28,7 +28,7 @@ namespace Framework.WebAPI.Filter
 
         protected ActionContextLoggerProvider(ILoggerFactory loggerFactory)
         {
-            _loggerFactory = loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory));
+            _loggerFactory = loggerFactory;
         }
 
         protected ILogger CreateLogger(ActionContext context)

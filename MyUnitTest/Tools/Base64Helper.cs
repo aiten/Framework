@@ -27,9 +27,8 @@ namespace Framework.MyUnitTest.Tools
         [Fact]
         public void Base64AsStringTest()
         {
-
-            string fromBase64 = "Test base 64";
-            string toBase64 = Base64Helper.StringToBase64(fromBase64);
+            string fromBase64  = "Test base 64";
+            string toBase64    = Base64Helper.StringToBase64(fromBase64);
             string base64Again = Base64Helper.StringFromBase64(toBase64);
 
             base64Again.Should().Be(fromBase64);

@@ -14,6 +14,8 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
+using Framework.Localization;
+
 namespace Framework.Repository
 {
     using System.Data;
@@ -44,7 +46,7 @@ namespace Framework.Repository
             TEntity entityInDb = await repository.GetTracking(key);
             if (entityInDb == default(TEntity))
             {
-                throw new DBConcurrencyException("(tracking-)entity not found.");
+                throw new DBConcurrencyException(ErrorMessages.ResourceManager.ToLocalizable(nameof(ErrorMessages.Framework_Repository_TrackingEntityNotFound)).Message());
             }
 
             repository.SetValueGraph(entityInDb, values);

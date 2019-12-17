@@ -46,6 +46,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Service.WebAPI", "Service.W
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyUnitTest", "MyUnitTest\MyUnitTest.csproj", "{71CD8280-5E9E-4DA6-8223-9E0FE6D28FE5}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Localization", "Localization\Localization.csproj", "{14CEAE12-8A04-4A48-A904-04B4CDD4EBCB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -128,6 +130,10 @@ Global
 		{71CD8280-5E9E-4DA6-8223-9E0FE6D28FE5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{71CD8280-5E9E-4DA6-8223-9E0FE6D28FE5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{71CD8280-5E9E-4DA6-8223-9E0FE6D28FE5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{14CEAE12-8A04-4A48-A904-04B4CDD4EBCB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{14CEAE12-8A04-4A48-A904-04B4CDD4EBCB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{14CEAE12-8A04-4A48-A904-04B4CDD4EBCB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{14CEAE12-8A04-4A48-A904-04B4CDD4EBCB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

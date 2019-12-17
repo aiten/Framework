@@ -40,7 +40,7 @@ namespace Framework.Wpf.Helpers
 
         public DelegateCommandAsync(Func<CancellationToken, Task<T>> command, Func<bool> canExecute = null)
         {
-            _command    = command ?? throw new ArgumentNullException(nameof(command));
+            _command    = command;
             _canExecute = canExecute;
         }
 

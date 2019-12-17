@@ -14,6 +14,8 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
+using Framework.Localization;
+
 namespace Framework.Logic
 {
     using System;
@@ -35,9 +37,9 @@ namespace Framework.Logic
 
         protected CRUDManager(IUnitOfWork unitOfWork, ICRUDRepository<TEntity, TKey> repository, IMapper mapper) : base(unitOfWork, repository, mapper)
         {
-            _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
-            _repository = repository ?? throw new ArgumentNullException(nameof(repository));
-            _mapper     = mapper ?? throw new ArgumentNullException(nameof(mapper));
+            _unitOfWork = unitOfWork;
+            _repository = repository;
+            _mapper     = mapper;
         }
 
         #region Add
@@ -145,7 +147,7 @@ namespace Framework.Logic
 
             if (entities.Count() != entitiesInDb.Count || entities.Count() != mergeJoin.Count())
             {
-                throw new ArgumentException("join result is different");
+                throw new ArgumentException(ErrorMessages.ResourceManager.ToLocalizable(nameof(ErrorMessages.Framework_Logic_JoinResultDifferent)).Message());
             }
 
             foreach (var merged in mergeJoin)

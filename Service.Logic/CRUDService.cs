@@ -28,7 +28,7 @@ namespace Framework.Service.Logic
 
         protected CRUDService(ICRUDManager<T, TKey> manager) : base(manager)
         {
-            _manager = manager ?? throw new ArgumentNullException(nameof(manager));
+            _manager = manager;
         }
 
         public async Task<TKey> Add(T value)

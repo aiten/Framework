@@ -4,7 +4,21 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Dependency\Dependency.csproj" />
+    <ProjectReference Include="..\Localization\Localization.csproj" />
     <ProjectReference Include="..\Logic.Abstraction\Logic.Abstraction.csproj" />
     <ProjectReference Include="..\Repository.Abstraction\Repository.Abstraction.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="ErrorMessages.Designer.cs">
+      <DependentUpon>ErrorMessages.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Update="ErrorMessages.resx">
+      <LastGenOutput>ErrorMessages.Designer.cs</LastGenOutput>
+      <Generator>PublicResXFileCodeGenerator</Generator>
+    </EmbeddedResource>
   </ItemGroup>
 </Project>

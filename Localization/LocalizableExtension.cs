@@ -15,42 +15,16 @@
 */
 
 using System;
+using System.Resources;
+using System.Runtime.CompilerServices;
 
-using Framework.WebAPI.Tool;
-
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc.Filters;
-
-namespace Framework.WebAPI.Filter
+namespace Framework.Localization
 {
-    public sealed class MethodCallHistoryFilter : IActionFilter
+    public static class LocalizableExtension
     {
-        private MethodCallHistory _methodCallHistory;
-
-        public MethodCallHistoryFilter(MethodCallHistory methodCallHistory)
+        public static Localizable ToLocalizable(this ResourceManager resourceManager, string resourceKey, object[] placeholders = null)
         {
-            _methodCallHistory = methodCallHistory;
-        }
-
-        public void OnActionExecuting(ActionExecutingContext context)
-        {
-        }
-
-        public void OnActionExecuted(ActionExecutedContext context)
-        {
-            string userName = null;
-
-            if (context.Controller is Microsoft.AspNetCore.Mvc.Controller controller)
-            {
-                userName = controller.User?.Identity?.Name;
-            }
-
-            _methodCallHistory.Add(GetCurrentUri(context.HttpContext.Request), userName);
-        }
-
-        public string GetCurrentUri(HttpRequest request)
-        {
-            return $"{request.Method} {request.Scheme}://{request.Host}{request.Path}{request.QueryString}";
+            return new Localizable(resourceManager, resourceKey, placeholders);
         }
     }
 }

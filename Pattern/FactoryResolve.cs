@@ -14,8 +14,6 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-using Framework.Dependency;
-
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Framework.Pattern
@@ -24,16 +22,17 @@ namespace Framework.Pattern
 
     public class FactoryResolve<T> : IFactory<T> where T : class
     {
-        private readonly IServiceCollection _container;
+        private readonly IServiceCollection   _container;
+        private readonly IServiceScopeFactory _serviceScopeFactory;
 
-        public FactoryResolve()
+        public FactoryResolve(IServiceScopeFactory serviceScopeFactory)
         {
-            _container = GlobalServiceCollection.Instance;
+            _serviceScopeFactory = serviceScopeFactory;
         }
 
         public IScope<T> Create()
         {
-            var childContainer = _container.BuildServiceProvider().CreateScope();
+            var childContainer = _serviceScopeFactory.CreateScope();
             return new ScopeResolve<T>(childContainer, childContainer.ServiceProvider.GetService<T>());
         }
     }

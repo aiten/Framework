@@ -14,12 +14,26 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
+using System;
+
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Framework.Dependency
 {
-    public static class GlobalServiceCollection
+    public static class AppService
     {
-        public static IServiceCollection Instance { get; set; }
+        public static IServiceCollection ServiceCollection { get; set; }
+
+        public static void BuildServiceProvider()
+        {
+            ServiceProvider = ServiceCollection.BuildServiceProvider();
+        }
+
+        public static IServiceProvider ServiceProvider { get; set; }
+
+        public static T GetRequiredService<T>()
+        {
+            return ServiceProvider.GetRequiredService<T>();
+        }
     }
 }

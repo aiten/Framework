@@ -66,15 +66,5 @@ namespace Framework.Dependency
 
             return services;
         }
-
-        public static TInterface Resolve<TInterface>(this IServiceCollection services)
-        {
-            return (TInterface)services.BuildServiceProvider().GetService(typeof(TInterface));
-        }
-
-        public static object Resolve(this IServiceCollection services, Type interfaceType)
-        {
-            return services.BuildServiceProvider().GetService(interfaceType);
-        }
     }
 }

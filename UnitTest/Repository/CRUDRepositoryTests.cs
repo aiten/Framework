@@ -50,6 +50,8 @@ namespace Framework.UnitTest.Repository
             // first add entity
 
             TKey key;
+            object entityState;
+
             using (var ctx = CreateTestDbContext())
             using (var trans = ctx.UnitOfWork.BeginTransaction())
             {
@@ -60,6 +62,7 @@ namespace Framework.UnitTest.Repository
                 await trans.CommitTransactionAsync();
 
                 key = GetEntityKey(entityToAdd);
+                entityState = GetEntityState(entityToAdd);
             }
 
             var allWithAdd = await GetAll();
@@ -87,6 +90,7 @@ namespace Framework.UnitTest.Repository
             {
                 TEntity entity = await ctx.Repository.Get(key);
                 GetEntityKey(entity).Should().Be(key);
+                entityState = GetEntityState(entity);
             }
 
             // update (with method update)
@@ -96,6 +100,7 @@ namespace Framework.UnitTest.Repository
             {
                 var entity = createTestEntity();
                 SetEntityKey(entity, key);
+                SetEntityState(entity, entityState);
 
                 await ctx.Repository.Update(key, entity);
 

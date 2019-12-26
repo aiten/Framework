@@ -34,6 +34,9 @@ namespace Framework.UnitTest.Repository
         public Func<TEntity, TKey>   GetEntityKey;
         public Action<TEntity, TKey> SetEntityKey;
 
+        public Func<TEntity, object>   GetEntityState = entity => null;
+        public Action<TEntity, object> SetEntityState = (entity, o) => {};
+
         public Func<TEntity, TEntity, bool> CompareEntity;
 
         public async Task<IList<TEntity>> GetAll()

@@ -14,17 +14,36 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.UnitTest.Repository
+using System.Threading.Tasks;
+
+namespace Framework.Repository.Abstraction
 {
-    using Framework.Repository.Abstraction;
+    using System;
+    using System.Collections.Generic;
 
-    using Microsoft.EntityFrameworkCore;
-
-    public class CRUDTestDbContext<TDbContext, TEntity, TKey, TIRepository> : GetTestDbContext<TDbContext, TEntity, TKey, TIRepository>
-        where TEntity : class where TIRepository : ICRUDRepository<TEntity, TKey> where TDbContext : DbContext
+    public interface ICrudRepository<TEntity, TKey> : IGetRepository<TEntity, TKey>
+        where TEntity : class
     {
-        public CRUDTestDbContext(TDbContext dbContext, IUnitOfWork uow, TIRepository repository) : base(dbContext, uow, repository)
-        {
-        }
+        Task<IList<TEntity>> GetTrackingAll();
+
+        Task<TEntity> GetTracking(TKey key);
+
+        Task<IList<TEntity>> GetTracking(IEnumerable<TKey> keys);
+
+        void Add(TEntity entity);
+
+        void AddRange(IEnumerable<TEntity> entities);
+
+        void Delete(TEntity entity);
+
+        void DeleteRange(IEnumerable<TEntity> entities);
+
+        void SetValue(TEntity trackingEntity, TEntity values);
+
+        void SetValueGraph(TEntity trackingEntity, TEntity values);
+
+        void SetState(TEntity entity, EntityState state);
+
+        void Sync(ICollection<TEntity> inDb, ICollection<TEntity> toDb, Func<TEntity, TEntity, bool> compareEntities, Action<TEntity> prepareForAdd);
     }
 }

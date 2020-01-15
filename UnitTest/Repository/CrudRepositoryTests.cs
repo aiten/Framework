@@ -28,8 +28,8 @@ namespace Framework.UnitTest.Repository
 
     using Microsoft.EntityFrameworkCore;
 
-    public class CRUDRepositoryTests<TDbContext, TEntity, TKey, TIRepository> : GetRepositoryTests<TDbContext, TEntity, TKey, TIRepository>
-        where TEntity : class where TIRepository : ICRUDRepository<TEntity, TKey> where TDbContext : DbContext
+    public class CrudRepositoryTests<TDbContext, TEntity, TKey, TIRepository> : GetRepositoryTests<TDbContext, TEntity, TKey, TIRepository>
+        where TEntity : class where TIRepository : ICrudRepository<TEntity, TKey> where TDbContext : DbContext
     {
         public async Task<TEntity> GetTrackingOK(TKey key)
         {

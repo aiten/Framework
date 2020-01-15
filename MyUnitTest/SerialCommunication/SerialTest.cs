@@ -183,7 +183,7 @@ namespace Framework.MyUnitTest.SerialCommunication
             serial.CommandSent         += (sender, e) => eventCounts.EventCommandSent++;
             serial.WaitCommandSent     += (sender, e) => eventCounts.EventWaitCommandSent++;
             serial.ReplyReceived       += (sender, e) => eventCounts.EventReplyReceived++;
-            serial.ReplyOK             += (sender, e) => eventCounts.EventReplyOK++;
+            serial.ReplyOk             += (sender, e) => eventCounts.EventReplyOK++;
             serial.ReplyError          += (sender, e) => eventCounts.EventReplyError++;
             serial.ReplyInfo           += (sender, e) => eventCounts.EventReplyInfo++;
             serial.ReplyUnknown        += (sender, e) => eventCounts.EventReplyUnknown++;

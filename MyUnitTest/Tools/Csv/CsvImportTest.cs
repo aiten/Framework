@@ -19,11 +19,12 @@ using System;
 using FluentAssertions;
 using FluentAssertions.Extensions;
 
+using Framework.Tools;
 using Framework.Tools.Csv;
 
 using Xunit;
 
-namespace Framework.Tools.Csv
+namespace Framework.MyUnitTest.Tools.Csv
 {
     public class CsvImportTest
     {

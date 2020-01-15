@@ -49,7 +49,7 @@ namespace Framework.Arduino.SerialCommunication.Abstraction
         event CommandEventHandler CommandSent;
         event CommandEventHandler WaitCommandSent;
         event CommandEventHandler ReplyReceived;
-        event CommandEventHandler ReplyOK;
+        event CommandEventHandler ReplyOk;
         event CommandEventHandler ReplyError;
         event CommandEventHandler ReplyInfo;
         event CommandEventHandler ReplyUnknown;

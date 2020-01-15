@@ -24,31 +24,22 @@ using Framework.Service.WebAPI.Uri;
 
 namespace Framework.Service.WebAPI
 {
-    public class ServiceBase : DisposeWrapper
+    public abstract class ServiceBase : DisposeWrapper
     {
         public string BaseApi { get; set; }
 
-        private HttpClient _httpClient;
-
-        protected ServiceBase(HttpClient httpClient)
-        {
-            _httpClient = httpClient;
-        }
-
-        protected virtual HttpClient GetHttpClient()
-        {
-            return _httpClient;
-        }
+        protected abstract IScope<HttpClient> CreateScope();
 
         #region Read / Get
 
         public async Task<IList<T>> ReadList<T>(string uri)
         {
-            var client = GetHttpClient();
-
-            HttpResponseMessage response = await client.GetAsync(uri);
-            response.EnsureSuccessStatusCode();
-            return await response.Content.ReadAsAsync<IList<T>>();
+            using (var scope = CreateScope())
+            {
+                HttpResponseMessage response = await scope.Instance.GetAsync(uri);
+                response.EnsureSuccessStatusCode();
+                return await response.Content.ReadAsAsync<IList<T>>();
+            }
         }
 
         public async Task<IList<T>> ReadList<T>(UriPathBuilder pathBuilder)
@@ -58,8 +49,10 @@ namespace Framework.Service.WebAPI
 
         public async Task<T> Read<T>(string uri)
         {
-            var client = GetHttpClient();
-            return await Read<T>(await client.GetAsync(uri));
+            using (var scope = CreateScope())
+            {
+                return await Read<T>(await scope.Instance.GetAsync(uri));
+            }
         }
 
         public async Task<T> Read<T>(UriPathBuilder pathBuilder)
@@ -74,11 +67,12 @@ namespace Framework.Service.WebAPI
 
         public async Task<string> ReadString(string uri)
         {
-            var client = GetHttpClient();
-
-            HttpResponseMessage response = await client.GetAsync(uri);
-            response.EnsureSuccessStatusCode();
-            return await response.Content.ReadAsStringAsync();
+            using (var scope = CreateScope())
+            {
+                HttpResponseMessage response = await scope.Instance.GetAsync(uri);
+                response.EnsureSuccessStatusCode();
+                return await response.Content.ReadAsStringAsync();
+            }
         }
 
         protected async Task<T> Read<T>(HttpResponseMessage response)

@@ -54,7 +54,7 @@ namespace Framework.Logic
             return MapToDto(await _repository.Get(keys));
         }
 
-        protected async virtual Task<IList<TEntity>> GetAllEntities()
+        protected virtual async Task<IList<TEntity>> GetAllEntities()
         {
             return await _repository.GetAll();
         }

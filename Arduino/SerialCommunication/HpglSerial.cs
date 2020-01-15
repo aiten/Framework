@@ -24,11 +24,11 @@ using Microsoft.Extensions.Logging;
 
 namespace Framework.Arduino.SerialCommunication
 {
-    public class HPGLSerial : Serial
+    public class HpglSerial : Serial
     {
         readonly int maxMessageLength = 128;
 
-        public HPGLSerial(IFactory<ISerialPort> serialPortFactory, ILogger<Serial> logger) : base(serialPortFactory, logger)
+        public HpglSerial(IFactory<ISerialPort> serialPortFactory, ILogger<Serial> logger) : base(serialPortFactory, logger)
         {
         }
 
@@ -36,10 +36,10 @@ namespace Framework.Arduino.SerialCommunication
 
         protected override string[] SplitCommand(string line)
         {
-            return SplitHPGL(line);
+            return SplitHpgl(line);
         }
 
-        protected string[] SplitHPGL(string line)
+        protected string[] SplitHpgl(string line)
         {
             string[] cmds    = line.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
             var      cmdList = new List<string>();

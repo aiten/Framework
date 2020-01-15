@@ -26,10 +26,10 @@ namespace Framework.Repository
 
     using EntityState = Abstraction.EntityState;
 
-    public abstract class CRUDRepository<TDbContext, TEntity, TKey> : GetRepository<TDbContext, TEntity, TKey>
+    public abstract class CrudRepository<TDbContext, TEntity, TKey> : GetRepository<TDbContext, TEntity, TKey>
         where TDbContext : DbContext where TEntity : class
     {
-        protected CRUDRepository(TDbContext dbContext)
+        protected CrudRepository(TDbContext dbContext)
             : base(dbContext)
         {
         }

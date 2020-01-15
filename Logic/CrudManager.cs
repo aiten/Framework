@@ -29,13 +29,13 @@ namespace Framework.Logic
 
     using Repository.Abstraction;
 
-    public abstract class CRUDManager<T, TKey, TEntity> : GetManager<T, TKey, TEntity>, ICRUDManager<T, TKey> where T : class where TEntity : class
+    public abstract class CrudManager<T, TKey, TEntity> : GetManager<T, TKey, TEntity>, ICrudManager<T, TKey> where T : class where TEntity : class
     {
         private readonly IMapper                        _mapper;
-        private readonly ICRUDRepository<TEntity, TKey> _repository;
+        private readonly ICrudRepository<TEntity, TKey> _repository;
         private readonly IUnitOfWork                    _unitOfWork;
 
-        protected CRUDManager(IUnitOfWork unitOfWork, ICRUDRepository<TEntity, TKey> repository, IMapper mapper) : base(unitOfWork, repository, mapper)
+        protected CrudManager(IUnitOfWork unitOfWork, ICrudRepository<TEntity, TKey> repository, IMapper mapper) : base(unitOfWork, repository, mapper)
         {
             _unitOfWork = unitOfWork;
             _repository = repository;

@@ -19,7 +19,7 @@ namespace Framework.Logic.Abstraction
     using System.Collections.Generic;
     using System.Threading.Tasks;
 
-    public interface ICRUDManager<T, TId> : IGetManager<T, TId> where T : class
+    public interface ICrudManager<T, TId> : IGetManager<T, TId> where T : class
     {
         Task<TId> Add(T value);
 

@@ -24,9 +24,9 @@ namespace Framework.Service.Logic
 {
     public abstract class GetService<T, TKey> : ServiceBase where T : class
     {
-        private readonly ICRUDManager<T, TKey> _manager;
+        private readonly ICrudManager<T, TKey> _manager;
 
-        protected GetService(ICRUDManager<T, TKey> manager)
+        protected GetService(ICrudManager<T, TKey> manager)
         {
             _manager = manager;
         }

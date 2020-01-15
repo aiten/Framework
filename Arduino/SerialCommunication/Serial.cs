@@ -63,7 +63,7 @@ namespace Framework.Arduino.SerialCommunication
         public event CommandEventHandler CommandSent;
         public event CommandEventHandler WaitCommandSent;
         public event CommandEventHandler ReplyReceived;
-        public event CommandEventHandler ReplyOK;
+        public event CommandEventHandler ReplyOk;
         public event CommandEventHandler ReplyError;
         public event CommandEventHandler ReplyInfo;
         public event CommandEventHandler ReplyUnknown;
@@ -961,9 +961,9 @@ namespace Framework.Arduino.SerialCommunication
 
         protected virtual void OnReplyDone(SerialEventArgs info)
         {
-            if (ReplyOK != null)
+            if (ReplyOk != null)
             {
-                Task.Run(() => ReplyOK?.Invoke(this, info));
+                Task.Run(() => ReplyOk?.Invoke(this, info));
             }
         }
 

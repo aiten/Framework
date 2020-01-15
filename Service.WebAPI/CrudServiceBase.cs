@@ -21,11 +21,11 @@ using System.Threading.Tasks;
 
 namespace Framework.Service.WebAPI
 {
-    public abstract class CRUDServiceBase<T, TKey> : ServiceBase where T : class where TKey : IComparable
+    public abstract class CrudServiceBase<T, TKey> : ServiceBase where T : class where TKey : IComparable
     {
         protected abstract TKey GetKey(T value);
 
-        protected CRUDServiceBase(HttpClient httpClient) : base(httpClient)
+        protected CrudServiceBase()
         {
         }
 
@@ -46,11 +46,13 @@ namespace Framework.Service.WebAPI
 
         public async Task<TKey> Add(T value)
         {
-            var client   = GetHttpClient();
-            var response = await client.PostAsJsonAsync(CreatePathBuilder().Build(), value);
+            using (var scope = CreateScope())
+            {
+                var response = await scope.Instance.PostAsJsonAsync(CreatePathBuilder().Build(), value);
 
-            response.EnsureSuccessStatusCode();
-            return GetKey(await response.Content.ReadAsAsync<T>());
+                response.EnsureSuccessStatusCode();
+                return GetKey(await response.Content.ReadAsAsync<T>());
+            }
         }
 
         public Task<IEnumerable<TKey>> Add(IEnumerable<T> values)
@@ -70,10 +72,11 @@ namespace Framework.Service.WebAPI
 
         public async Task Delete(TKey key)
         {
-            var client   = GetHttpClient();
-            var response = await client.DeleteAsync(CreatePathBuilder().AddPath(key).Build());
-
-            response.EnsureSuccessStatusCode();
+            using (var scope = CreateScope())
+            {
+                var response = await scope.Instance.DeleteAsync(CreatePathBuilder().AddPath(key).Build());
+                response.EnsureSuccessStatusCode();
+            }
         }
 
         public Task Delete(IEnumerable<TKey> keys)
@@ -83,10 +86,11 @@ namespace Framework.Service.WebAPI
 
         public async Task Update(T value)
         {
-            var client   = GetHttpClient();
-            var response = await client.PutAsJsonAsync(CreatePathBuilder().AddPath(GetKey(value)).Build(), value);
-
-            response.EnsureSuccessStatusCode();
+            using (var scope = CreateScope())
+            {
+                var response = await scope.Instance.PutAsJsonAsync(CreatePathBuilder().AddPath(GetKey(value)).Build(), value);
+                response.EnsureSuccessStatusCode();
+            }
         }
 
         public Task Update(IEnumerable<T> values)

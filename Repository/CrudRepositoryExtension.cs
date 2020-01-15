@@ -23,9 +23,9 @@ namespace Framework.Repository
 
     using Abstraction;
 
-    public static class CRUDRepositoryExtensions
+    public static class CrudRepositoryExtensions
     {
-        public static async Task Store<TEntity, TKey>(this ICRUDRepository<TEntity, TKey> repository, TEntity entity, TKey key)
+        public static async Task Store<TEntity, TKey>(this ICrudRepository<TEntity, TKey> repository, TEntity entity, TKey key)
             where TEntity : class
         {
             TEntity entityInDb = await repository.GetTracking(key);
@@ -40,7 +40,7 @@ namespace Framework.Repository
             }
         }
 
-        public static async Task Update<TEntity, TKey>(this ICRUDRepository<TEntity, TKey> repository, TKey key, TEntity values)
+        public static async Task Update<TEntity, TKey>(this ICrudRepository<TEntity, TKey> repository, TKey key, TEntity values)
             where TEntity : class
         {
             TEntity entityInDb = await repository.GetTracking(key);

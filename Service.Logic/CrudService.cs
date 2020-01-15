@@ -22,11 +22,11 @@ using Framework.Logic.Abstraction;
 
 namespace Framework.Service.Logic
 {
-    public abstract class CRUDService<T, TKey> : GetService<T, TKey> where T : class
+    public abstract class CrudService<T, TKey> : GetService<T, TKey> where T : class
     {
-        private readonly ICRUDManager<T, TKey> _manager;
+        private readonly ICrudManager<T, TKey> _manager;
 
-        protected CRUDService(ICRUDManager<T, TKey> manager) : base(manager)
+        protected CrudService(ICrudManager<T, TKey> manager) : base(manager)
         {
             _manager = manager;
         }

@@ -22,7 +22,6 @@ namespace Framework.Pattern
 
     public class FactoryResolve<T> : IFactory<T> where T : class
     {
-        private readonly IServiceCollection   _container;
         private readonly IServiceScopeFactory _serviceScopeFactory;
 
         public FactoryResolve(IServiceScopeFactory serviceScopeFactory)

@@ -24,7 +24,7 @@ namespace Framework.Arduino.SerialCommunication.Abstraction
     {
         #region Setup/Init
 
-        Task ConnectAsync(string portName);
+        Task ConnectAsync(string portName, string serverName);
         Task DisconnectAsync();
         void AbortCommands();
         void ResumeAfterAbort();

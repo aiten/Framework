@@ -109,7 +109,7 @@ namespace Framework.MyUnitTest.SerialCommunication
             using (var serialPort = CreateSerialPortMock(new string[0]))
             using (var serial = new Serial(new FactoryInstance<ISerialPort>(serialPort), CreateLogger()))
             {
-                await serial.ConnectAsync("com2", null);
+                await serial.ConnectAsync("com2", null, null, null);
                 serial.CommandsInQueue.Should().Be(0);
 
                 await serial.DisconnectAsync();
@@ -126,7 +126,7 @@ namespace Framework.MyUnitTest.SerialCommunication
                 }))
             using (var serial = new Serial(new FactoryInstance<ISerialPort>(serialPort), CreateLogger()))
             {
-                await serial.ConnectAsync("com2", null);
+                await serial.ConnectAsync("com2", null, null, null);
 
                 await serial.SendCommandAsync("?", 1000);
 
@@ -147,7 +147,7 @@ namespace Framework.MyUnitTest.SerialCommunication
                 }))
             using (var serial = new Serial(new FactoryInstance<ISerialPort>(serialPort), CreateLogger()))
             {
-                await serial.ConnectAsync("com2", null);
+                await serial.ConnectAsync("com2", null, null, null);
 
                 await serial.SendCommandAsync("?");
                 await serial.SendCommandAsync("?");
@@ -205,7 +205,7 @@ namespace Framework.MyUnitTest.SerialCommunication
             {
                 var eventCalls = SubscribeForEventCall(serial);
 
-                await serial.ConnectAsync("com2", null);
+                await serial.ConnectAsync("com2", null, null, null);
 
                 await serial.SendCommandAsync("?");
 
@@ -239,7 +239,7 @@ namespace Framework.MyUnitTest.SerialCommunication
             {
                 var eventCalls = SubscribeForEventCall(serial);
 
-                await serial.ConnectAsync("com2", null);
+                await serial.ConnectAsync("com2", null, null, null);
 
                 await serial.SendCommandAsync("?");
 
@@ -275,7 +275,7 @@ namespace Framework.MyUnitTest.SerialCommunication
 
                 serial.ErrorIsReply = false;
 
-                await serial.ConnectAsync("com2", null);
+                await serial.ConnectAsync("com2", null, null, null);
 
                 await serial.SendCommandAsync("?");
 
@@ -311,7 +311,7 @@ namespace Framework.MyUnitTest.SerialCommunication
 
                 serial.ErrorIsReply = true; // no OK is needed
 
-                await serial.ConnectAsync("com2", null);
+                await serial.ConnectAsync("com2", null, null, null);
 
                 await serial.SendCommandAsync("?");
 
@@ -345,7 +345,7 @@ namespace Framework.MyUnitTest.SerialCommunication
 
                 serial.ErrorIsReply = true; // no OK is needed
 
-                await serial.ConnectAsync("com2", null);
+                await serial.ConnectAsync("com2", null, null, null);
 
                 await serial.SendCommandAsync("?");
 

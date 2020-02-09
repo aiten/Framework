@@ -131,7 +131,9 @@ namespace Framework.Arduino.SerialCommunication
         /// </summary>
         /// <param name="portName">e.g. Com1</param>
         /// <param name="serverName">e.g. uri, must be null or empty</param>
-        public async Task ConnectAsync(string portName, string serverName)
+        /// <param name="userName"></param>
+        /// <param name="password"></param>
+        public async Task ConnectAsync(string portName, string serverName, string userName, string password)
         {
             await Task.Delay(0); // avoid CS1998
             Logger?.LogTrace($@"Connect: {portName}");

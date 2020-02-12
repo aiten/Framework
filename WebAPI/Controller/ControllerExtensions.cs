@@ -30,6 +30,8 @@ namespace Framework.WebAPI.Controller
 
     public static class ControllerExtensions
     {
+        #region Url
+
         public static string GetCurrentUri(this Controller controller)
         {
             if (controller.Request == null)
@@ -60,6 +62,10 @@ namespace Framework.WebAPI.Controller
             return totalUri.Substring(0, totalUri.Length - removeTrailing.Length);
         }
 
+        #endregion
+
+        #region Result
+
         public static async Task<ActionResult<T>> NotFoundOrOk<T>(this Controller controller, T obj)
         {
             if (obj == null)
@@ -81,6 +87,8 @@ namespace Framework.WebAPI.Controller
 
             return controller.Ok(list);
         }
+
+        #endregion
 
         #region Get/GetAll
 

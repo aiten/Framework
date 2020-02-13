@@ -51,38 +51,29 @@ namespace Framework.WebAPI.Filter
                 return AuthenticateResult.Fail("Missing Authorization Header");
             }
 
-            int?   userId;
-            string userName;
             try
             {
                 var authHeader      = AuthenticationHeaderValue.Parse(Request.Headers["Authorization"]);
                 var credentialBytes = Convert.FromBase64String(authHeader.Parameter);
                 var credentials     = Encoding.UTF8.GetString(credentialBytes).Split(new[] { ':' }, 2);
                 var password        = credentials[1];
+                var userName        = credentials[0];
 
-                userName = credentials[0];
-                userId   = await _authenticationManager.Authenticate(userName, password);
+                var userPrincipal = await _authenticationManager.Authenticate(userName, password);
+
+                if (userPrincipal == null)
+                {
+                    return AuthenticateResult.Fail("Invalid Username or Password");
+                }
+
+                var ticket = new AuthenticationTicket(userPrincipal, Scheme.Name);
+
+                return AuthenticateResult.Success(ticket);
             }
             catch
             {
                 return AuthenticateResult.Fail("Invalid Authorization Header");
             }
-
-            if (userId == null)
-            {
-                return AuthenticateResult.Fail("Invalid Username or Password");
-            }
-
-            var claims = new[]
-            {
-                new Claim(ClaimTypes.NameIdentifier, userId.ToString()),
-                new Claim(ClaimTypes.Name,           userName),
-            };
-            var identity  = new ClaimsIdentity(claims, Scheme.Name);
-            var principal = new ClaimsPrincipal(identity);
-            var ticket    = new AuthenticationTicket(principal, Scheme.Name);
-
-            return AuthenticateResult.Success(ticket);
         }
     }
 }

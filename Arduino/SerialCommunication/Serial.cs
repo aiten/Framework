@@ -47,6 +47,9 @@ namespace Framework.Arduino.SerialCommunication
         readonly AutoResetEvent      _autoEvent       = new AutoResetEvent(false);
         readonly List<SerialCommand> _pendingCommands = new List<SerialCommand>();
 
+        object _pendingCommandsLock = new Object();
+        object _commandsLock        = new Object();
+
         #endregion
 
         public Serial(IFactory<ISerialPort> serialPortFactory, ILogger<Serial> logger)
@@ -80,7 +83,7 @@ namespace Framework.Arduino.SerialCommunication
         {
             get
             {
-                lock (_pendingCommands)
+                lock (_pendingCommandsLock)
                 {
                     return _pendingCommands.Count;
                 }
@@ -91,7 +94,7 @@ namespace Framework.Arduino.SerialCommunication
         {
             get
             {
-                lock (_pendingCommands)
+                lock (_pendingCommandsLock)
                 {
                     return _pendingCommands.ToArray();
                 }
@@ -170,13 +173,13 @@ namespace Framework.Arduino.SerialCommunication
 
             bool wasEmpty;
 
-            lock (_pendingCommands)
+            lock (_pendingCommandsLock)
             {
                 wasEmpty = _pendingCommands.Count == 0;
                 _pendingCommands.Clear();
             }
 
-            lock (_commands)
+            lock (_commandsLock)
             {
                 _commands.Clear();
             }
@@ -256,7 +259,7 @@ namespace Framework.Arduino.SerialCommunication
         public void AbortCommands()
         {
             bool wasEmpty;
-            lock (_pendingCommands)
+            lock (_pendingCommandsLock)
             {
                 wasEmpty = _pendingCommands.Count == 0;
                 _pendingCommands.Clear();
@@ -284,7 +287,7 @@ namespace Framework.Arduino.SerialCommunication
 
             while (true)
             {
-                lock (_pendingCommands)
+                lock (_pendingCommandsLock)
                 {
                     if (_pendingCommands.Count == 0)
                     {
@@ -455,7 +458,7 @@ namespace Framework.Arduino.SerialCommunication
             var c = new SerialCommand { SeqId = _commandSeqId++, CommandText = cmd };
             int queueLength;
 
-            lock (_pendingCommands)
+            lock (_pendingCommandsLock)
             {
                 queueLength = _pendingCommands.Count;
                 if (queueLength == 0)
@@ -484,7 +487,7 @@ namespace Framework.Arduino.SerialCommunication
                 return;
             }
 
-            lock (_commands)
+            lock (_commandsLock)
             {
                 if (_commands.Count > MaxCommandHistoryCount)
                 {
@@ -582,13 +585,10 @@ namespace Framework.Arduino.SerialCommunication
             var sw = Stopwatch.StartNew();
             while (Continue)
             {
-                SerialCommand cmd = null;
-                lock (_pendingCommands)
+                SerialCommand cmd;
+                lock (_pendingCommandsLock)
                 {
-                    if (_pendingCommands.Count > 0)
-                    {
-                        cmd = _pendingCommands[0];
-                    }
+                    cmd = _pendingCommands.FirstOrDefault();
                 }
 
                 if (cmd == null)
@@ -665,7 +665,7 @@ namespace Framework.Arduino.SerialCommunication
                 // commands are sent to the arduino until the buffer is full
                 // In the _pendingCommand list also the commands are still stored with no reply.
 
-                lock (_pendingCommands)
+                lock (_pendingCommandsLock)
                 {
                     foreach (SerialCommand cmd in _pendingCommands)
                     {
@@ -703,7 +703,7 @@ namespace Framework.Arduino.SerialCommunication
                             return;
                         }
 
-                        lock (_pendingCommands)
+                        lock (_pendingCommandsLock)
                         {
                             if (_pendingCommands.Count > 0 && _pendingCommands[0].SentTime.HasValue)
                             {
@@ -786,13 +786,10 @@ namespace Framework.Arduino.SerialCommunication
 
         private void MessageReceived(string message)
         {
-            SerialCommand cmd = null;
-            lock (_pendingCommands)
+            SerialCommand cmd;
+            lock (_pendingCommandsLock)
             {
-                if (_pendingCommands.Count > 0)
-                {
-                    cmd = _pendingCommands[0];
-                }
+                cmd = _pendingCommands.FirstOrDefault();
             }
 
             if (string.IsNullOrEmpty(message) == false)
@@ -869,7 +866,7 @@ namespace Framework.Arduino.SerialCommunication
                 if (endCommand && cmd != null)
                 {
                     int queueLength;
-                    lock (_pendingCommands)
+                    lock (_pendingCommandsLock)
                     {
                         if (_pendingCommands.Count > 0) // may cause because of a reset
                         {
@@ -996,7 +993,7 @@ namespace Framework.Arduino.SerialCommunication
 
         #endregion
 
-        #region Command History 
+        #region Command History
 
         readonly List<SerialCommand> _commands = new List<SerialCommand>();
 
@@ -1004,7 +1001,7 @@ namespace Framework.Arduino.SerialCommunication
         {
             get
             {
-                lock (_commands)
+                lock (_commandsLock)
                 {
                     return new List<SerialCommand>(_commands);
                 }
@@ -1015,7 +1012,7 @@ namespace Framework.Arduino.SerialCommunication
         {
             get
             {
-                lock (_commands)
+                lock (_commandsLock)
                 {
                     return _commands.Last();
                 }
@@ -1024,7 +1021,7 @@ namespace Framework.Arduino.SerialCommunication
 
         public void ClearCommandHistory()
         {
-            lock (_commands)
+            lock (_commandsLock)
             {
                 _commands.Clear();
             }

@@ -29,7 +29,7 @@ namespace Framework.Tools
 
         public static string StringToBase64(string toConvert)
         {
-            return Convert.ToBase64String(Encoding.ASCII.GetBytes(toConvert));
+            return Convert.ToBase64String(Encoding.UTF8.GetBytes(toConvert));
         }
     }
 }

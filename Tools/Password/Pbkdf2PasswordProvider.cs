@@ -16,11 +16,12 @@
 
 
 using System;
+using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 
 namespace Framework.Tools.Password
 {
-    public class Pbkdf2PasswordProvider : IPasswordProvider
+    public class Pbkdf2PasswordProvider : IOneWayPasswordProvider
     {
         public const int SaltByteSize     = 24;
         public const int HashByteSize     = 20; // to match the size of the PBKDF2-HMAC-SHA-1 hash 
@@ -53,6 +54,7 @@ namespace Framework.Tools.Password
             return SlowEquals(hash, testHash);
         }
 
+        [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
         private static bool SlowEquals(byte[] a, byte[] b)
         {
             var diff = (uint)a.Length ^ (uint)b.Length;

@@ -16,7 +16,7 @@
 
 namespace Framework.Tools.Password
 {
-    public interface ITwoWayPasswordProvider: IOneWayPasswordProvider
+    public interface ITwoWayPasswordProvider : IOneWayPasswordProvider
     {
         string GetPassword(string passwordHash);
     }

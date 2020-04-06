@@ -65,7 +65,7 @@ namespace Framework.Repository
 
             //// 2. AddEntity To DB
             var toAdd = new List<TEntity>();
-            
+
             foreach (var entityToDb in toDb)
             {
                 var entityInDb = inDb.FirstOrDefault(x => compareEntities(x, entityToDb));

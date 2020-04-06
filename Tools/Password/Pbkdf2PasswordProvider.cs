@@ -62,6 +62,7 @@ namespace Framework.Tools.Password
             {
                 diff |= (uint)(a[i] ^ b[i]);
             }
+
             return diff == 0;
         }
 

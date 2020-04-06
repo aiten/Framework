@@ -133,7 +133,7 @@ namespace Framework.MyUnitTest.Tools.Csv
 
         #endregion
 
-        #region StringQuoting 
+        #region StringQuoting
 
         public class CsvImportStringClass
         {

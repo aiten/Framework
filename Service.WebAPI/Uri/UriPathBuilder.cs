@@ -66,12 +66,15 @@ namespace Framework.Service.WebAPI.Uri
 
         public UriPathBuilder AddQuery(string query)
         {
-            if (!string.IsNullOrEmpty(Query))
+            if (string.IsNullOrEmpty(Query))
             {
-                throw new ArgumentException("\"Query\" must not be empty");
+                Query = query;
+            }
+            else
+            {
+                Query += "&" + query;
             }
 
-            Query = query;
             return this;
         }
 

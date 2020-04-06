@@ -49,7 +49,7 @@ namespace Framework.UnitTest.Repository
 
             // first add entity
 
-            TKey key;
+            TKey   key;
             object entityState;
 
             using (var ctx = CreateTestDbContext())
@@ -61,7 +61,7 @@ namespace Framework.UnitTest.Repository
                 await ctx.UnitOfWork.SaveChangesAsync();
                 await trans.CommitTransactionAsync();
 
-                key = GetEntityKey(entityToAdd);
+                key         = GetEntityKey(entityToAdd);
                 entityState = GetEntityState(entityToAdd);
             }
 

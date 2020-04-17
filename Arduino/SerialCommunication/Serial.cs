@@ -726,7 +726,11 @@ namespace Framework.Arduino.SerialCommunication
             byte[] encodedStr = _serialPort.Encoding.GetBytes(str);
 
             await _serialPort.BaseStream.WriteAsync(encodedStr, 0, encodedStr.Length, _serialPortCancellationTokenSource.Token);
-            await _serialPort.BaseStream.FlushAsync();
+            if (Environment.OSVersion.Platform != PlatformID.Unix)
+            {
+                // linux: with flush we may delete our recent WriteAsync (see SerialStream.Unix.cs)
+                await _serialPort.BaseStream.FlushAsync();
+            }
         }
 
         private async Task<string> ReadFromSerialAsync()

@@ -139,7 +139,7 @@ namespace Framework.Arduino.SerialCommunication
         public async Task ConnectAsync(string portName, string serverName, string userName, string password)
         {
             await Task.Delay(0); // avoid CS1998
-            Logger?.LogTrace($@"Connect: {portName}");
+            Logger?.LogInformation($@"Connect: {portName}");
 
             // Create a new SerialPort object with default settings.
             Aborted = false;
@@ -203,7 +203,7 @@ namespace Framework.Arduino.SerialCommunication
         private async Task Disconnect(bool join)
         {
             await Task.Delay(5);
-            Logger?.LogTrace($"Disconnecting: {join.ToString()}");
+            Logger?.LogInformation($"Disconnecting: {join.ToString()}");
             Aborted = true;
             _serialPortCancellationTokenSource?.Cancel();
 
@@ -249,7 +249,7 @@ namespace Framework.Arduino.SerialCommunication
                 _serialPortCancellationTokenSource = null;
             }
 
-            Logger?.LogTrace($"Disconnected: {join.ToString()}");
+            Logger?.LogInformation($"Disconnected: {join.ToString()}");
         }
 
         /// <summary>
@@ -258,6 +258,7 @@ namespace Framework.Arduino.SerialCommunication
         /// </summary>
         public void AbortCommands()
         {
+            Logger?.LogInformation("Aborting");
             bool wasEmpty;
             lock (_pendingCommandsLock)
             {
@@ -273,6 +274,7 @@ namespace Framework.Arduino.SerialCommunication
             OnCommandQueueChanged(new SerialEventArgs(0, null));
 
             Aborted = true;
+            Logger?.LogInformation("Aborted");
         }
 
         /// <summary>
@@ -284,6 +286,8 @@ namespace Framework.Arduino.SerialCommunication
             {
                 return;
             }
+
+            Logger?.LogInformation("Resume");
 
             while (true)
             {
@@ -314,6 +318,8 @@ namespace Framework.Arduino.SerialCommunication
             // Set the read/write timeouts
             _serialPort.ReadTimeout  = 500;
             _serialPort.WriteTimeout = 500;
+
+            Logger?.LogInformation($"Setup: Port:{portName}, Baud:{BaudRate}");
         }
 
         public void Dispose()
@@ -470,7 +476,7 @@ namespace Framework.Arduino.SerialCommunication
                 queueLength++;
             }
 
-            Logger?.LogTrace($"Queue: {cmd}");
+            Logger?.LogInformation($"Queue: {cmd}");
             OnCommandQueueChanged(new SerialEventArgs(queueLength, c));
             return c;
         }
@@ -532,7 +538,7 @@ namespace Framework.Arduino.SerialCommunication
 
         private bool WriteSerial(string commandText, bool addNewLine)
         {
-            Logger?.LogTrace($"Write: {commandText}");
+            Logger?.LogInformation($"Write: {commandText}");
             try
             {
                 if (addNewLine)
@@ -687,6 +693,8 @@ namespace Framework.Arduino.SerialCommunication
 
                 if (nextCmd != null && (!Pause || SendNext))
                 {
+                    Logger?.LogTrace($"Write: L:{queuedCmdLength}");
+ 
                     if (queuedCmdLength == 0 || queuedCmdLength + nextCmd.CommandText.Length + 2 < ArduinoBufferSize)
                     {
                         // send everything if queue is empty
@@ -798,7 +806,7 @@ namespace Framework.Arduino.SerialCommunication
 
             if (string.IsNullOrEmpty(message) == false)
             {
-                Logger?.LogTrace($"Read: {message.Replace("\n", @"\n").Replace("\r", @"\r").Replace("\t", @"\t")}");
+                Logger?.LogInformation($"Read: {message.Replace("\n", @"\n").Replace("\r", @"\r").Replace("\t", @"\t")}");
 
                 bool endCommand = false;
 
@@ -880,6 +888,8 @@ namespace Framework.Arduino.SerialCommunication
                         queueLength = _pendingCommands.Count;
                         _autoEvent.Set();
                     }
+
+                    Logger?.LogDebug($"DeQueue: {cmd.CommandText}");
 
                     OnCommandQueueChanged(new SerialEventArgs(queueLength, cmd));
 

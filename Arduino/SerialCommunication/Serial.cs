@@ -694,7 +694,7 @@ namespace Framework.Arduino.SerialCommunication
                 if (nextCmd != null && (!Pause || SendNext))
                 {
                     Logger?.LogTrace($"Write: L:{queuedCmdLength}");
- 
+
                     if (queuedCmdLength == 0 || queuedCmdLength + nextCmd.CommandText.Length + 2 < ArduinoBufferSize)
                     {
                         // send everything if queue is empty

@@ -76,7 +76,7 @@ namespace Framework.Arduino.SerialCommunication.Abstraction
         int WriteTimeout { get; set; }
 
         public int BytesToWrite { get; }
-        public int BytesToRead { get; }
+        public int BytesToRead  { get; }
 
         Stream BaseStream { get; }
 

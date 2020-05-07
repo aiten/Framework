@@ -16,8 +16,6 @@
 
 namespace Framework.WebAPI.Filter
 {
-    using System;
-
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.Controllers;
     using Microsoft.Extensions.Logging;

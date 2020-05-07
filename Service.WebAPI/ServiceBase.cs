@@ -36,7 +36,7 @@ namespace Framework.Service.WebAPI
         {
             using (var scope = CreateScope())
             {
-                HttpResponseMessage response = await scope.Instance.GetAsync(uri);
+                var response = await scope.Instance.GetAsync(uri);
                 response.EnsureSuccessStatusCode();
                 return await response.Content.ReadAsAsync<IList<T>>();
             }
@@ -69,7 +69,7 @@ namespace Framework.Service.WebAPI
         {
             using (var scope = CreateScope())
             {
-                HttpResponseMessage response = await scope.Instance.GetAsync(uri);
+                var response = await scope.Instance.GetAsync(uri);
                 response.EnsureSuccessStatusCode();
                 return await response.Content.ReadAsStringAsync();
             }

@@ -19,14 +19,24 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
 
+using Framework.Pattern;
+
 namespace Framework.Service.WebAPI
 {
     public abstract class CrudServiceBase<T, TKey> : ServiceBase where T : class where TKey : IComparable
     {
         protected abstract TKey GetKey(T value);
 
-        protected CrudServiceBase()
+        private readonly HttpClient _httpClient;
+
+        protected CrudServiceBase(HttpClient httpClient)
         {
+            _httpClient = httpClient;
+        }
+
+        protected override IScope<HttpClient> CreateScope()
+        {
+            return new ScopeInstance<HttpClient>(_httpClient);
         }
 
         public async Task<T> Get(TKey id)

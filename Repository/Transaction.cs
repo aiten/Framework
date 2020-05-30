@@ -41,24 +41,30 @@ namespace Framework.Repository
 
         public bool InTransaction => _dbTran != null;
 
-        public async Task CommitTransactionAsync()
+        private void CheckInTransaction()
         {
             if (InTransaction == false)
             {
                 throw new ArgumentException(ErrorMessages.ResourceManager.ToLocalizable(nameof(ErrorMessages.Framework_Repository_TransactionNotStarted)).Message());
             }
+        }
 
+        public async Task SaveChangesAsync()
+        {
+            CheckInTransaction();
             await UnitOfWork.SaveChangesAsync();
+        }
+
+        public async Task CommitTransactionAsync()
+        {
+            await SaveChangesAsync();
             _dbTran.Commit();
             _dbTran = null;
         }
 
         public void RollbackTransaction()
         {
-            if (InTransaction == false)
-            {
-                throw new ArgumentException(ErrorMessages.ResourceManager.ToLocalizable(nameof(ErrorMessages.Framework_Repository_TransactionNotStarted)).Message());
-            }
+            CheckInTransaction();
 
             _dbTran.Rollback();
             _dbTran = null;

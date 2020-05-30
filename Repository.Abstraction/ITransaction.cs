@@ -21,6 +21,8 @@ namespace Framework.Repository.Abstraction
 
     public interface ITransaction : IDisposable
     {
+        Task SaveChangesAsync();
+
         Task CommitTransactionAsync();
     }
 }

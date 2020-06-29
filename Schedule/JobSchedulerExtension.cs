@@ -14,19 +14,34 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.Tools
+using System;
+
+using Framework.Schedule.Abstraction;
+
+namespace Framework.Schedule
 {
-    using Abstraction;
-
-    using Microsoft.Extensions.DependencyInjection;
-
-    public static class LiveServiceCollectionExtensions
+    public static class JobSchedulerExtension
     {
-        public static IServiceCollection AddFrameWorkTools(this IServiceCollection services)
+        public static IJobExecutor Periodic(this IJobScheduler scheduler, TimeSpan period, Type job, object state)
         {
-            services.AddTransient<ICurrentDateTime, CurrentDateTime>();
+            var schedule = new PeriodicSchedule(period);
+            return scheduler.ScheduleJob(schedule, job, state);
+        }
 
-            return services;
+        public static IJobExecutor Periodic<T>(this IJobScheduler scheduler, TimeSpan period, object state) where T : IJob
+        {
+            return scheduler.Periodic(period, typeof(T), state);
+        }
+
+        public static IJobExecutor Daily(this IJobScheduler scheduler, TimeSpan timeOfDay, Type job, object state)
+        {
+            var schedule = new DailySchedule(timeOfDay);
+            return scheduler.ScheduleJob(schedule, job, state);
+        }
+
+        public static IJobExecutor Daily<T>(this IJobScheduler scheduler, TimeSpan timeOfDay, object state) where T : IJob
+        {
+            return scheduler.Daily(timeOfDay, typeof(T), state);
         }
     }
 }

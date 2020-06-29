@@ -14,19 +14,12 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.Tools
+using System;
+
+namespace Framework.Schedule.Abstraction
 {
-    using Abstraction;
-
-    using Microsoft.Extensions.DependencyInjection;
-
-    public static class LiveServiceCollectionExtensions
+    public interface IJobScheduler : IDisposable
     {
-        public static IServiceCollection AddFrameWorkTools(this IServiceCollection services)
-        {
-            services.AddTransient<ICurrentDateTime, CurrentDateTime>();
-
-            return services;
-        }
+        IJobExecutor ScheduleJob(ISchedule schedule, Type job, object state);
     }
 }

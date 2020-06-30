@@ -16,6 +16,7 @@
 
 using System;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Framework.Schedule.Abstraction
 {
@@ -24,5 +25,7 @@ namespace Framework.Schedule.Abstraction
         void Start();
 
         CancellationTokenSource CtSource { get; }
+
+        IJobExecutor Then(Type job, object state);
     }
 }

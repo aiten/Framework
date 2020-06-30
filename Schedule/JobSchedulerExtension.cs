@@ -43,5 +43,9 @@ namespace Framework.Schedule
         {
             return scheduler.Daily(timeOfDay, typeof(T), state);
         }
+        public static IJobExecutor Then<T>(this IJobExecutor jobExecutor, object state) where T : IJob
+        {
+            return jobExecutor.Then(typeof(T), state);
+        }
     }
 }

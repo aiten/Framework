@@ -15,6 +15,7 @@
 */
 
 using System;
+using System.Collections.Generic;
 using System.Threading;
 
 using Framework.Schedule.Abstraction;
@@ -27,11 +28,13 @@ namespace Framework.Schedule
 {
     internal abstract class JobExecutor : IJobExecutor
     {
-        private readonly IServiceProvider _serviceProvider;
-        private readonly ICurrentDateTime _currentDateTime;
-        private readonly ILogger          _logger;
-        private readonly Type             _job;
-        private readonly object           _state;
+        private readonly IServiceProvider    _serviceProvider;
+        private readonly ICurrentDateTime    _currentDateTime;
+        private readonly ILogger             _logger;
+        private readonly ILoggerFactory      _loggerFactory;
+        private readonly Type                _job;
+        private readonly object              _state;
+        private readonly IList<IJobExecutor> _thenExecutors = new List<IJobExecutor>();
 
         private volatile bool _disposed;
 
@@ -46,6 +49,7 @@ namespace Framework.Schedule
             _serviceProvider = serviceProvider;
             _currentDateTime = currentDateTime;
             _logger          = loggerFactory.CreateLogger(job);
+            _loggerFactory   = loggerFactory;
             _job             = job;
             _state           = state;
         }
@@ -55,8 +59,20 @@ namespace Framework.Schedule
         /// </summary>
         public abstract void Start();
 
+        public IJobExecutor Then(Type job, object state)
+        {
+            var thenJob = new ThenJobExecutor(_serviceProvider, _loggerFactory, _currentDateTime, job, state);
+            _thenExecutors.Add(thenJob);
+            return thenJob;
+        }
+
         public void Dispose()
         {
+            foreach (var thenJobs in _thenExecutors)
+            {
+                ((JobExecutor)thenJobs).Dispose();
+            }
+
             _disposed = true;
             Timer?.Dispose();
         }
@@ -87,6 +103,28 @@ namespace Framework.Schedule
             }
 
             Executed();
+
+            ExecuteThen();
+        }
+
+        private void ExecuteThen()
+        {
+            foreach (var thenJobs in _thenExecutors)
+            {
+                ((JobExecutor)thenJobs).Execute();
+            }
+        }
+
+        private sealed class ThenJobExecutor : JobExecutor
+        {
+            public ThenJobExecutor(IServiceProvider serviceProvider, ILoggerFactory loggerFactory, ICurrentDateTime currentDateTime, Type job, object state) :
+                base(serviceProvider, loggerFactory, currentDateTime, job, state)
+            {
+            }
+
+            public override void Start()
+            {
+            }
         }
     }
 }

@@ -17,6 +17,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
+using System.Threading.Tasks;
 
 using Framework.Schedule.Abstraction;
 using Framework.Tools.Abstraction;
@@ -85,7 +86,7 @@ namespace Framework.Schedule
         {
         }
 
-        protected async void Execute()
+        protected async Task Execute()
         {
             Executing();
 
@@ -104,14 +105,14 @@ namespace Framework.Schedule
 
             Executed();
 
-            ExecuteThen();
+            await ExecuteThen();
         }
 
-        private void ExecuteThen()
+        private async Task ExecuteThen()
         {
             foreach (var thenJobs in _thenExecutors)
             {
-                ((JobExecutor)thenJobs).Execute();
+                await ((JobExecutor)thenJobs).Execute();
             }
         }
 

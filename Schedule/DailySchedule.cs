@@ -35,33 +35,29 @@ namespace Framework.Schedule
 
         public IJobExecutor Schedule(IServiceProvider serviceProvider, ILoggerFactory loggerFactory, ICurrentDateTime currentDateTime, Type job, object state)
         {
-            return new TimedJobExecutor(_timeOfDay, serviceProvider, loggerFactory, currentDateTime, job, state);
+            return new DailyJobExecutor(_timeOfDay, serviceProvider, loggerFactory, currentDateTime, job, state);
         }
 
-        private sealed class TimedJobExecutor : JobExecutor
+        private sealed class DailyJobExecutor : JobExecutor
         {
             private readonly ILogger _logger;
 
             private readonly ICurrentDateTime _dateTimeService;
             private readonly TimeSpan         _timeOfDay;
-            private readonly Timer            _timer;
-
-            private volatile bool _disposed;
 
             private bool _wasExecutedAlready;
 
-            public TimedJobExecutor(TimeSpan timeOfDay, IServiceProvider serviceProvider, ILoggerFactory loggerFactory, ICurrentDateTime currentDateTime, Type job, object state)
+            public DailyJobExecutor(TimeSpan timeOfDay, IServiceProvider serviceProvider, ILoggerFactory loggerFactory, ICurrentDateTime currentDateTime, Type job, object state)
                 : base(serviceProvider, loggerFactory, currentDateTime, job, state)
             {
                 _logger          = loggerFactory.CreateLogger(GetType());
                 _dateTimeService = currentDateTime;
                 _timeOfDay       = timeOfDay;
-                _timer           = new Timer(state => ((TimedJobExecutor)state).Execute(), this, (int)GetOffsetToNextTick().TotalMilliseconds, -1);
             }
 
             public override void Start()
             {
-                Timer = new Timer(state => ((TimedJobExecutor)state).Execute(), this, (int)GetOffsetToNextTick().TotalMilliseconds, -1);
+                Timer = new Timer(state => ((DailyJobExecutor)state).Execute(), this, (int)GetOffsetToNextTick().TotalMilliseconds, -1);
             }
 
             protected override void Executing()
@@ -77,12 +73,12 @@ namespace Framework.Schedule
 
                 try
                 {
-                    if (_disposed)
+                    if (IsDisposed)
                     {
                         return;
                     }
 
-                    _timer.Change((int)GetOffsetToNextTick().TotalMilliseconds, -1);
+                    Timer.Change((int)GetOffsetToNextTick().TotalMilliseconds, -1);
                 }
                 catch (Exception e)
                 {

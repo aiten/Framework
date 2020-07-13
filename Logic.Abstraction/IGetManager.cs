@@ -19,7 +19,7 @@ namespace Framework.Logic.Abstraction
     using System.Collections.Generic;
     using System.Threading.Tasks;
 
-    public interface IGetManager<T, in TId> where T : class
+    public interface IGetManager<T, in TId> : IManager where T : class
     {
         Task<T> Get(TId id);
 

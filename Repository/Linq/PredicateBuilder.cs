@@ -16,12 +16,12 @@
 
 // see: https://github.com/scottksmith95/LINQKit
 
-using System;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq.Expressions;
-
 namespace Framework.Repository.Linq
 {
+    using System;
+    using System.Diagnostics.CodeAnalysis;
+    using System.Linq.Expressions;
+
     /// <summary> The Predicate Operator </summary>
     public enum PredicateOperator
     {

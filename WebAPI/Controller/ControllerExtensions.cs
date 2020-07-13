@@ -14,8 +14,6 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-using Framework.WebAPI.Tool;
-
 namespace Framework.WebAPI.Controller
 {
     using System;
@@ -25,6 +23,8 @@ namespace Framework.WebAPI.Controller
     using System.Threading.Tasks;
 
     using Microsoft.AspNetCore.Mvc;
+
+    using Framework.WebAPI.Tool;
 
     using Logic.Abstraction;
 

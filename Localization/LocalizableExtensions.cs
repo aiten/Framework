@@ -14,11 +14,11 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-using System.Resources;
-
 namespace Framework.Localization
 {
-    public static class LocalizableExtension
+    using System.Resources;
+
+    public static class LocalizableExtensions
     {
         public static Localizable ToLocalizable(this ResourceManager resourceManager, string resourceKey, object[] placeholders = null)
         {

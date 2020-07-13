@@ -14,13 +14,13 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-using Framework.WebAPI.Tool;
-
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc.Filters;
-
 namespace Framework.WebAPI.Filter
 {
+    using Framework.WebAPI.Tool;
+
+    using Microsoft.AspNetCore.Http;
+    using Microsoft.AspNetCore.Mvc.Filters;
+
     public sealed class MethodCallHistoryFilter : IActionFilter
     {
         private MethodCallHistory _methodCallHistory;

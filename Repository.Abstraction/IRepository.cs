@@ -16,7 +16,7 @@
 
 namespace Framework.Repository.Abstraction
 {
-    public enum EntityState
+    public enum MyEntityState
     {
         /// <summary>
         /// see entity framework.

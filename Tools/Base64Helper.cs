@@ -14,11 +14,11 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-using System;
-using System.Text;
-
 namespace Framework.Tools
 {
+    using System;
+    using System.Text;
+
     public class Base64Helper
     {
         public static string StringFromBase64(string base64String)

@@ -14,16 +14,16 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-using System.Collections.Generic;
-using System.Net;
-using System.Net.Http;
-using System.Threading.Tasks;
-
-using Framework.Pattern;
-using Framework.Service.WebAPI.Uri;
-
 namespace Framework.Service.WebAPI
 {
+    using System.Collections.Generic;
+    using System.Net;
+    using System.Net.Http;
+    using System.Threading.Tasks;
+
+    using Framework.Pattern;
+    using Framework.Service.WebAPI.Uri;
+
     public abstract class ServiceBase : DisposeWrapper
     {
         public string BaseApi { get; set; }

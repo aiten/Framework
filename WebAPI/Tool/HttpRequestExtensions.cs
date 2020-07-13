@@ -14,10 +14,10 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-using Microsoft.AspNetCore.Http;
-
 namespace Framework.WebAPI.Tool
 {
+    using Microsoft.AspNetCore.Http;
+
     public static class HttpRequestExtensions
     {
         public static string GetCurrentUri(this HttpRequest request)

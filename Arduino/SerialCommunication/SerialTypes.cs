@@ -24,7 +24,7 @@ namespace Framework.Arduino.SerialCommunication
     public enum EReplyType
     {
         NoReply      = 0, // no reply received (other options must not be set)
-        ReplyOK      = 1,
+        ReplyOk      = 1,
         ReplyError   = 2,
         ReplyInfo    = 4,
         ReplyUnknown = 8

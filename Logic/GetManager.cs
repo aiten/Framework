@@ -40,17 +40,17 @@ namespace Framework.Logic
 
         public async Task<IEnumerable<T>> GetAll()
         {
-            return MapToDto(await GetAllEntities());
+            return await MapToDto(await GetAllEntities());
         }
 
         public async Task<T> Get(TKey key)
         {
-            return MapToDto(await _repository.Get(key));
+            return await MapToDto(await _repository.Get(key));
         }
 
         public async Task<IEnumerable<T>> Get(IEnumerable<TKey> keys)
         {
-            return MapToDto(await _repository.Get(keys));
+            return await MapToDto(await _repository.Get(keys));
         }
 
         protected virtual async Task<IList<TEntity>> GetAllEntities()
@@ -58,31 +58,31 @@ namespace Framework.Logic
             return await _repository.GetAll();
         }
 
-        protected virtual T SetDto(T dto)
+        protected virtual async Task<T> SetDto(T dto)
         {
-            return dto;
+            return await Task.FromResult(dto);
         }
 
-        protected virtual IEnumerable<T> SetDto(IEnumerable<T> dtos)
+        protected virtual async Task<IEnumerable<T>> SetDto(IEnumerable<T> dtos)
         {
             foreach (var dto in dtos)
             {
-                SetDto(dto);
+                await SetDto(dto);
             }
 
             return dtos;
         }
 
-        protected IEnumerable<T> MapToDto(IEnumerable<TEntity> entities)
+        protected async Task<IEnumerable<T>> MapToDto(IList<TEntity> entities)
         {
             var dtos = _mapper.Map<IEnumerable<TEntity>, IEnumerable<T>>(entities);
-            return SetDto(dtos);
+            return await SetDto(dtos);
         }
 
-        protected T MapToDto(TEntity entity)
+        protected async Task<T> MapToDto(TEntity entity)
         {
             var dto = _mapper.Map<TEntity, T>(entity);
-            return SetDto(dto);
+            return await SetDto(dto);
         }
     }
 }

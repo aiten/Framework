@@ -14,15 +14,15 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-using System;
-using System.Collections.Generic;
-using System.Net.Http;
-using System.Threading.Tasks;
-
-using Framework.Pattern;
-
 namespace Framework.Service.WebAPI
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Net.Http;
+    using System.Threading.Tasks;
+
+    using Framework.Pattern;
+
     public abstract class CrudServiceBase<T, TKey> : ServiceBase where T : class where TKey : IComparable
     {
         protected abstract TKey GetKey(T value);

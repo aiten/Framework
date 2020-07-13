@@ -14,8 +14,6 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-using Framework.Localization;
-
 namespace Framework.Logic
 {
     using System;
@@ -27,10 +25,14 @@ namespace Framework.Logic
 
     using AutoMapper;
 
+    using Framework.Localization;
+
     using Repository.Abstraction;
 
     public abstract class CrudManager<T, TKey, TEntity> : GetManager<T, TKey, TEntity>, ICrudManager<T, TKey> where T : class where TEntity : class
     {
+        #region private /ctr
+
         private readonly IMapper                        _mapper;
         private readonly ICrudRepository<TEntity, TKey> _repository;
         private readonly IUnitOfWork                    _unitOfWork;
@@ -41,6 +43,8 @@ namespace Framework.Logic
             _repository = repository;
             _mapper     = mapper;
         }
+
+        #endregion
 
         #region Add
 
@@ -158,6 +162,8 @@ namespace Framework.Logic
 
         #endregion
 
+        #region internal
+
         protected async Task CommitTransaction(ITransaction trans)
         {
             try
@@ -172,6 +178,8 @@ namespace Framework.Logic
                 throw;
             }
         }
+
+        #endregion
 
         #region Validadation and Modification overrides
 

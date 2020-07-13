@@ -14,24 +14,24 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Diagnostics;
-
-using Framework.Arduino.SerialCommunication.Abstraction;
-
-using Microsoft.Extensions.Logging;
-
-using Framework.WinAPI;
-using Framework.Pattern;
-
 namespace Framework.Arduino.SerialCommunication
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Text;
+    using System.IO;
+    using System.Threading;
+    using System.Threading.Tasks;
+    using System.Diagnostics;
+
+    using Framework.Arduino.SerialCommunication.Abstraction;
+
+    using Microsoft.Extensions.Logging;
+
+    using Framework.WinAPI;
+    using Framework.Pattern;
+
     public class Serial : ISerial
     {
         #region Private Members
@@ -52,11 +52,15 @@ namespace Framework.Arduino.SerialCommunication
 
         #endregion
 
+        #region ctr
+
         public Serial(IFactory<ISerialPort> serialPortFactory, ILogger<Serial> logger)
         {
             Logger             = logger;
             _serialPortFactory = serialPortFactory;
         }
+
+        #endregion
 
         #region Events
 
@@ -837,7 +841,7 @@ namespace Framework.Arduino.SerialCommunication
                     endCommand = true;
                     if (cmd != null)
                     {
-                        cmd.ReplyType |= EReplyType.ReplyOK;
+                        cmd.ReplyType |= EReplyType.ReplyOk;
                     }
 
                     OnReplyDone(new SerialEventArgs(message, cmd));

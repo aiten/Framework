@@ -16,7 +16,9 @@
 
 namespace Framework.Logic
 {
-    public class ManagerBase
+    using Framework.Logic.Abstraction;
+
+    public class ManagerBase : IManager
     {
     }
 }

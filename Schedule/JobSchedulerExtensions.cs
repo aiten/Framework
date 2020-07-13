@@ -14,12 +14,12 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-using System;
-
-using Framework.Schedule.Abstraction;
-
 namespace Framework.Schedule
 {
+    using System;
+
+    using Framework.Schedule.Abstraction;
+
     public static class JobSchedulerExtension
     {
         public static IJobExecutor Periodic(this IJobScheduler scheduler, TimeSpan period, Type job, object state)
@@ -43,6 +43,7 @@ namespace Framework.Schedule
         {
             return scheduler.Daily(timeOfDay, typeof(T), state);
         }
+
         public static IJobExecutor Then<T>(this IJobExecutor jobExecutor, object state) where T : IJob
         {
             return jobExecutor.Then(typeof(T), state);

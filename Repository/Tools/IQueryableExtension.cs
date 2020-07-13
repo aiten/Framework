@@ -14,17 +14,17 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-using System.Collections.Generic;
-using System.Reflection;
-using System.Linq;
-
-using Microsoft.EntityFrameworkCore.Query;
-using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
-
 // see: https://stackoverflow.com/questions/37527783/get-sql-code-from-an-entity-framework-core-iqueryablet
 
 namespace Framework.Repository.Tools
 {
+    using System.Collections.Generic;
+    using System.Reflection;
+    using System.Linq;
+
+    using Microsoft.EntityFrameworkCore.Query;
+    using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
+
     public static class IQueryableExtensions
     {
         public static string ToSql<TEntity>(this IQueryable<TEntity> query) where TEntity : class

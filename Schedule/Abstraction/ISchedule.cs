@@ -14,14 +14,14 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-using System;
-
-using Framework.Tools.Abstraction;
-
-using Microsoft.Extensions.Logging;
-
 namespace Framework.Schedule.Abstraction
 {
+    using System;
+
+    using Framework.Tools.Abstraction;
+
+    using Microsoft.Extensions.Logging;
+
     public interface ISchedule
     {
         IJobExecutor Schedule(IServiceProvider serviceProvider, ILoggerFactory loggerFactory, ICurrentDateTime currentDateTime, Type job, object state);

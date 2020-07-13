@@ -24,7 +24,7 @@ namespace Framework.Arduino.SerialCommunication
 
     using Abstraction;
 
-    public static class SerialExtension
+    public static class SerialExtensions
     {
         const int DefaultTimeout = 10 * 60 * 1000;
 
@@ -116,7 +116,7 @@ namespace Framework.Arduino.SerialCommunication
             if (ret.Any())
             {
                 var last = ret.Last();
-                if (last.ReplyType.HasFlag(EReplyType.ReplyOK))
+                if (last.ReplyType.HasFlag(EReplyType.ReplyOk))
                 {
                     return last.ResultText;
                 }

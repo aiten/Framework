@@ -14,11 +14,11 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-using System.Windows;
-using System.Windows.Controls;
-
 namespace Framework.Wpf.Helpers
 {
+    using System.Windows;
+    using System.Windows.Controls;
+
     public static class PasswordHelper
     {
         public static readonly DependencyProperty PasswordProperty =

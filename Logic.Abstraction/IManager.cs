@@ -14,19 +14,9 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.Schedule
+namespace Framework.Logic.Abstraction
 {
-    using Framework.Schedule.Abstraction;
-
-    using Microsoft.Extensions.DependencyInjection;
-
-    public static class LiveServiceCollectionExtensions
+    public interface IManager
     {
-        public static IServiceCollection AddJobScheduler(this IServiceCollection services)
-        {
-            services.AddSingleton<IJobScheduler, JobScheduler>();
-
-            return services;
-        }
     }
 }

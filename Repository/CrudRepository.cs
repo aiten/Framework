@@ -14,6 +14,7 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
+using Framework.Repository.Abstraction;
 
 namespace Framework.Repository
 {
@@ -23,8 +24,6 @@ namespace Framework.Repository
     using System.Threading.Tasks;
 
     using Microsoft.EntityFrameworkCore;
-
-    using EntityState = Abstraction.EntityState;
 
     public abstract class CrudRepository<TDbContext, TEntity, TKey> : GetRepository<TDbContext, TEntity, TKey>
         where TDbContext : DbContext where TEntity : class
@@ -79,7 +78,7 @@ namespace Framework.Repository
             DeleteEntities(entities);
         }
 
-        public void SetState(TEntity entity, EntityState state)
+        public void SetState(TEntity entity, MyEntityState state)
         {
             SetEntityState(entity, (Microsoft.EntityFrameworkCore.EntityState)state);
         }

@@ -14,13 +14,13 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
 namespace Framework.Service.WebAPI.Uri
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Text;
+
     public class UriQueryBuilder
     {
         private readonly List<Tuple<string, object>> _list = new List<Tuple<string, object>>();
@@ -49,6 +49,26 @@ namespace Framework.Service.WebAPI.Uri
         public UriQueryBuilder Add<T>(string filterName, T val)
         {
             _list.Add(new Tuple<string, object>(filterName, val));
+            return this;
+        }
+
+        public UriQueryBuilder AddIfNotNull<T>(string filterName, T? val) where T : struct
+        {
+            if (val.HasValue)
+            {
+                _list.Add(new Tuple<string, object>(filterName, val.Value));
+            }
+
+            return this;
+        }
+
+        public UriQueryBuilder AddIfNotNullOrEmpty(string filterName, string val)
+        {
+            if (string.IsNullOrEmpty(val) == false)
+            {
+                _list.Add(new Tuple<string, object>(filterName, val));
+            }
+
             return this;
         }
 

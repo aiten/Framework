@@ -14,18 +14,18 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-using System;
-
-using FluentAssertions;
-using FluentAssertions.Extensions;
-
-using Framework.Tools;
-using Framework.Tools.Csv;
-
-using Xunit;
-
 namespace Framework.MyUnitTest.Tools.Csv
 {
+    using System;
+
+    using FluentAssertions;
+    using FluentAssertions.Extensions;
+
+    using Framework.Tools;
+    using Framework.Tools.Csv;
+
+    using Xunit;
+
     public class CsvImportTest
     {
         #region CsvImport

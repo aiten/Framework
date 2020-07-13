@@ -14,13 +14,13 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-using System;
-using System.Globalization;
-using System.Resources;
-using System.Runtime.CompilerServices;
-
 namespace Framework.Localization
 {
+    using System;
+    using System.Globalization;
+    using System.Resources;
+    using System.Runtime.CompilerServices;
+
     public class Localizable
     {
         private ResourceManager _resourceManager;

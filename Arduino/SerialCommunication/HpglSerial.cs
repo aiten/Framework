@@ -14,16 +14,16 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-using System;
-using System.Collections.Generic;
-
-using Framework.Pattern;
-using Framework.Arduino.SerialCommunication.Abstraction;
-
-using Microsoft.Extensions.Logging;
-
 namespace Framework.Arduino.SerialCommunication
 {
+    using System;
+    using System.Collections.Generic;
+
+    using Framework.Pattern;
+    using Framework.Arduino.SerialCommunication.Abstraction;
+
+    using Microsoft.Extensions.Logging;
+
     public class HpglSerial : Serial
     {
         readonly int maxMessageLength = 128;
@@ -41,16 +41,16 @@ namespace Framework.Arduino.SerialCommunication
 
         protected string[] SplitHpgl(string line)
         {
-            string[] cmds    = line.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
-            var      cmdList = new List<string>();
+            var cmds    = line.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
+            var cmdList = new List<string>();
 
             foreach (string l in cmds)
             {
-                string message = l;
+                var message = l;
                 while (message.Length > maxMessageLength)
                 {
-                    string cmd = message.Substring(0, 2);
-                    int    idx = 0;
+                    var cmd = message.Substring(0, 2);
+                    var idx = 0;
                     while (idx < maxMessageLength && idx != -1)
                     {
                         idx = message.IndexOf(',', idx + 1);

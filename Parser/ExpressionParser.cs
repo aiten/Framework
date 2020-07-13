@@ -155,7 +155,7 @@ namespace Framework.Parser
                 return;
             }
 
-            char ch = _reader.SkipSpaces();
+            char ch = Reader.SkipSpaces();
 
             if (ch == '\0')
             {
@@ -168,7 +168,7 @@ namespace Framework.Parser
 
         protected virtual void ScanNextToken()
         {
-            char ch = _reader.NextChar;
+            char ch = Reader.NextChar;
             if (IsToken("||", false, false))
             {
                 _state._detailToken = ETokenType.XOrSy;
@@ -214,14 +214,14 @@ namespace Framework.Parser
             if (ch == LeftParenthesis)
             {
                 _state._detailToken = ETokenType.LeftParenthesisSy;
-                _reader.Next();
+                Reader.Next();
                 return;
             }
 
             if (ch == RightParenthesis)
             {
                 _state._detailToken = ETokenType.RightParenthesisSy;
-                _reader.Next();
+                Reader.Next();
                 return;
             }
 
@@ -229,51 +229,51 @@ namespace Framework.Parser
             {
                 case '>':
                     _state._detailToken = ETokenType.GreaterSy;
-                    _reader.Next();
+                    Reader.Next();
                     return;
                 case '<':
                     _state._detailToken = ETokenType.LessSy;
-                    _reader.Next();
+                    Reader.Next();
                     return;
                 case '&':
                     _state._detailToken = ETokenType.AndSy;
-                    _reader.Next();
+                    Reader.Next();
                     return;
                 case '|':
                     _state._detailToken = ETokenType.OrSy;
-                    _reader.Next();
+                    Reader.Next();
                     return;
                 case '-':
                     _state._detailToken = ETokenType.MinusSy;
-                    _reader.Next();
+                    Reader.Next();
                     return;
                 case '+':
                     _state._detailToken = ETokenType.PlusSy;
-                    _reader.Next();
+                    Reader.Next();
                     return;
                 case '*':
                     _state._detailToken = ETokenType.MultiplySy;
-                    _reader.Next();
+                    Reader.Next();
                     return;
                 case '/':
                     _state._detailToken = ETokenType.DivideSy;
-                    _reader.Next();
+                    Reader.Next();
                     return;
                 case '%':
                     _state._detailToken = ETokenType.ModuloSy;
-                    _reader.Next();
+                    Reader.Next();
                     return;
                 case '^':
                     _state._detailToken = ETokenType.PowSy;
-                    _reader.Next();
+                    Reader.Next();
                     return;
                 case '!':
                     _state._detailToken = ETokenType.FactorialSy;
-                    _reader.Next();
+                    Reader.Next();
                     return;
                 case '=':
                     _state._detailToken = ETokenType.AssignSy;
-                    _reader.Next();
+                    Reader.Next();
                     return;
             }
 
@@ -281,7 +281,7 @@ namespace Framework.Parser
             if (CommandStream.IsNumber(ch))
             {
                 _state._detailToken = ETokenType.FloatSy;
-                _state._number      = _reader.GetDouble(out bool istFloatingPoint);
+                _state._number      = Reader.GetDouble(out bool istFloatingPoint);
                 return;
             }
 
@@ -289,7 +289,7 @@ namespace Framework.Parser
             if (IsIdentStart(ch))
             {
                 var start = ReadIdent();
-                ch = _reader.SkipSpaces();
+                ch = Reader.SkipSpaces();
 
                 // check if this is a variable or a function.
                 // a function has a parenthesis '(' open after the name
@@ -385,14 +385,14 @@ namespace Framework.Parser
         {
             var sb = new StringBuilder();
 
-            char ch = _reader.NextChar;
+            char ch = Reader.NextChar;
             sb.Append(ch);
-            ch = _reader.Next();
+            ch = Reader.Next();
 
             while (CommandStream.IsAlpha(ch) || CommandStream.IsDigit(ch))
             {
                 sb.Append(ch);
-                ch = _reader.Next();
+                ch = Reader.Next();
             }
 
             return sb.ToString();
@@ -439,7 +439,7 @@ namespace Framework.Parser
             if (GetTokenType() == ETokenType.VariableSy)
             {
                 // copy current state
-                var          e_now     = _reader.PushIdx();
+                var          e_now     = Reader.PushIdx();
                 SParserState state_now = _state;
 
                 GetNextToken();
@@ -462,7 +462,7 @@ namespace Framework.Parser
                 }
 
                 // go back to previous token
-                _reader.PopIdx(e_now);
+                Reader.PopIdx(e_now);
                 _state = state_now;
             }
 

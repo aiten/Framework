@@ -14,12 +14,11 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-using System.Threading.Tasks;
-
 namespace Framework.Repository.Abstraction
 {
     using System;
     using System.Collections.Generic;
+    using System.Threading.Tasks;
 
     public interface ICrudRepository<TEntity, TKey> : IGetRepository<TEntity, TKey>
         where TEntity : class
@@ -42,7 +41,7 @@ namespace Framework.Repository.Abstraction
 
         void SetValueGraph(TEntity trackingEntity, TEntity values);
 
-        void SetState(TEntity entity, EntityState state);
+        void SetState(TEntity entity, MyEntityState state);
 
         void Sync(ICollection<TEntity> inDb, ICollection<TEntity> toDb, Func<TEntity, TEntity, bool> compareEntities, Action<TEntity> prepareForAdd);
     }

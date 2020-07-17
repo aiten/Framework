@@ -31,8 +31,8 @@ namespace Framework.Tools.Password
 
         public string GetPasswordHash(string password)
         {
-            var    cryptoProvider = new RNGCryptoServiceProvider();
-            byte[] salt           = new byte[SaltByteSize];
+            var cryptoProvider = new RNGCryptoServiceProvider();
+            var salt           = new byte[SaltByteSize];
             cryptoProvider.GetBytes(salt);
 
             var hash = GetPbkdf2Bytes(password, salt, Pbkdf2Iterations, HashByteSize);

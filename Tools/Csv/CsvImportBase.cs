@@ -30,6 +30,8 @@ namespace Framework.Tools.Csv
 
         public event EventHandler<IList<string>> ReadFirstLine;
 
+        public char ListSeparatorChar { get; set; } = ';';
+
         public string NewLineInString { get; set; } = "\n";
 
         public CsvImportBase()
@@ -129,7 +131,7 @@ namespace Framework.Tools.Csv
                     {
                         quoteChar = ch;
                     }
-                    else if (quoteChar == noQuoteChar && (ch == ';'))
+                    else if (quoteChar == noQuoteChar && (ch == ListSeparatorChar))
                     {
                         columns.Add(sb.ToString());
                         sb.Clear();

@@ -16,16 +16,36 @@
 
 namespace Framework.Service.WebAPI
 {
+    using System;
+    using System.Collections.Generic;
+
     using System.Net.Http;
     using System.Net.Http.Headers;
 
     public static class HttpClientHelper
     {
-        public static void PrepareHttpClient(HttpClient httpClient, string baseUri)
+        public static void PrepareHttpClient(HttpClient httpClient, string baseUri = null, int timeOutSeconds = -1, Dictionary<string, string> defaultHeaders = null)
         {
-            httpClient.BaseAddress = new System.Uri(baseUri);
+            if (!string.IsNullOrEmpty(baseUri))
+            {
+                httpClient.BaseAddress = new System.Uri(baseUri);
+            }
+
             httpClient.DefaultRequestHeaders.Accept.Clear();
             httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+            if (timeOutSeconds != -1)
+            {
+                httpClient.Timeout = TimeSpan.FromSeconds(timeOutSeconds);
+            }
+
+            if (defaultHeaders != null)
+            {
+                foreach (var defaultHeader in defaultHeaders)
+                {
+                    httpClient.DefaultRequestHeaders.Add(defaultHeader.Key, defaultHeader.Value);
+                }
+            }
         }
 
         public static HttpClientHandler CreateHttpClientHandlerIgnoreSSLCertificatesError()

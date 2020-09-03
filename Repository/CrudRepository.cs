@@ -14,8 +14,6 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-using Framework.Repository.Abstraction;
-
 namespace Framework.Repository
 {
     using System;
@@ -24,6 +22,8 @@ namespace Framework.Repository
     using System.Threading.Tasks;
 
     using Microsoft.EntityFrameworkCore;
+
+    using Framework.Repository.Abstraction;
 
     public abstract class CrudRepository<TDbContext, TEntity, TKey> : GetRepository<TDbContext, TEntity, TKey>
         where TDbContext : DbContext where TEntity : class

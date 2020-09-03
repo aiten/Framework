@@ -21,6 +21,7 @@ namespace Framework.Tools.Csv
     using System.Globalization;
     using System.IO;
     using System.Text;
+    using System.Threading.Tasks;
 
     public class CsvImportBase
     {
@@ -92,6 +93,12 @@ namespace Framework.Tools.Csv
         public IList<IList<string>> ReadStringMatrixFromCsv(string fileName, bool skipTitleLine)
         {
             string[] lines = File.ReadAllLines(fileName, Encoding);
+            return ReadStringMatrixFromCsv(lines, skipTitleLine);
+        }
+
+        public async Task<IList<IList<string>>> ReadStringMatrixFromCsvAsync(string fileName, bool skipTitleLine)
+        {
+            string[] lines = await File.ReadAllLinesAsync(fileName, Encoding);
             return ReadStringMatrixFromCsv(lines, skipTitleLine);
         }
 

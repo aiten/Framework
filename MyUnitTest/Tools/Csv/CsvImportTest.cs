@@ -63,6 +63,7 @@ namespace Framework.MyUnitTest.Tools.Csv
             public DateTime? ColDateAndTimeNull         { get; set; }
             public DateTime? ColDateAndTimeFractionNull { get; set; }
             public TimeSpan? ColTimeSpanNull            { get; set; }
+            public byte[]    ColByteArr                 { get; set; }
         }
 
         [Fact]
@@ -70,9 +71,9 @@ namespace Framework.MyUnitTest.Tools.Csv
         {
             var lines = new[]
             {
-                "ColString;ColInt;ColShort;ColDecimal;ColByte;ColBool;ColLong;ColEnum;ColDate;ColDateAndTime;ColDateAndTimeFraction;ColTimeSpan;ColDouble;ColIntNull;ColShortNull;ColDecimalNull;ColByteNull;ColBoolNull;ColLongNull;ColEnumNull;ColDateNull;ColDateAndTimeNull;ColDateAndTimeFractionNull;ColDoubleNull;ColTimeSpanNull",
-                "Str;1;2;2.5;127;true;1234567890;EnumValue1;2018/12/31;2018/12/31 15:56:45;2018/12/31 15:56:45.123;15:56:45;34.12;1;2;2.5;127;false;9876543210;EnumValue1;2018/12/31;2018/12/31 15:56:45;2018/12/31 15:56:45.123;34.12;15:56:45",
-                ";1;2;2.5;127;true;1234567890;EnumValue2;2018/12/31;2018/12/31 15:56:45;2018/12/31 15:56:45.123;15:56:45.123;34.12;;;;;;;;;;;"
+                "ColString;ColInt;ColShort;ColDecimal;ColByte;ColBool;ColLong;ColEnum;ColDate;ColDateAndTime;ColDateAndTimeFraction;ColTimeSpan;ColDouble;ColIntNull;ColShortNull;ColDecimalNull;ColByteNull;ColBoolNull;ColLongNull;ColEnumNull;ColDateNull;ColDateAndTimeNull;ColDateAndTimeFractionNull;ColDoubleNull;ColTimeSpanNull;ColByteArr",
+                "Str;1;2;2.5;127;true;1234567890;EnumValue1;2018/12/31;2018/12/31 15:56:45;2018/12/31 15:56:45.123;15:56:45;34.12;1;2;2.5;127;false;9876543210;EnumValue1;2018/12/31;2018/12/31 15:56:45;2018/12/31 15:56:45.123;34.12;15:56:45;0x12345678",
+                ";1;2;2.5;127;true;1234567890;EnumValue2;2018/12/31;2018/12/31 15:56:45;2018/12/31 15:56:45.123;15:56:45.123;34.12;;;;;;;;;;;;"
             };
 
             var csvList = new CsvImport<CsvImportClass>().Read(lines);
@@ -105,7 +106,8 @@ namespace Framework.MyUnitTest.Tools.Csv
                 ColDateAndTimeNull         = new DateTime(2018, 12, 31, 15, 56, 45),
                 ColDateAndTimeFractionNull = new DateTime(2018, 12, 31, 15, 56, 45, 123),
                 ColTimeSpanNull            = new TimeSpan(15, 56, 45),
-                ColDoubleNull              = 34.12
+                ColDoubleNull              = 34.12,
+                ColByteArr                 = new byte[] { 0x12, 0x34, 0x56, 0x78 }
             };
             var csvObjectShouldBeNull = new CsvImportClass
             {

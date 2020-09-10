@@ -184,6 +184,21 @@ namespace Framework.Tools.Csv
             return long.Parse(excelField);
         }
 
+        public ushort ExcelUShort(string excelField)
+        {
+            return ushort.Parse(excelField);
+        }
+
+        public uint ExcelUInt(string excelField)
+        {
+            return uint.Parse(excelField);
+        }
+
+        public ulong ExcelULong(string excelField)
+        {
+            return ulong.Parse(excelField);
+        }
+
         public float ExcelFloat(string excelField)
         {
             return float.Parse(excelField);

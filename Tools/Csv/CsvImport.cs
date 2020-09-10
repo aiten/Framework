@@ -90,105 +90,87 @@ namespace Framework.Tools.Csv
             return newT;
         }
 
+        private object? GetValue(string valueAsString, Type type)
+        {
+            if (type.IsGenericType && type.Name.StartsWith(@"Nullable"))
+            {
+                if (string.IsNullOrEmpty(valueAsString))
+                {
+                    return null;
+                }
+
+                type = type.GenericTypeArguments[0];
+            }
+
+            if (type == typeof(string))
+            {
+                return ExcelString(valueAsString);
+            }
+            else if (type == typeof(int))
+            {
+                return ExcelInt(valueAsString);
+            }
+            else if (type == typeof(long))
+            {
+                return ExcelLong(valueAsString);
+            }
+            else if (type == typeof(short))
+            {
+                return ExcelShort(valueAsString);
+            }
+            else if (type == typeof(uint))
+            {
+                return ExcelUInt(valueAsString);
+            }
+            else if (type == typeof(ulong))
+            {
+                return ExcelULong(valueAsString);
+            }
+            else if (type == typeof(ushort))
+            {
+                return ExcelUShort(valueAsString);
+            }
+            else if (type == typeof(decimal))
+            {
+                return ExcelDecimal(valueAsString);
+            }
+            else if (type == typeof(byte))
+            {
+                return ExcelByte(valueAsString);
+            }
+            else if (type == typeof(bool))
+            {
+                return ExcelBool(valueAsString);
+            }
+            else if (type == typeof(DateTime))
+            {
+                return ExcelDateOrDateTime(valueAsString);
+            }
+            else if (type == typeof(TimeSpan))
+            {
+                return ExcelTimeSpan(valueAsString);
+            }
+            else if (type == typeof(double))
+            {
+                return ExcelDouble(valueAsString);
+            }
+            else if (type.IsEnum)
+            {
+                return ExcelEnum(type, valueAsString);
+            }
+            else if (type == typeof(byte[]))
+            {
+                return ExcelImage(valueAsString);
+            }
+
+            throw new NotImplementedException();
+        }
+
         private void AssignProperty(object obj, string valueAsString, PropertyInfo pi)
         {
             if (pi != null && pi.CanWrite)
             {
-                if (pi.PropertyType == typeof(string))
-                {
-                    pi.SetValue(obj, ExcelString(valueAsString));
-                }
-                else if (pi.PropertyType == typeof(int))
-                {
-                    pi.SetValue(obj, ExcelInt(valueAsString));
-                }
-                else if (pi.PropertyType == typeof(long))
-                {
-                    pi.SetValue(obj, ExcelLong(valueAsString));
-                }
-                else if (pi.PropertyType == typeof(short))
-                {
-                    pi.SetValue(obj, ExcelShort(valueAsString));
-                }
-                else if (pi.PropertyType == typeof(decimal))
-                {
-                    pi.SetValue(obj, ExcelDecimal(valueAsString));
-                }
-                else if (pi.PropertyType == typeof(byte))
-                {
-                    pi.SetValue(obj, ExcelByte(valueAsString));
-                }
-                else if (pi.PropertyType == typeof(bool))
-                {
-                    pi.SetValue(obj, ExcelBool(valueAsString));
-                }
-                else if (pi.PropertyType == typeof(DateTime))
-                {
-                    pi.SetValue(obj, ExcelDateOrDateTime(valueAsString));
-                }
-                else if (pi.PropertyType == typeof(TimeSpan))
-                {
-                    pi.SetValue(obj, ExcelTimeSpan(valueAsString));
-                }
-                else if (pi.PropertyType == typeof(double))
-                {
-                    pi.SetValue(obj, ExcelDouble(valueAsString));
-                }
-                else if (pi.PropertyType == typeof(int?))
-                {
-                    pi.SetValue(obj, string.IsNullOrEmpty(valueAsString) ? (int?)null : ExcelInt(valueAsString));
-                }
-                else if (pi.PropertyType == typeof(long?))
-                {
-                    pi.SetValue(obj, string.IsNullOrEmpty(valueAsString) ? (long?)null : ExcelLong(valueAsString));
-                }
-                else if (pi.PropertyType == typeof(short?))
-                {
-                    pi.SetValue(obj, string.IsNullOrEmpty(valueAsString) ? (short?)null : ExcelShort(valueAsString));
-                }
-                else if (pi.PropertyType == typeof(byte?))
-                {
-                    pi.SetValue(obj, string.IsNullOrEmpty(valueAsString) ? (byte?)null : ExcelByte(valueAsString));
-                }
-                else if (pi.PropertyType == typeof(bool?))
-                {
-                    pi.SetValue(obj, string.IsNullOrEmpty(valueAsString) ? (bool?)null : ExcelBool(valueAsString));
-                }
-                else if (pi.PropertyType == typeof(double?))
-                {
-                    pi.SetValue(obj, string.IsNullOrEmpty(valueAsString) ? (double?)null : ExcelDouble(valueAsString));
-                }
-                else if (pi.PropertyType == typeof(decimal?))
-                {
-                    pi.SetValue(obj, string.IsNullOrEmpty(valueAsString) ? (decimal?)null : ExcelDecimal(valueAsString));
-                }
-                else if (pi.PropertyType == typeof(DateTime?))
-                {
-                    pi.SetValue(obj, string.IsNullOrEmpty(valueAsString) ? (DateTime?)null : ExcelDateOrDateTime(valueAsString));
-                }
-                else if (pi.PropertyType == typeof(TimeSpan?))
-                {
-                    pi.SetValue(obj, string.IsNullOrEmpty(valueAsString) ? (TimeSpan?)null : ExcelTimeSpan(valueAsString));
-                }
-                else if (pi.PropertyType.IsEnum)
-                {
-                    pi.SetValue(obj, ExcelEnum(pi.PropertyType, valueAsString));
-                }
-                else if (pi.PropertyType.IsGenericType && pi.PropertyType.Name.StartsWith(@"Nullable") && pi.PropertyType.GenericTypeArguments[0].IsEnum)
-                {
-                    pi.SetValue(obj, string.IsNullOrEmpty(valueAsString) ? null : ExcelEnum(pi.PropertyType.GenericTypeArguments[0], valueAsString));
-                }
-                else if (pi.PropertyType == typeof(byte[]))
-                {
-                    if (!string.IsNullOrEmpty(valueAsString))
-                    {
-                        pi.SetValue(obj, ExcelImage(valueAsString));
-                    }
-                }
-                else
-                {
-                    throw new NotImplementedException();
-                }
+                pi.SetValue(obj, GetValue(valueAsString, pi.PropertyType));
             }
         }
     }

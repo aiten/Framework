@@ -19,22 +19,22 @@ namespace Framework.WebAPI.Host
     using System;
     using System.ServiceProcess;
 
-    using Microsoft.AspNetCore.Hosting;
+    using Microsoft.Extensions.Hosting;
 
     using NLog;
 
     public class WebAPiService : ServiceBase
     {
-        private IWebHost _webHost;
-        private ILogger  _logger = LogManager.GetCurrentClassLogger();
+        private IHost   _webHost;
+        private ILogger _logger = LogManager.GetCurrentClassLogger();
 
-        public Func<string[], IWebHostBuilder> WebHostBuilder { get; set; }
+        public Func<string[], IHostBuilder> HostBuilder { get; set; }
 
         protected override void OnStart(string[] args)
         {
             try
             {
-                _webHost = WebHostBuilder(args).Build();
+                _webHost = HostBuilder(args).Build();
                 _webHost.Start();
             }
             catch (Exception e)

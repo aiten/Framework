@@ -25,7 +25,7 @@ namespace Framework.WebAPI.Host
 
     using Framework.WinAPI;
 
-    using Microsoft.AspNetCore.Hosting;
+    using Microsoft.Extensions.Hosting;
 
     using NLog;
 
@@ -33,16 +33,16 @@ namespace Framework.WebAPI.Host
     {
         private static string BaseDirectory => Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
-        public static void StartWebService(string[] args, Func<string[], IWebHostBuilder> buildWebHost)
+        public static void StartWebService(string[] args, Func<string[], IHostBuilder> buildHost)
         {
             if (RunsAsService())
             {
                 Environment.CurrentDirectory = BaseDirectory;
-                ServiceBase.Run(new ServiceBase[] { new WebAPiService() { WebHostBuilder = buildWebHost } });
+                ServiceBase.Run(new ServiceBase[] { new WebAPiService() { HostBuilder = buildHost } });
             }
             else
             {
-                buildWebHost(args).Build().Run();
+                buildHost(args).Build().Run();
                 LogManager.Shutdown();
             }
         }

@@ -20,6 +20,8 @@ namespace Framework.Schedule.Abstraction
 
     public interface IJobScheduler : IDisposable
     {
-        IJobExecutor ScheduleJob(ISchedule schedule, Type job, object state);
+        IJobExecutor ScheduleJob(ISchedule schedule, Type job);
+
+        void Start();
     }
 }

@@ -24,6 +24,6 @@ namespace Framework.Schedule.Abstraction
 
     public interface ISchedule
     {
-        IJobExecutor Schedule(IServiceProvider serviceProvider, ILoggerFactory loggerFactory, ICurrentDateTime currentDateTime, Type job, object state);
+        IJobExecutor Schedule(IServiceProvider serviceProvider, ILoggerFactory loggerFactory, ICurrentDateTime currentDateTime, Type job);
     }
 }

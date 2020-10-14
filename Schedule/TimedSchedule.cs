@@ -24,47 +24,46 @@ namespace Framework.Schedule
 
     using Microsoft.Extensions.Logging;
 
-    public sealed class DailySchedule : ISchedule
+    public sealed class TimedSchedule : ISchedule
     {
-        private readonly TimeSpan _timeOfDay;
-
-        public DailySchedule(TimeSpan timeOfDay)
+        public TimedSchedule()
         {
-            _timeOfDay = timeOfDay;
         }
 
         public IJobExecutor Schedule(IServiceProvider serviceProvider, ILoggerFactory loggerFactory, ICurrentDateTime currentDateTime, Type job)
         {
-            return new DailyJobExecutor(_timeOfDay, serviceProvider, loggerFactory, currentDateTime, job);
+            return new TimedJobExecutor(serviceProvider, loggerFactory, currentDateTime, job);
         }
 
-        private sealed class DailyJobExecutor : JobExecutor
+        private sealed class TimedJobExecutor : JobExecutor
         {
-            private readonly ILogger _logger;
-
+            private readonly ILogger          _logger;
             private readonly ICurrentDateTime _dateTimeService;
-            private readonly TimeSpan         _timeOfDay;
 
-            private bool _wasExecutedAlready;
-
-            public DailyJobExecutor(TimeSpan timeOfDay, IServiceProvider serviceProvider, ILoggerFactory loggerFactory, ICurrentDateTime currentDateTime, Type job)
-                : base(serviceProvider, loggerFactory, currentDateTime, job)
+            public TimedJobExecutor(IServiceProvider serviceProvider, ILoggerFactory loggerFactory, ICurrentDateTime currentDateTime, Type job) :
+                base(serviceProvider, loggerFactory, currentDateTime, job)
             {
                 _logger          = loggerFactory.CreateLogger(GetType());
                 _dateTimeService = currentDateTime;
-                _timeOfDay       = timeOfDay;
             }
 
             public override void Start()
             {
-                Timer = new Timer(state => ((DailyJobExecutor)state).Execute(), this, (int)GetOffsetToNextTick().TotalMilliseconds, -1);
+                Timer = new Timer(async (state) => await ((TimedJobExecutor)state).Execute(), this, (int)GetRandomDelay(), -1);
             }
 
             protected override void Executed()
             {
                 base.Executed();
 
-                _wasExecutedAlready = true;
+                var nextExecution = NextExecutionRequest;
+
+                if (nextExecution == null ||
+                    nextExecution < _dateTimeService.Now)
+                {
+                    _logger.LogError($"NextExcecutionRequest {NextExecutionRequest?.ToString()} < {_dateTimeService.Now}. Restart immediately.");
+                    nextExecution = _dateTimeService.Now + TimeSpan.FromMilliseconds(GetRandomDelay());
+                }
 
                 try
                 {
@@ -73,35 +72,14 @@ namespace Framework.Schedule
                         return;
                     }
 
-                    Timer.Change((int)GetOffsetToNextTick().TotalMilliseconds, -1);
+                    var nextExecutionDateTimeOffset = GetOffsetToNextTick(nextExecution.Value, DateTimeOffset => _dateTimeService.Now + TimeSpan.FromMilliseconds(GetRandomDelay()));
+
+                    Timer.Change((int)nextExecutionDateTimeOffset.TotalMilliseconds, -1);
                 }
                 catch (Exception e)
                 {
                     _logger.LogError(e, "Timer could not schedule the next runtime successfully.");
                 }
-            }
-
-            private DateTime GetNextExecutionDateTime()
-            {
-                var currentTime           = _dateTimeService.Now;
-                var nextExecutionDateTime = currentTime.Date.Add(_timeOfDay);
-                return nextExecutionDateTime;
-            }
-
-            private TimeSpan GetOffsetToNextTick()
-            {
-                return GetOffsetToNextTick(GetNextExecutionDateTime(), OnTimeInPast);
-            }
-
-            private DateTimeOffset OnTimeInPast(DateTimeOffset nextExecutionDateTimeOffset)
-            {
-                if (!_wasExecutedAlready)
-                {
-                    // If the job was not executed today, e.g. when the service was down at the scheduled time
-                    return _dateTimeService.Now + TimeSpan.FromMilliseconds(GetRandomDelay());
-                }
-
-                return nextExecutionDateTimeOffset.AddDays(1);
             }
         }
     }

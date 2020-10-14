@@ -33,17 +33,17 @@ namespace Framework.Schedule
             _period = period;
         }
 
-        public IJobExecutor Schedule(IServiceProvider serviceProvider, ILoggerFactory loggerFactory, ICurrentDateTime currentDateTime, Type job, object state)
+        public IJobExecutor Schedule(IServiceProvider serviceProvider, ILoggerFactory loggerFactory, ICurrentDateTime currentDateTime, Type job)
         {
-            return new PeriodicJobExecutor(_period, serviceProvider, loggerFactory, currentDateTime, job, state);
+            return new PeriodicJobExecutor(_period, serviceProvider, loggerFactory, currentDateTime, job);
         }
 
         private sealed class PeriodicJobExecutor : JobExecutor
         {
             private readonly TimeSpan _period;
 
-            public PeriodicJobExecutor(TimeSpan period, IServiceProvider serviceProvider, ILoggerFactory loggerFactory, ICurrentDateTime currentDateTime, Type job, object state) :
-                base(serviceProvider, loggerFactory, currentDateTime, job, state)
+            public PeriodicJobExecutor(TimeSpan period, IServiceProvider serviceProvider, ILoggerFactory loggerFactory, ICurrentDateTime currentDateTime, Type job) :
+                base(serviceProvider, loggerFactory, currentDateTime, job)
             {
                 _period = period;
             }

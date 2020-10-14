@@ -40,9 +40,13 @@ namespace Framework.Service.WebAPI.Uri
             _list.AddRange(old._list);
         }
 
-        public UriQueryBuilder AddRange<T>(string filterName, IList<T> valueList)
+        public UriQueryBuilder AddRange<T>(string filterName, IEnumerable<T> valueList)
         {
-            _list.AddRange(valueList.Select(val => new Tuple<string, object>(filterName, val)));
+            if (valueList != null)
+            {
+                _list.AddRange(valueList.Select(val => new Tuple<string, object>(filterName, val)));
+            }
+
             return this;
         }
 

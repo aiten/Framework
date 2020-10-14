@@ -64,10 +64,10 @@ namespace Framework.MyUnitTest.Drawing
         public void PointNotInPolygon()
         {
             Polygon2D polygon = CreateClosedPolygon();
-            polygon.IsPointInPolygon(new Point2D { X = 1, Y = 100.5 }).Should().Be(false);
+            polygon.IsPointInPolygon(new Point2D { X = 1, Y     = 100.5 }).Should().Be(false);
             polygon.IsPointInPolygon(new Point2D { X = 100.5, Y = 1 }).Should().Be(false);
-            polygon.IsPointInPolygon(new Point2D { X = -0.5, Y = 1 }).Should().Be(false);
-            polygon.IsPointInPolygon(new Point2D { X = 1, Y = -0.5 }).Should().Be(false);
+            polygon.IsPointInPolygon(new Point2D { X = -0.5, Y  = 1 }).Should().Be(false);
+            polygon.IsPointInPolygon(new Point2D { X = 1, Y     = -0.5 }).Should().Be(false);
         }
 
         [Fact]

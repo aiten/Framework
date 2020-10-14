@@ -14,19 +14,12 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.Schedule.Abstraction
+using Framework.Schedule.Abstraction;
+
+namespace Framework.Schedule
 {
-    using System.Threading;
-    using System.Threading.Tasks;
-
-    public interface IJob
+    public sealed class JobState : IJobState
     {
-        object State { get; set; }
-
-        CancellationToken CToken { get; set; }
-
-        Task SetContext();
-
-        Task Execute();
+        public object State { get; set; }
     }
 }

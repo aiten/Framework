@@ -60,7 +60,12 @@ namespace Framework.Service.WebAPI.Uri
 
         public UriPathBuilder AddPath(string[] pathElements)
         {
-            return AddPath(string.Join("/", pathElements.Select(HttpUtility.UrlEncode)));
+            if (pathElements != null)
+            {
+                return AddPath(string.Join("/", pathElements.Select(HttpUtility.UrlEncode)));
+            }
+
+            return this;
         }
 
         public UriPathBuilder AddQuery(string query)

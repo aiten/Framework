@@ -38,12 +38,19 @@ namespace Framework.Schedule
             _currentDateTime = currentDateTime;
         }
 
-        public IJobExecutor ScheduleJob(ISchedule schedule, Type job, object state)
+        public IJobExecutor ScheduleJob(ISchedule schedule, Type job)
         {
-            var jobExecutor = schedule.Schedule(_serviceProvider, _loggerFactory, _currentDateTime, job, state);
+            var jobExecutor = schedule.Schedule(_serviceProvider, _loggerFactory, _currentDateTime, job);
             _jobExecutorList.Add(jobExecutor);
-            jobExecutor.Start();
             return jobExecutor;
+        }
+
+        public void Start()
+        {
+            foreach (var jobExecutor in _jobExecutorList)
+            {
+                jobExecutor.Start();
+            }
         }
 
         public void Dispose()

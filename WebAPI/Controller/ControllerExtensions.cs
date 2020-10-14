@@ -51,9 +51,9 @@ namespace Framework.WebAPI.Controller
                 return "dummy";
             }
 
-            string totalUri = controller.Request.GetCurrentUri();
+            var totalUri = controller.Request.GetCurrentUri();
 
-            int filterIdx = totalUri.LastIndexOf('?');
+            var filterIdx = totalUri.LastIndexOf('?');
             if (filterIdx > 0)
             {
                 totalUri = totalUri.Substring(0, filterIdx - 1);
@@ -110,8 +110,8 @@ namespace Framework.WebAPI.Controller
 
         public static async Task<ActionResult<T>> Add<T, TKey>(this Controller controller, ICrudManager<T, TKey> manager, T value) where T : class where TKey : IComparable
         {
-            TKey   newId  = await manager.Add(value);
-            string newUri = controller.GetCurrentUri() + "/" + newId;
+            var newId  = await manager.Add(value);
+            var newUri = controller.GetCurrentUri() + "/" + newId;
             return controller.Created(newUri, await manager.Get(newId));
         }
 
@@ -121,9 +121,9 @@ namespace Framework.WebAPI.Controller
             var newIds     = await manager.Add(values);
             var newObjects = await manager.Get(newIds);
 
-            string uri     = controller.GetCurrentUri("/bulk");
-            var    newUris = newIds.Select(id => uri + "/" + id);
-            var    results = newIds.Select((id, idx) => new UriAndValue<T>() { Uri = uri + "/" + id, Value = newObjects.ElementAt(idx) });
+            var uri     = controller.GetCurrentUri("/bulk");
+            var newUris = newIds.Select(id => uri + "/" + id);
+            var results = newIds.Select((id, idx) => new UriAndValue<T>() { Uri = uri + "/" + id, Value = newObjects.ElementAt(idx) });
             return results;
         }
 
@@ -142,8 +142,8 @@ namespace Framework.WebAPI.Controller
         public static async Task<ActionResult<T>> AddNoGet<T, TKey>(this Controller controller, ICrudManager<T, TKey> manager, T value, Action<T, TKey> setIdFunc)
             where T : class where TKey : IComparable
         {
-            TKey   newId  = await manager.Add(value);
-            string newUri = controller.GetCurrentUri() + "/" + newId;
+            var newId  = await manager.Add(value);
+            var newUri = controller.GetCurrentUri() + "/" + newId;
             setIdFunc(value, newId);
             return controller.Created(newUri, value);
         }
@@ -155,7 +155,7 @@ namespace Framework.WebAPI.Controller
             Action<T, TKey>       setIdFunc)
             where T : class where TKey : IComparable
         {
-            IEnumerable<TKey> newIds = await manager.Add(values);
+            var newIds = await manager.Add(values);
 
             Func<T, TKey, T> mySetFunc = (v, k) =>
             {
@@ -163,9 +163,9 @@ namespace Framework.WebAPI.Controller
                 return v;
             };
 
-            string uri     = controller.GetCurrentUri("/bulk");
-            var    newUris = newIds.Select(id => uri + "/" + id);
-            var    results = newIds.Select((id, idx) => new UriAndValue<T>() { Uri = uri + "/" + id, Value = mySetFunc(values.ElementAt(idx), id) });
+            var uri     = controller.GetCurrentUri("/bulk");
+            var newUris = newIds.Select(id => uri + "/" + id);
+            var results = newIds.Select((id, idx) => new UriAndValue<T>() { Uri = uri + "/" + id, Value = mySetFunc(values.ElementAt(idx), id) });
             return results;
         }
 

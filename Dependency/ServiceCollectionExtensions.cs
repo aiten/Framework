@@ -39,8 +39,8 @@ namespace Framework.Dependency
             {
                 foreach (var type in assembly.GetTypes().Where(t => t.IsClass && !t.IsAbstract))
                 {
-                    string interfaceName = "I" + type.Name;
-                    var    interfaceType = type.GetInterface(interfaceName);
+                    var interfaceName = "I" + type.Name;
+                    var interfaceType = type.GetInterface(interfaceName);
                     if (interfaceType != null)
                     {
                         services.Add(new ServiceDescriptor(interfaceType, type, liveTime));

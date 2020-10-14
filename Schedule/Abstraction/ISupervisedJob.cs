@@ -19,14 +19,10 @@ namespace Framework.Schedule.Abstraction
     using System.Threading;
     using System.Threading.Tasks;
 
-    public interface IJob
+    public interface ISupervisedJob : IJob
     {
-        object State { get; set; }
+        Task<bool> IsAlreadyExecuted();
 
-        CancellationToken CToken { get; set; }
-
-        Task SetContext();
-
-        Task Execute();
+        Task SetAsExecuted();
     }
 }

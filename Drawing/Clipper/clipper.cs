@@ -56,7 +56,7 @@ using System.Collections.Generic;
 //using System.IO;            //debugging with streamReader & StreamWriter
 //using System.Windows.Forms; //debugging to clipboard
 
-namespace Framework.Tools.Clipper
+namespace Framework.Drawing.Clipper
 {
 #if use_int32
   using cInt = Int32;

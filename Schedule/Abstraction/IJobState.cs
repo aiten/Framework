@@ -16,17 +16,8 @@
 
 namespace Framework.Schedule.Abstraction
 {
-    using System.Threading;
-    using System.Threading.Tasks;
-
-    public interface IJob
+    public interface IJobState
     {
         object State { get; set; }
-
-        CancellationToken CToken { get; set; }
-
-        Task SetContext();
-
-        Task Execute();
     }
 }

@@ -24,7 +24,6 @@ namespace Framework.Schedule
     using Framework.Schedule.Abstraction;
     using Framework.Tools.Abstraction;
 
-    using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Logging;
 
     internal abstract class JobExecutor : IJobExecutor
@@ -34,7 +33,6 @@ namespace Framework.Schedule
         private readonly ILogger             _logger;
         private readonly ILoggerFactory      _loggerFactory;
         private readonly Type                _job;
-        private readonly object              _state;
         private readonly IList<IJobExecutor> _thenExecutors = new List<IJobExecutor>();
 
         private volatile bool _disposed;
@@ -42,17 +40,19 @@ namespace Framework.Schedule
         protected bool IsDisposed => _disposed;
 
         public CancellationTokenSource CtSource { get; set; } = new CancellationTokenSource();
+        public Type                    JobState { get; set; }
+        public object                  State    { get; set; }
 
-        public Timer Timer { get; set; }
+        public Timer     Timer                { get; set; }
+        public DateTime? NextExecutionRequest { get; private set; }
 
-        protected JobExecutor(IServiceProvider serviceProvider, ILoggerFactory loggerFactory, ICurrentDateTime currentDateTime, Type job, object state)
+        protected JobExecutor(IServiceProvider serviceProvider, ILoggerFactory loggerFactory, ICurrentDateTime currentDateTime, Type job)
         {
             _serviceProvider = serviceProvider;
             _currentDateTime = currentDateTime;
             _logger          = loggerFactory.CreateLogger(job);
             _loggerFactory   = loggerFactory;
             _job             = job;
-            _state           = state;
         }
 
         /// <summary>
@@ -60,9 +60,9 @@ namespace Framework.Schedule
         /// </summary>
         public abstract void Start();
 
-        public IJobExecutor Then(Type job, object state)
+        public IJobExecutor Then(Type job)
         {
-            var thenJob = new ThenJobExecutor(_serviceProvider, _loggerFactory, _currentDateTime, job, state);
+            var thenJob = new ThenJobExecutor(_serviceProvider, _loggerFactory, _currentDateTime, job);
             _thenExecutors.Add(thenJob);
             return thenJob;
         }
@@ -88,20 +88,13 @@ namespace Framework.Schedule
 
         protected async Task Execute()
         {
+            var jobController = new JobDispatcher(_job, JobState, State, CtSource, _serviceProvider, _logger);
+
             Executing();
 
-            try
-            {
-                using (var scope = _serviceProvider.CreateScope())
-                {
-                    var job = (IJob)scope.ServiceProvider.GetService(_job);
-                    await job.Execute(_state, CtSource.Token);
-                }
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Unhandled exception by job.");
-            }
+            await jobController.Run();
+
+            NextExecutionRequest = jobController.NextExecutionRequest;
 
             Executed();
 
@@ -118,14 +111,35 @@ namespace Framework.Schedule
 
         private sealed class ThenJobExecutor : JobExecutor
         {
-            public ThenJobExecutor(IServiceProvider serviceProvider, ILoggerFactory loggerFactory, ICurrentDateTime currentDateTime, Type job, object state) :
-                base(serviceProvider, loggerFactory, currentDateTime, job, state)
+            public ThenJobExecutor(IServiceProvider serviceProvider, ILoggerFactory loggerFactory, ICurrentDateTime currentDateTime, Type job) :
+                base(serviceProvider, loggerFactory, currentDateTime, job)
             {
             }
 
             public override void Start()
             {
             }
+        }
+
+        protected TimeSpan GetOffsetToNextTick(DateTime nextExecutionDateTime, Func<DateTimeOffset, DateTimeOffset> inThePast)
+        {
+            var currentTime                 = _currentDateTime.Now;
+            var nextExecutionTimeUtcOffset  = TimeZoneInfo.Local.GetUtcOffset(nextExecutionDateTime);
+            var nextExecutionDateTimeOffset = new DateTimeOffset(nextExecutionDateTime, nextExecutionTimeUtcOffset);
+            if (nextExecutionDateTimeOffset < currentTime)
+            {
+                // Already in the past. Als delegate for new date
+                nextExecutionDateTimeOffset = inThePast(nextExecutionDateTimeOffset);
+            }
+
+            var executionOffset = nextExecutionDateTimeOffset - currentTime;
+            return executionOffset;
+        }
+
+        protected int GetRandomDelay(int from = 5000, int to = 15000)
+        {
+            var random = new Random((int)DateTime.Now.Ticks);
+            return random.Next(from, to);
         }
     }
 }

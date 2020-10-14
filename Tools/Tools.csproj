@@ -5,7 +5,4 @@
   <ItemGroup>
     <ProjectReference Include="..\Dependency\Dependency.csproj" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Csv\" />
-  </ItemGroup>
 </Project>

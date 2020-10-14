@@ -15,14 +15,14 @@
 */
 
 
-namespace Framework.Tools.Csv
-{
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Reflection;
-    using System.Threading.Tasks;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using System.Threading.Tasks;
 
+namespace Framework.CsvImport
+{
     public class CsvImport<T> : CsvImportBase where T : new()
     {
         public IList<T> Read(string[] csvLines)

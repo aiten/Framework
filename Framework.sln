@@ -50,6 +50,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Schedule", "Schedule\Schedu
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebAPI.Host", "WebAPI.Host\WebAPI.Host.csproj", "{F8EEE293-614C-4E3B-A416-91D8305507FD}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CsvImport", "CsvImport\CsvImport.csproj", "{46939433-D907-425D-8CF2-7CC2BB3B25DF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -140,6 +142,10 @@ Global
 		{F8EEE293-614C-4E3B-A416-91D8305507FD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F8EEE293-614C-4E3B-A416-91D8305507FD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F8EEE293-614C-4E3B-A416-91D8305507FD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{46939433-D907-425D-8CF2-7CC2BB3B25DF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{46939433-D907-425D-8CF2-7CC2BB3B25DF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{46939433-D907-425D-8CF2-7CC2BB3B25DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{46939433-D907-425D-8CF2-7CC2BB3B25DF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

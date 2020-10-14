@@ -21,8 +21,8 @@ namespace Framework.MyUnitTest.Tools.Csv
     using FluentAssertions;
     using FluentAssertions.Extensions;
 
+    using Framework.CsvImport;
     using Framework.Tools;
-    using Framework.Tools.Csv;
 
     using Xunit;
 

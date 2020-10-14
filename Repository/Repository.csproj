@@ -3,10 +3,11 @@
     <TargetFramework>$(TargetFrameworkForProjects)</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.8" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="3.1.8" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.9" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="3.1.9" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\CsvImport\CsvImport.csproj" />
     <ProjectReference Include="..\Localization\Localization.csproj" />
     <ProjectReference Include="..\Repository.Abstraction\Repository.Abstraction.csproj" />
     <ProjectReference Include="..\Tools\Tools.csproj" />

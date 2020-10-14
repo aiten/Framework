@@ -20,7 +20,7 @@ namespace Framework.Repository.Tools
     using System.Collections.Generic;
     using System.Linq;
 
-    using Framework.Tools.Csv;
+    using Framework.CsvImport;
 
     using Microsoft.EntityFrameworkCore;
 

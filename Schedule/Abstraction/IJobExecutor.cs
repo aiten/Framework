@@ -23,8 +23,12 @@ namespace Framework.Schedule.Abstraction
     {
         void Start();
 
-        CancellationTokenSource CtSource { get; }
+        Type JobState { get; set; }
 
-        IJobExecutor Then(Type job, object state);
+        object State { get; set; }
+
+        CancellationTokenSource CtSource { get; set; }
+
+        IJobExecutor Then(Type job);
     }
 }

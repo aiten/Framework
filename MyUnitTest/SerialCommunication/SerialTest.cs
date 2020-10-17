@@ -1,5 +1,5 @@
 ﻿/*
-  This file is part of CNCLib - A library for stepper motors.
+  This file is part of  https://github.com/aiten/Framework.
 
   Copyright (c) Herbert Aitenbichler
 
@@ -13,6 +13,8 @@
   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, 
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
+
+using NLog;
 
 namespace Framework.MyUnitTest.SerialCommunication
 {
@@ -29,8 +31,6 @@ namespace Framework.MyUnitTest.SerialCommunication
     using Framework.UnitTest;
 
     using Microsoft.Extensions.Logging;
-
-    using NLog;
 
     using NSubstitute;
 

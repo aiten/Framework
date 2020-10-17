@@ -1,5 +1,5 @@
 ﻿/*
-  This file is part of CNCLib - A library for stepper motors.
+  This file is part of  https://github.com/aiten/Framework.
 
   Copyright (c) Herbert Aitenbichler
 
@@ -67,8 +67,8 @@ namespace Framework.Tools
                             return false;
                         }
 
-                        var collectionItems1      = ((IEnumerable)valueA).Cast<object>();
-                        var collectionItems2      = ((IEnumerable)valueB).Cast<object>();
+                        var collectionItems1      = ((IEnumerable)valueA)!.Cast<object>().ToList();
+                        var collectionItems2      = ((IEnumerable)valueB)!.Cast<object>().ToList();
                         var collectionItemsCount1 = collectionItems1.Count();
                         var collectionItemsCount2 = collectionItems2.Count();
 

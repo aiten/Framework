@@ -1,5 +1,5 @@
 ﻿/*
-  This file is part of CNCLib - A library for stepper motors.
+  This file is part of  https://github.com/aiten/Framework.
 
   Copyright (c) Herbert Aitenbichler
 
@@ -68,13 +68,13 @@ namespace Framework.Repository.Linq
         public static Expression<Func<T, bool>> Or<T>([NotNull] this Expression<Func<T, bool>> expr1, [NotNull] Expression<Func<T, bool>> expr2)
         {
             var expr2Body = new RebindParameterVisitor(expr2.Parameters[0], expr1.Parameters[0]).Visit(expr2.Body);
-            return Expression.Lambda<Func<T, bool>>(Expression.OrElse(expr1.Body, expr2Body), expr1.Parameters);
+            return Expression.Lambda<Func<T, bool>>(Expression.OrElse(expr1.Body, expr2Body!), expr1.Parameters);
         }
 
         public static Expression<Func<T, bool>> And<T>([NotNull] this Expression<Func<T, bool>> expr1, [NotNull] Expression<Func<T, bool>> expr2)
         {
             var expr2Body = new RebindParameterVisitor(expr2.Parameters[0], expr1.Parameters[0]).Visit(expr2.Body);
-            return Expression.Lambda<Func<T, bool>>(Expression.AndAlso(expr1.Body, expr2Body), expr1.Parameters);
+            return Expression.Lambda<Func<T, bool>>(Expression.AndAlso(expr1.Body, expr2Body!), expr1.Parameters);
         }
 
         /// <summary>

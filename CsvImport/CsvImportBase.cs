@@ -1,5 +1,5 @@
 ﻿/*
-  This file is part of CNCLib - A library for stepper motors.
+  This file is part of  https://github.com/aiten/Framework.
 
   Copyright (c) Herbert Aitenbichler
 
@@ -14,15 +14,15 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace Framework.CsvImport
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Globalization;
+    using System.IO;
+    using System.Text;
+    using System.Threading.Tasks;
+
     public class CsvImportBase
     {
         private readonly NumberFormatInfo _nfi;
@@ -92,13 +92,13 @@ namespace Framework.CsvImport
 
         public IList<IList<string>> ReadStringMatrixFromCsv(string fileName, bool skipTitleLine)
         {
-            string[] lines = File.ReadAllLines(fileName, Encoding);
+            var lines = File.ReadAllLines(fileName, Encoding);
             return ReadStringMatrixFromCsv(lines, skipTitleLine);
         }
 
         public async Task<IList<IList<string>>> ReadStringMatrixFromCsvAsync(string fileName, bool skipTitleLine)
         {
-            string[] lines = await File.ReadAllLinesAsync(fileName, Encoding);
+            var lines = await File.ReadAllLinesAsync(fileName, Encoding);
             return ReadStringMatrixFromCsv(lines, skipTitleLine);
         }
 
@@ -110,10 +110,10 @@ namespace Framework.CsvImport
                 return null;
             }
 
-            var  columns     = new List<string>();
-            var  sb          = new StringBuilder(line.Length);
-            char noQuoteChar = '\0';
-            char quoteChar   = noQuoteChar;
+            var columns     = new List<string>();
+            var sb          = new StringBuilder(line.Length);
+            var noQuoteChar = '\0';
+            var quoteChar   = noQuoteChar;
 
             while (true)
             {
@@ -240,8 +240,8 @@ namespace Framework.CsvImport
             {
                 // Parse date and time with custom specifier.
                 // e.g. string dateString = "19.01.2018";
-                string      format   = "dd.MM.yyyy";
-                CultureInfo provider = CultureInfo.InvariantCulture;
+                var format   = "dd.MM.yyyy";
+                var provider = CultureInfo.InvariantCulture;
 
                 return DateTime.ParseExact(excelField, format, provider);
             }
@@ -267,8 +267,8 @@ namespace Framework.CsvImport
             {
                 // Parse date and time with custom specifier.
                 // e.g. string dateString = "19.01.2018";
-                string      format   = "yyyy/MM/dd";
-                CultureInfo provider = CultureInfo.InvariantCulture;
+                var format   = "yyyy/MM/dd";
+                var provider = CultureInfo.InvariantCulture;
 
                 return DateTime.ParseExact(excelField, format, provider);
             }
@@ -298,10 +298,10 @@ namespace Framework.CsvImport
                 // Parse date and time with custom specifier.
                 // e.g. string dateString = "2017/09/20 00:00:00.000";
 
-                bool   hasFraction = excelField.IndexOf('.') > 0;
-                string format      = hasFraction ? "yyyy/MM/dd HH:mm:ss.fff" : "yyyy/MM/dd HH:mm:ss";
+                var hasFraction = excelField.IndexOf('.') > 0;
+                var format      = hasFraction ? "yyyy/MM/dd HH:mm:ss.fff" : "yyyy/MM/dd HH:mm:ss";
 
-                CultureInfo provider = CultureInfo.InvariantCulture;
+                var provider = CultureInfo.InvariantCulture;
 
                 return DateTime.ParseExact(excelField, format, provider);
             }
@@ -332,7 +332,7 @@ namespace Framework.CsvImport
             {
                 if ((excelField.Length % 2) == 1)
                 {
-                    throw new ArgumentException(nameof(excelField), @"string has odd length.");
+                    throw new ArgumentException(@"string has odd length.", nameof(excelField));
                 }
 
                 int length = (excelField.Length - 2) / 2;

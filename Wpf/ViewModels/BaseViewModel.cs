@@ -1,5 +1,5 @@
 /*
-  This file is part of CNCLib - A library for stepper motors.
+  This file is part of  https://github.com/aiten/Framework.
 
   Copyright (c) Herbert Aitenbichler
 

@@ -1,5 +1,5 @@
 ﻿/*
-  This file is part of CNCLib - A library for stepper motors.
+  This file is part of  https://github.com/aiten/Framework.
 
   Copyright (c) Herbert Aitenbichler
 
@@ -30,17 +30,19 @@ namespace Framework.Schedule
         private readonly IServiceProvider        _serviceProvider;
         private readonly ILogger                 _logger;
         private readonly Type                    _job;
-        private readonly Type                    _jobState;
-        private readonly object                  _state;
+        private readonly string                  _jobName;
+        private readonly Type                    _paramContainer;
+        private readonly object                  _param;
         private readonly CancellationTokenSource _ctSource;
 
         public DateTime? NextExecutionRequest { get; private set; }
 
-        public JobDispatcher(Type job, Type jobState, object state, CancellationTokenSource ctSource, IServiceProvider serviceProvider, ILogger logger)
+        public JobDispatcher(Type job, string jobName, Type paramContainer, object param, CancellationTokenSource ctSource, IServiceProvider serviceProvider, ILogger logger)
         {
             _job             = job;
-            _jobState        = jobState;
-            _state           = state;
+            _jobName         = jobName;
+            _paramContainer  = paramContainer;
+            _param           = param;
             _ctSource        = ctSource;
             _serviceProvider = serviceProvider;
             _logger          = logger;
@@ -52,23 +54,24 @@ namespace Framework.Schedule
             {
                 using (var scope = _serviceProvider.CreateScope())
                 {
-                    if (_jobState != null)
+                    if (_paramContainer != null)
                     {
-                        var jobStateObj = (IJobState)scope.ServiceProvider.GetService(_jobState);
-                        jobStateObj.State = _state;
+                        var jobStateObj = (IJobParamContainer)scope.ServiceProvider.GetService(_paramContainer);
+                        jobStateObj.Param = _param;
                     }
 
                     var job = (IJob)scope.ServiceProvider.GetService(_job);
 
-                    job.State  = _state;
-                    job.CToken = _ctSource.Token;
+                    job.JobName = _jobName;
+                    job.Param   = _param;
+                    job.CToken  = _ctSource.Token;
 
                     await Run(job);
                 }
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Unhandled exception by job.");
+                _logger.LogError(e, $"Unhandled exception by job: {_jobName}.");
             }
         }
 
@@ -85,7 +88,7 @@ namespace Framework.Schedule
                 await job.Execute();
             }
 
-            if (job is ITimedJob timedJob)
+            if (job is ISelfScheduledJob timedJob)
             {
                 NextExecutionRequest = await timedJob.GetNextExecutionTime();
             }

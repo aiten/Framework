@@ -1,5 +1,5 @@
 ﻿/*
-  This file is part of CNCLib - A library for stepper motors.
+  This file is part of  https://github.com/aiten/Framework.
 
   Copyright (c) Herbert Aitenbichler
 
@@ -36,7 +36,7 @@ namespace Framework.WebAPI.Controller
         {
             if (controller.Request == null)
             {
-                // unit test => no Request available 
+                // unit test => no Request available
                 return "dummy";
             }
 
@@ -47,7 +47,7 @@ namespace Framework.WebAPI.Controller
         {
             if (controller.Request == null)
             {
-                // unit test => no Request available 
+                // unit test => no Request available
                 return "dummy";
             }
 

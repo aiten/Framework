@@ -1,5 +1,5 @@
 ﻿/*
-  This file is part of CNCLib - A library for stepper motors.
+  This file is part of  https://github.com/aiten/Framework.
 
   Copyright (c) Herbert Aitenbichler
 
@@ -24,9 +24,9 @@ namespace Framework.Schedule
 
     using Microsoft.Extensions.Logging;
 
-    public sealed class TimedSchedule : ISchedule
+    public sealed class SelfScheduledSchedule : ISchedule
     {
-        public TimedSchedule()
+        public SelfScheduledSchedule()
         {
         }
 

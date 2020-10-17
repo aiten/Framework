@@ -1,5 +1,5 @@
 ﻿/*
-  This file is part of CNCLib - A library for stepper motors.
+  This file is part of  https://github.com/aiten/Framework.
 
   Copyright (c) Herbert Aitenbichler
 
@@ -158,6 +158,8 @@ namespace Framework.Logic
             {
                 UpdateEntity(values, merged.EntityInDb, merged.Entity);
             }
+
+            await Task.CompletedTask;
         }
 
         #endregion

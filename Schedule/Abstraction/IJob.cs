@@ -1,5 +1,5 @@
 ﻿/*
-  This file is part of CNCLib - A library for stepper motors.
+  This file is part of  https://github.com/aiten/Framework.
 
   Copyright (c) Herbert Aitenbichler
 
@@ -21,7 +21,9 @@ namespace Framework.Schedule.Abstraction
 
     public interface IJob
     {
-        object State { get; set; }
+        string JobName { get; set; }
+
+        object Param { get; set; }
 
         CancellationToken CToken { get; set; }
 

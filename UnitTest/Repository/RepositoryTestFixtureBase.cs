@@ -1,5 +1,5 @@
 ﻿/*
-  This file is part of CNCLib - A library for stepper motors.
+  This file is part of  https://github.com/aiten/Framework.
 
   Copyright (c) Herbert Aitenbichler
 
@@ -70,7 +70,7 @@ namespace Framework.UnitTest.Repository
                 throw new NullReferenceException(@"DB context is null!");
             }
 
-            await Context.Database.ExecuteSqlCommandAsync(sql);
+            await Context.Database.ExecuteSqlRawAsync(sql);
         }
     }
 }

@@ -1,5 +1,5 @@
 ﻿/*
-  This file is part of CNCLib - A library for stepper motors.
+  This file is part of  https://github.com/aiten/Framework.
 
   Copyright (c) Herbert Aitenbichler
 
@@ -52,11 +52,11 @@ namespace Framework.Schedule
 
         public static IJobExecutor Timed(this IJobScheduler scheduler, Type job, Action<IJobExecutor> setOption = null)
         {
-            var schedule = new TimedSchedule();
+            var schedule = new SelfScheduledSchedule();
             return scheduler.ScheduleJob(schedule, job).SetOptions(setOption);
         }
 
-        public static IJobExecutor Timed<T>(this IJobScheduler scheduler, Action<IJobExecutor> setOption = null) where T : ITimedJob
+        public static IJobExecutor Timed<T>(this IJobScheduler scheduler, Action<IJobExecutor> setOption = null) where T : ISelfScheduledJob
         {
             return scheduler.Timed(typeof(T)).SetOptions(setOption);
         }

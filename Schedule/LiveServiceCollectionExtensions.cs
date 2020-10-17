@@ -1,5 +1,5 @@
 ﻿/*
-  This file is part of CNCLib - A library for stepper motors.
+  This file is part of  https://github.com/aiten/Framework.
 
   Copyright (c) Herbert Aitenbichler
 
@@ -25,6 +25,7 @@ namespace Framework.Schedule
         public static IServiceCollection AddJobScheduler(this IServiceCollection services)
         {
             services.AddSingleton<IJobScheduler, JobScheduler>();
+            services.AddTransient<JobParamContainer>();
 
             return services;
         }

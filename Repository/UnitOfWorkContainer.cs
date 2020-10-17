@@ -1,5 +1,5 @@
 ﻿/*
-  This file is part of CNCLib - A library for stepper motors.
+  This file is part of  https://github.com/aiten/Framework.
 
   Copyright (c) Herbert Aitenbichler
 
@@ -14,10 +14,24 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.Schedule.Abstraction
+namespace Framework.Repository
 {
-    public interface IJobState
+    using Framework.Repository.Abstraction;
+
+    public class UnitOfWorkContainer
     {
-        object State { get; set; }
+        public IUnitOfWork UnitOfWork { get; set; }
+
+        protected UnitOfWorkContainer(IUnitOfWork unitOfWork)
+        {
+            UnitOfWork = unitOfWork;
+        }
+    }
+
+    public class UnitOfWorkContainer<TUnitOfWork> : UnitOfWorkContainer where TUnitOfWork : IUnitOfWork
+    {
+        public UnitOfWorkContainer(TUnitOfWork unitOfWork) : base(unitOfWork)
+        {
+        }
     }
 }

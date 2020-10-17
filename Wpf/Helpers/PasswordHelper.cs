@@ -1,5 +1,5 @@
 ﻿/*
-  This file is part of CNCLib - A library for stepper motors.
+  This file is part of  https://github.com/aiten/Framework.
 
   Copyright (c) Herbert Aitenbichler
 
@@ -65,10 +65,13 @@ namespace Framework.Wpf.Helpers
             dp.SetValue(IsUpdatingProperty, value);
         }
 
-        private static void OnPasswordPropertyChanged(DependencyObject sender,
-            DependencyPropertyChangedEventArgs                         e)
+        private static void OnPasswordPropertyChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
         {
-            PasswordBox passwordBox = sender as PasswordBox;
+            var passwordBox = sender as PasswordBox;
+
+            if (passwordBox == null)
+                return;
+
             passwordBox.PasswordChanged -= PasswordChanged;
 
             if (!(bool)GetIsUpdating(passwordBox))
@@ -79,10 +82,9 @@ namespace Framework.Wpf.Helpers
             passwordBox.PasswordChanged += PasswordChanged;
         }
 
-        private static void Attach(DependencyObject sender,
-            DependencyPropertyChangedEventArgs      e)
+        private static void Attach(DependencyObject sender, DependencyPropertyChangedEventArgs e)
         {
-            PasswordBox passwordBox = sender as PasswordBox;
+            var passwordBox = sender as PasswordBox;
 
             if (passwordBox == null)
                 return;
@@ -100,7 +102,11 @@ namespace Framework.Wpf.Helpers
 
         private static void PasswordChanged(object sender, RoutedEventArgs e)
         {
-            PasswordBox passwordBox = sender as PasswordBox;
+            var passwordBox = sender as PasswordBox;
+
+            if (passwordBox == null)
+                return;
+
             SetIsUpdating(passwordBox, true);
             SetPassword(passwordBox, passwordBox.Password);
             SetIsUpdating(passwordBox, false);

@@ -1,5 +1,5 @@
 ﻿/*
-  This file is part of CNCLib - A library for stepper motors.
+  This file is part of  https://github.com/aiten/Framework.
 
   Copyright (c) Herbert Aitenbichler
 
@@ -14,12 +14,24 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-using Framework.Schedule.Abstraction;
-
-namespace Framework.Schedule
+namespace Framework.Repository
 {
-    public sealed class JobState : IJobState
+    using Microsoft.EntityFrameworkCore;
+
+    public class DbContextContainer
     {
-        public object State { get; set; }
+        public DbContext DbContext { get; set; }
+
+        protected DbContextContainer(DbContext dbContext)
+        {
+            this.DbContext = dbContext;
+        }
+    }
+
+    public class DbContextContainer<TDbContext> : DbContextContainer where TDbContext : DbContext
+    {
+        public DbContextContainer(TDbContext dbContext) : base(dbContext)
+        {
+        }
     }
 }

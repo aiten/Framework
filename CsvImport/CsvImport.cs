@@ -1,5 +1,5 @@
 ﻿/*
-  This file is part of CNCLib - A library for stepper motors.
+  This file is part of  https://github.com/aiten/Framework.
 
   Copyright (c) Herbert Aitenbichler
 
@@ -14,15 +14,14 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Threading.Tasks;
-
 namespace Framework.CsvImport
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Reflection;
+    using System.Threading.Tasks;
+
     public class CsvImport<T> : CsvImportBase where T : new()
     {
         public IList<T> Read(string[] csvLines)
@@ -47,9 +46,9 @@ namespace Framework.CsvImport
         {
             // first line is columnLineHeader!!!!
 
-            var  list  = new List<T>();
-            var  props = GetPropertyMapping(lines[0]);
-            bool first = true;
+            var list  = new List<T>();
+            var props = GetPropertyMapping(lines[0]);
+            var first = true;
 
             if (props.Any(prop => prop == null))
             {
@@ -73,14 +72,14 @@ namespace Framework.CsvImport
 
         private PropertyInfo[] GetPropertyMapping(IList<string> columnNames)
         {
-            Type t = typeof(T);
-            return columnNames.Select((columnName) => t.GetProperty(columnName, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance)).ToArray();
+            var t = typeof(T);
+            return columnNames.Select(columnName => t.GetProperty(columnName, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance)).ToArray();
         }
 
-        private T Map(IList<string> line, PropertyInfo[] props)
+        private T Map(IList<string> line, IReadOnlyList<PropertyInfo> props)
         {
             var newT = new T();
-            int idx  = 0;
+            var idx  = 0;
 
             foreach (var column in line)
             {
@@ -90,7 +89,9 @@ namespace Framework.CsvImport
             return newT;
         }
 
+#pragma warning disable 8632
         private object? GetValue(string valueAsString, Type type)
+#pragma warning restore 8632
         {
             if (type.IsGenericType && type.Name.StartsWith(@"Nullable"))
             {

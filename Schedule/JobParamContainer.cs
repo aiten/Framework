@@ -1,5 +1,5 @@
 ﻿/*
-  This file is part of CNCLib - A library for stepper motors.
+  This file is part of  https://github.com/aiten/Framework.
 
   Copyright (c) Herbert Aitenbichler
 
@@ -14,13 +14,12 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-using System;
-using System.Threading.Tasks;
-
-namespace Framework.Schedule.Abstraction
+namespace Framework.Schedule
 {
-    public interface ITimedJob : IJob
+    using Framework.Schedule.Abstraction;
+
+    public sealed class JobParamContainer : IJobParamContainer
     {
-        Task<DateTime> GetNextExecutionTime();
+        public object Param { get; set; }
     }
 }

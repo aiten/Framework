@@ -14,9 +14,13 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.Logic.Abstraction
+using System;
+using System.Threading.Tasks;
+
+namespace Framework.Schedule.Abstraction
 {
-    public interface IManager
+    public interface ISelfScheduledJob : IJob
     {
+        Task<DateTime> GetNextExecutionTime();
     }
 }

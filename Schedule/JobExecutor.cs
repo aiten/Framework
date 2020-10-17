@@ -1,5 +1,5 @@
 ﻿/*
-  This file is part of CNCLib - A library for stepper motors.
+  This file is part of  https://github.com/aiten/Framework.
 
   Copyright (c) Herbert Aitenbichler
 
@@ -40,8 +40,10 @@ namespace Framework.Schedule
         protected bool IsDisposed => _disposed;
 
         public CancellationTokenSource CtSource { get; set; } = new CancellationTokenSource();
-        public Type                    JobState { get; set; }
-        public object                  State    { get; set; }
+
+        public string JobName        { get; set; }
+        public Type   ParamContainer { get; set; } = typeof(JobParamContainer);
+        public object Param          { get; set; }
 
         public Timer     Timer                { get; set; }
         public DateTime? NextExecutionRequest { get; private set; }
@@ -53,6 +55,7 @@ namespace Framework.Schedule
             _logger          = loggerFactory.CreateLogger(job);
             _loggerFactory   = loggerFactory;
             _job             = job;
+            JobName          = job.Name;
         }
 
         /// <summary>
@@ -88,7 +91,7 @@ namespace Framework.Schedule
 
         protected async Task Execute()
         {
-            var jobController = new JobDispatcher(_job, JobState, State, CtSource, _serviceProvider, _logger);
+            var jobController = new JobDispatcher(_job, JobName, ParamContainer, Param, CtSource, _serviceProvider, _logger);
 
             Executing();
 

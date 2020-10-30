@@ -147,9 +147,9 @@ namespace Framework.Schedule
 
         protected static async Task CastAndRunJob(object state)
         {
-            var job = (IJob)state;
-            _ = job ?? throw new ArgumentNullException(nameof(job));
-            await job.Execute();
+            var jobExecutor = (JobExecutor)state;
+            _ = jobExecutor ?? throw new ArgumentNullException(nameof(jobExecutor));
+            await jobExecutor.Execute();
         }
     }
 }

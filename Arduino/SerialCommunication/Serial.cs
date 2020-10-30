@@ -629,10 +629,11 @@ namespace Framework.Arduino.SerialCommunication
 
         private async Task<bool> WaitUntilCommandsDoneAsync(IEnumerable<SerialCommand> commands, int maxMilliseconds)
         {
-            var sw = Stopwatch.StartNew();
+            var sw         = Stopwatch.StartNew();
+            var myCommands = commands.ToList();
             while (Continue)
             {
-                var noReplayCmd = commands.FirstOrDefault(cmd => cmd.ReplyType == EReplyType.NoReply);
+                var noReplayCmd = myCommands.FirstOrDefault(cmd => cmd.ReplyType == EReplyType.NoReply);
 
                 if (noReplayCmd == null)
                 {

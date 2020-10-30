@@ -671,6 +671,7 @@ namespace Framework.Parser
                 case ETokenType.BitShiftRightSy: return (double)((uint)(lhs) >> (ushort)(rhs));
 
                 // level 3
+                // ReSharper disable 3 CompareOfFloatsByEqualityOperator
                 case ETokenType.EqualSy:        return lhs == rhs ? 1.0 : 0.0;
                 case ETokenType.UnEqualSy:      return lhs != rhs ? 1.0 : 0.0;
                 case ETokenType.LessSy:         return lhs < rhs ? 1.0 : 0.0;

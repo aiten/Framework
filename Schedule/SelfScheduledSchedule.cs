@@ -49,7 +49,7 @@ namespace Framework.Schedule
 
             public override void Start()
             {
-                Timer = new Timer(async (state) => await ((TimedJobExecutor)state).Execute(), this, (int)GetRandomDelay(), -1);
+                Timer = new Timer(async (state) => await CastAndRunJob(state), this, (int)GetRandomDelay(), -1);
             }
 
             protected override void Executed()

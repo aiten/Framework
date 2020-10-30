@@ -21,8 +21,6 @@ namespace Framework.Tools.Security
     using System.Linq;
     using System.Security.Cryptography.X509Certificates;
 
-    using Abstraction;
-
     public static class CertificateExtensions
     {
         private static IList<Tuple<string, string>> Split(string name)

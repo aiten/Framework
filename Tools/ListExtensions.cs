@@ -24,6 +24,12 @@ namespace Framework.Tools
 
     public static class ListExtensions
     {
+        public static ICollection<T> ToICollection<T>(this IEnumerable<T> list)
+        {
+            var icollection = list as ICollection<T>;
+            return icollection ?? list.ToList();
+        }
+
         public static IEnumerable<IEnumerable<T>> Split<T>(this IEnumerable<T> list, int size)
         {
             if (size < 1)
@@ -31,9 +37,9 @@ namespace Framework.Tools
                 throw new ArgumentOutOfRangeException(nameof(size), size, @"Must not be < 1");
             }
 
-            var      listList = new List<IEnumerable<T>>();
-            int      count    = 0;
-            IList<T> lastList = null;
+            var listList = new List<IEnumerable<T>>();
+            int count    = 0;
+            var lastList = new List<T>();
 
             foreach (var element in list)
             {

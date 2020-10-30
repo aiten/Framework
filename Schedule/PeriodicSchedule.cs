@@ -50,7 +50,7 @@ namespace Framework.Schedule
 
             public override void Start()
             {
-                Timer = new Timer(state => ((PeriodicJobExecutor)state).Execute(), this, TimeSpan.Zero, _period);
+                Timer = new Timer(async (state) => await CastAndRunJob(state), this, TimeSpan.Zero, _period);
             }
         }
     }

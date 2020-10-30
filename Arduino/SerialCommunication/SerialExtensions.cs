@@ -112,7 +112,7 @@ namespace Framework.Arduino.SerialCommunication
         /// <returns>ok result from arduino or empty(if error)</returns>
         public static async Task<string> SendCommandAndReadOKReplyAsync(this ISerial serial, string line, int waitForMilliseconds)
         {
-            var ret = await serial.SendCommandAsync(line, waitForMilliseconds);
+            var ret = (await serial.SendCommandAsync(line, waitForMilliseconds)).ToList();
             if (ret.Any())
             {
                 var last = ret.Last();

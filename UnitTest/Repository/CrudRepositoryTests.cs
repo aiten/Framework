@@ -134,7 +134,7 @@ namespace Framework.UnitTest.Repository
             }
         }
 
-        public async Task AddUpdateDeleteBulk(Func<IEnumerable<TEntity>> createTestEntities, Action<IEnumerable<TEntity>> updateEntities)
+        public async Task AddUpdateDeleteBulk(Func<ICollection<TEntity>> createTestEntities, Action<IEnumerable<TEntity>> updateEntities)
         {
             var allWithoutAdd = await GetAll();
             allWithoutAdd.Should().NotBeNull();

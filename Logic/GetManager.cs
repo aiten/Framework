@@ -14,6 +14,8 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
+using Framework.Tools;
+
 namespace Framework.Logic
 {
     using System.Collections.Generic;
@@ -65,12 +67,14 @@ namespace Framework.Logic
 
         protected virtual async Task<IEnumerable<T>> SetDto(IEnumerable<T> dtos)
         {
-            foreach (var dto in dtos)
+            var myDtos = dtos.ToICollection();
+
+            foreach (var dto in myDtos)
             {
                 await SetDto(dto);
             }
 
-            return dtos;
+            return myDtos;
         }
 
         protected async Task<IEnumerable<T>> MapToDto(IList<TEntity> entities)

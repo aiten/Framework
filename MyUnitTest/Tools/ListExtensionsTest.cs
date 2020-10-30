@@ -16,6 +16,7 @@
 
 namespace Framework.MyUnitTest.Tools
 {
+    using System.Collections;
     using System.Linq;
 
     using FluentAssertions;
@@ -33,7 +34,7 @@ namespace Framework.MyUnitTest.Tools
         {
             int[] testArray = { };
 
-            var result = testArray.Split(100);
+            var result = testArray.Split(100).ToICollection();
 
             result.Should().NotBeNull();
             result.Count().Should().Be(0);
@@ -44,7 +45,7 @@ namespace Framework.MyUnitTest.Tools
         {
             int[] testArray = { 1, 2, 3, 4 };
 
-            var result = testArray.Split(1);
+            var result = testArray.Split(1).ToICollection();
 
             result.Should().NotBeNull();
             result.Count().Should().Be(testArray.Length);
@@ -55,7 +56,7 @@ namespace Framework.MyUnitTest.Tools
         {
             int[] testArray = { 1, 2, 3, 4 };
 
-            var result = testArray.Split(2);
+            var result = testArray.Split(2).ToICollection();
 
             result.Should().NotBeNull();
             result.Count().Should().Be(testArray.Length / 2);
@@ -66,7 +67,7 @@ namespace Framework.MyUnitTest.Tools
         {
             int[] testArray = { 1, 2, 3, 4, 5 };
 
-            var result = testArray.Split(2);
+            var result = testArray.Split(2).ToICollection();
 
             result.Should().NotBeNull();
             result.Count().Should().Be(3);
@@ -77,7 +78,7 @@ namespace Framework.MyUnitTest.Tools
         {
             int[] testArray = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
 
-            var result = testArray.Split(3);
+            var result = testArray.Split(3).ToICollection();
 
             int compareValue = 1;
 
@@ -99,7 +100,7 @@ namespace Framework.MyUnitTest.Tools
         {
             int[] testArray = { };
 
-            var result = testArray.SplitBefore((e) => e > 100);
+            var result = testArray.SplitBefore((e) => e > 100).ToICollection();
 
             result.Should().NotBeNull();
             result.Count().Should().Be(0);
@@ -158,7 +159,7 @@ namespace Framework.MyUnitTest.Tools
         {
             int[] testArray = { };
 
-            var result = testArray.SplitAfter((e) => e > 100);
+            var result = testArray.SplitAfter((e) => e > 100).ToICollection();
 
             result.Should().NotBeNull();
             result.Count().Should().Be(0);
@@ -226,8 +227,11 @@ namespace Framework.MyUnitTest.Tools
             var pi1 = typeof(SelectTest).GetProperty("Property1");
             var pi2 = typeof(SelectTest).GetProperty("Property2");
 
-            var intOfProperty1    = testArray.Select<int>(pi1);
-            var doubleOfProperty2 = testArray.Select<double>(pi2);
+            var intOfProperty1    = testArray.Select<int>(pi1).ToList();
+            var doubleOfProperty2 = testArray.Select<double>(pi2).ToList();
+
+            testArray.Should().Contain(x => x.Property1 == 1);
+            testArray.Should().Contain(x => x.Property2 > 1);
 
             intOfProperty1.Should().HaveCount(2);
             intOfProperty1.Should().Contain(new int[] { 1, 2 });

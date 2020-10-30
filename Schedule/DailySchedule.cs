@@ -57,7 +57,7 @@ namespace Framework.Schedule
 
             public override void Start()
             {
-                Timer = new Timer(state => ((DailyJobExecutor)state).Execute(), this, (int)GetOffsetToNextTick().TotalMilliseconds, -1);
+                Timer = new Timer(async (state) => await CastAndRunJob(state), this, (int)GetOffsetToNextTick().TotalMilliseconds, -1);
             }
 
             protected override void Executed()

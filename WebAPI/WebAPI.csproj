@@ -6,5 +6,6 @@
   <ItemGroup>
     <ProjectReference Include="..\Dependency\Dependency.csproj" />
     <ProjectReference Include="..\Logic.Abstraction\Logic.Abstraction.csproj" />
+    <ProjectReference Include="..\Tools\Tools.csproj" />
   </ItemGroup>
 </Project>

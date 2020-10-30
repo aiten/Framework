@@ -144,5 +144,12 @@ namespace Framework.Schedule
             var random = new Random((int)DateTime.Now.Ticks);
             return random.Next(from, to);
         }
+
+        protected static async Task CastAndRunJob(object state)
+        {
+            var job = (IJob)state;
+            _ = job ?? throw new ArgumentNullException(nameof(job));
+            await job.Execute();
+        }
     }
 }

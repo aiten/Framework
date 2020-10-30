@@ -28,6 +28,8 @@ namespace Framework.WebAPI.Controller
 
     using Logic.Abstraction;
 
+    using Framework.Tools;
+
     public static class ControllerExtensions
     {
         #region Url
@@ -118,7 +120,7 @@ namespace Framework.WebAPI.Controller
         public static async Task<IEnumerable<UriAndValue<T>>> AddIntern<T, TKey>(this Controller controller, ICrudManager<T, TKey> manager, IEnumerable<T> values)
             where T : class where TKey : IComparable
         {
-            var newIds     = await manager.Add(values);
+            var newIds     = (await manager.Add(values)).ToICollection();
             var newObjects = await manager.Get(newIds);
 
             var uri     = controller.GetCurrentUri("/bulk");
@@ -151,11 +153,11 @@ namespace Framework.WebAPI.Controller
         public static async Task<IEnumerable<UriAndValue<T>>> AddNoGetIntern<T, TKey>(
             this Controller       controller,
             ICrudManager<T, TKey> manager,
-            IEnumerable<T>        values,
+            ICollection<T>        values,
             Action<T, TKey>       setIdFunc)
             where T : class where TKey : IComparable
         {
-            var newIds = await manager.Add(values);
+            var newIds = (await manager.Add(values)).ToICollection();
 
             Func<T, TKey, T> mySetFunc = (v, k) =>
             {
@@ -164,7 +166,7 @@ namespace Framework.WebAPI.Controller
             };
 
             var uri     = controller.GetCurrentUri("/bulk");
-            var newUris = newIds.Select(id => uri + "/" + id);
+            var newUris = newIds.Select(id => uri + "/" + id).ToICollection();
             var results = newIds.Select((id, idx) => new UriAndValue<T>() { Uri = uri + "/" + id, Value = mySetFunc(values.ElementAt(idx), id) });
             return results;
         }
@@ -172,14 +174,14 @@ namespace Framework.WebAPI.Controller
         public static async Task<ActionResult<IEnumerable<UriAndValue<T>>>> AddNoGet<T, TKey>(
             this Controller       controller,
             ICrudManager<T, TKey> manager,
-            IEnumerable<T>        values,
+            ICollection<T>        values,
             Action<T, TKey>       setIdFunc)
             where T : class where TKey : IComparable
         {
             return controller.Ok(await AddNoGetIntern(controller, manager, values, setIdFunc));
         }
 
-        public static async Task<ActionResult<UrisAndValues<T>>> Add2NoGet<T, TKey>(this Controller controller, ICrudManager<T, TKey> manager, IEnumerable<T> values, Action<T, TKey> setIdFunc)
+        public static async Task<ActionResult<UrisAndValues<T>>> Add2NoGet<T, TKey>(this Controller controller, ICrudManager<T, TKey> manager, ICollection<T> values, Action<T, TKey> setIdFunc)
             where T : class where TKey : IComparable
         {
             return controller.Ok((await AddNoGetIntern(controller, manager, values, setIdFunc)).ToUrisAndValues());

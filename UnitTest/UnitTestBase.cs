@@ -27,10 +27,6 @@ namespace Framework.UnitTest
         {
         }
 
-        protected virtual void InitializeDependencies()
-        {
-        }
-
         private CurrentDateTimeMock _currentDateTime;
 
         protected ICurrentDateTime CurrentDateTime => CurrentDateTimeX;

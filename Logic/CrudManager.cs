@@ -26,6 +26,7 @@ namespace Framework.Logic
     using AutoMapper;
 
     using Framework.Localization;
+    using Framework.Tools;
 
     using Repository.Abstraction;
 
@@ -55,10 +56,11 @@ namespace Framework.Logic
 
         public async Task<IEnumerable<TKey>> Add(IEnumerable<T> values)
         {
+            var myValues = values.ToICollection();
             using (var trans = _unitOfWork.BeginTransaction())
             {
-                await ValidateDto(values, ValidationType.AddValidation);
-                var entities = MapFromDtos(values, ValidationType.AddValidation);
+                await ValidateDto(myValues, ValidationType.AddValidation);
+                var entities = MapFromDtos(myValues, ValidationType.AddValidation).ToICollection();
 
                 foreach (var entity in entities)
                 {
@@ -84,10 +86,12 @@ namespace Framework.Logic
 
         public async Task Delete(IEnumerable<T> values)
         {
+            var myValues = values.ToICollection();
+
             using (var trans = _unitOfWork.BeginTransaction())
             {
-                await ValidateDto(values, ValidationType.DeleteValidation);
-                var entities = MapFromDtos(values, ValidationType.DeleteValidation);
+                await ValidateDto(myValues, ValidationType.DeleteValidation);
+                var entities = MapFromDtos(myValues, ValidationType.DeleteValidation).ToICollection();
 
                 foreach (var entity in entities)
                 {
@@ -133,30 +137,35 @@ namespace Framework.Logic
 
         public async Task Update(IEnumerable<T> values)
         {
+            var myValues = values.ToICollection();
+
             using (var trans = _unitOfWork.BeginTransaction())
             {
-                await ValidateDto(values, ValidationType.UpdateValidation);
+                await ValidateDto(myValues, ValidationType.UpdateValidation);
 
-                var entities     = MapFromDtos(values, ValidationType.UpdateValidation);
+                var entities     = MapFromDtos(myValues, ValidationType.UpdateValidation).ToICollection();
                 var entitiesInDb = await _repository.GetTracking(entities.Select(GetKey));
 
-                await Update(values, entitiesInDb, entities);
+                await Update(myValues, entitiesInDb, entities);
                 await CommitTransaction(trans);
             }
         }
 
         protected async Task Update(IEnumerable<T> values, IList<TEntity> entitiesInDb, IEnumerable<TEntity> entities)
         {
-            var mergeJoin = entitiesInDb.Join(entities, GetKey, GetKey, (entityInDb, entity) => new { EntityInDb = entityInDb, Entity = entity });
+            var myEntities = entities.ToICollection();
+            var myValues   = values.ToICollection();
 
-            if (entities.Count() != entitiesInDb.Count || entities.Count() != mergeJoin.Count())
+            var mergeJoin = entitiesInDb.Join(myEntities, GetKey, GetKey, (entityInDb, entity) => new { EntityInDb = entityInDb, Entity = entity }).ToList();
+
+            if (myEntities.Count() != entitiesInDb.Count || myEntities.Count() != mergeJoin.Count())
             {
                 throw new ArgumentException(ErrorMessages.ResourceManager.ToLocalizable(nameof(ErrorMessages.Framework_Logic_JoinResultDifferent)).Message());
             }
 
             foreach (var merged in mergeJoin)
             {
-                UpdateEntity(values, merged.EntityInDb, merged.Entity);
+                UpdateEntity(myValues, merged.EntityInDb, merged.Entity);
             }
 
             await Task.CompletedTask;
@@ -174,7 +183,9 @@ namespace Framework.Logic
                 await trans.CommitTransactionAsync();
                 await Modified();
             }
+#pragma warning disable 168
             catch (Exception e)
+#pragma warning restore 168
             {
                 // Console.WriteLine(e);
                 throw;

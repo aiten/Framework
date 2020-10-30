@@ -45,11 +45,6 @@ namespace Framework.MyUnitTest.SerialCommunication
         string _errorTag = @"error:";
         string _infoTag  = @"info:";
 
-        public SerialTest()
-        {
-            InitializeDependencies();
-        }
-
         private ISerialPort CreateSerialPortMock(string[] responseStrings)
         {
             var serialPort = Substitute.For<ISerialPort>();
@@ -100,6 +95,7 @@ namespace Framework.MyUnitTest.SerialCommunication
 
         private ILogger<Serial> CreateLogger()
         {
+            // ReSharper disable once SuspiciousTypeConversion.Global
             return LogManager.CreateNullLogger() as ILogger<Serial>;
         }
 

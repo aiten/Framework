@@ -39,39 +39,43 @@ namespace Framework.Localization
             {
                 var allInResource = mgr.GetResourceSet(cultureInfo, true, true);
 
-                foreach (DictionaryEntry x in allInResource)
+                if (allInResource != null)
                 {
-                    var keys  = ((string)x.Key).Split('.');
-                    var value = (string)x.Value;
-
-                    var current = result;
-
-                    foreach (var key in keys.Take(keys.Length - 1))
+                    foreach (DictionaryEntry x in allInResource)
                     {
-                        if (current.ContainsKey(key))
+                        var keys  = ((string)x.Key).Split('.');
+                        var value = (string)x.Value;
+
+                        var current = result;
+
+                        foreach (var key in keys.Take(keys.Length - 1))
                         {
-                            var val = current[key];
-                            if (val is string)
+                            if (current.ContainsKey(key))
                             {
-                                throw new Exception(ErrorMessages.ResourceManager.ToLocalizable(nameof(ErrorMessages.Localization_Configuration_KeyIsUsed), new object[] { (string)x.Key }).Message());
+                                var val = current[key];
+                                if (val is string)
+                                {
+                                    throw new Exception(ErrorMessages.ResourceManager.ToLocalizable(nameof(ErrorMessages.Localization_Configuration_KeyIsUsed), new object[] { (string)x.Key }).Message());
+                                }
+
+                                current = (Dictionary<string, object>)val;
                             }
-
-                            current = val as Dictionary<string, object>;
+                            else
+                            {
+                                var newCurrent = new Dictionary<string, object>();
+                                current[key] = newCurrent;
+                                current      = newCurrent;
+                            }
                         }
-                        else
+
+                        var lastKey = keys.Last();
+                        if (current.ContainsKey(lastKey))
                         {
-                            current[key] = new Dictionary<string, object>();
-                            current      = current[key] as Dictionary<string, object>;
+                            throw new Exception(ErrorMessages.ResourceManager.ToLocalizable(nameof(ErrorMessages.Localization_Configuration_DuplicatedKey), new object[] { (string)x.Key }).Message());
                         }
-                    }
 
-                    var lastKey = keys.Last();
-                    if (current.ContainsKey(lastKey))
-                    {
-                        throw new Exception(ErrorMessages.ResourceManager.ToLocalizable(nameof(ErrorMessages.Localization_Configuration_DuplicatedKey), new object[] { (string)x.Key }).Message());
+                        current[lastKey] = value;
                     }
-
-                    current[lastKey] = value;
                 }
             }
 

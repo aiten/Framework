@@ -91,7 +91,7 @@ namespace Framework.Repository.Linq
         /// <summary> Show predicate string </summary>
         public override string ToString()
         {
-            return Predicate == null ? null : Predicate.ToString();
+            return Predicate?.ToString();
         }
 
         #region Implicit Operators
@@ -102,7 +102,7 @@ namespace Framework.Repository.Linq
         /// <param name="right"></param>
         public static implicit operator Expression<Func<T, bool>>(ExpressionStarter<T> right)
         {
-            return right == null ? null : right.Predicate;
+            return right?.Predicate;
         }
 
         /// <summary>

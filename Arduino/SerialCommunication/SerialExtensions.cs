@@ -93,7 +93,7 @@ namespace Framework.Arduino.SerialCommunication
             {
                 string line;
                 var    lines = new List<string>();
-                while ((line = sr.ReadLine()) != null)
+                while ((line = await sr.ReadLineAsync()) != null)
                 {
                     lines.Add(line);
                 }

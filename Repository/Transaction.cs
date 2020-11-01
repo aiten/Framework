@@ -58,7 +58,7 @@ namespace Framework.Repository
         public async Task CommitTransactionAsync()
         {
             await SaveChangesAsync();
-            _dbTran.Commit();
+            await _dbTran.CommitAsync();
             _dbTran = null;
         }
 

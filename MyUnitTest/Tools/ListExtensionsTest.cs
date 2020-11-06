@@ -37,7 +37,7 @@ namespace Framework.MyUnitTest.Tools
             var result = testArray.Split(100).ToICollection();
 
             result.Should().NotBeNull();
-            result.Count().Should().Be(0);
+            result.Count.Should().Be(0);
         }
 
         [Fact]
@@ -48,7 +48,7 @@ namespace Framework.MyUnitTest.Tools
             var result = testArray.Split(1).ToICollection();
 
             result.Should().NotBeNull();
-            result.Count().Should().Be(testArray.Length);
+            result.Count.Should().Be(testArray.Length);
         }
 
         [Fact]
@@ -59,7 +59,7 @@ namespace Framework.MyUnitTest.Tools
             var result = testArray.Split(2).ToICollection();
 
             result.Should().NotBeNull();
-            result.Count().Should().Be(testArray.Length / 2);
+            result.Count.Should().Be(testArray.Length / 2);
         }
 
         [Fact]
@@ -70,7 +70,7 @@ namespace Framework.MyUnitTest.Tools
             var result = testArray.Split(2).ToICollection();
 
             result.Should().NotBeNull();
-            result.Count().Should().Be(3);
+            result.Count.Should().Be(3);
         }
 
         [Fact]
@@ -103,7 +103,7 @@ namespace Framework.MyUnitTest.Tools
             var result = testArray.SplitBefore((e) => e > 100).ToICollection();
 
             result.Should().NotBeNull();
-            result.Count().Should().Be(0);
+            result.Count.Should().Be(0);
         }
 
         [Fact]
@@ -162,7 +162,7 @@ namespace Framework.MyUnitTest.Tools
             var result = testArray.SplitAfter((e) => e > 100).ToICollection();
 
             result.Should().NotBeNull();
-            result.Count().Should().Be(0);
+            result.Count.Should().Be(0);
         }
 
         [Fact]

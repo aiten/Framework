@@ -27,10 +27,7 @@ namespace Framework.Wpf.Views
     {
         public static void DefaultInitForBaseViewModel(this BaseViewModel vm)
         {
-            if (vm.MessageBox == null)
-            {
-                vm.MessageBox = MessageBox.Show;
-            }
+            vm.MessageBox ??= MessageBox.Show;
 
             if (vm.BrowseFileNameFunc == null)
             {

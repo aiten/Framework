@@ -49,7 +49,7 @@ namespace Framework.WebAPI.Filter
 
         protected abstract ExceptionResponse? GetResponse(ExceptionContext exceptionContext);
 
-        protected struct ExceptionResponse
+        protected readonly struct ExceptionResponse
         {
             public ExceptionResponse(HttpStatusCode statusCode, Exception exception)
             {

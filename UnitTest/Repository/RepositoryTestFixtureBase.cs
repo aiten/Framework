@@ -25,7 +25,7 @@ namespace Framework.UnitTest.Repository
 
     public abstract class RepositoryTestFixtureBase<TDbContext> : IDisposable where TDbContext : DbContext
     {
-        public RepositoryTestFixtureBase()
+        protected RepositoryTestFixtureBase()
         {
             ScriptDir = $"{Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)}\\Repository\\SQL\\";
         }

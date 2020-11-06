@@ -14,8 +14,6 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-using NLog;
-
 namespace Framework.MyUnitTest.SerialCommunication
 {
     using System.IO;
@@ -31,6 +29,8 @@ namespace Framework.MyUnitTest.SerialCommunication
     using Framework.UnitTest;
 
     using Microsoft.Extensions.Logging;
+
+    using NLog;
 
     using NSubstitute;
 

@@ -17,13 +17,8 @@
 namespace Framework.WebAPI.Host
 {
     using System;
-    using System.Diagnostics;
     using System.IO;
     using System.Reflection;
-    using System.Runtime.InteropServices;
-    using System.ServiceProcess;
-
-    using Framework.WinAPI;
 
     using Microsoft.Extensions.Hosting;
 
@@ -35,59 +30,13 @@ namespace Framework.WebAPI.Host
 
         public static void StartWebService(string[] args, Func<string[], IHostBuilder> buildHost)
         {
-            if (RunsAsService())
-            {
-                Environment.CurrentDirectory = BaseDirectory;
-                ServiceBase.Run(new ServiceBase[] { new WebAPiService() { HostBuilder = buildHost } });
-            }
-            else
-            {
-                buildHost(args).Build().Run();
-                LogManager.Shutdown();
-            }
-        }
+            Environment.CurrentDirectory = BaseDirectory;
 
-        public static bool RunsAsService()
-        {
-            var commandline = System.Environment.CommandLine;
-
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) && Microsoft.Azure.Web.DataProtection.Util.IsAzureEnvironment() == false)
-            {
-                if (IsUnderIisExpress())
-                {
-                    return false;
-                }
-
-                return WinAPIWrapper.CheckForConsoleWindow() && IsUnderWindowsServiceManager();
-            }
-
-            return false; // never can be a windows service
-        }
-
-        public static bool IsUnderIisExpress()
-        {
-            var currentProcess = Process.GetCurrentProcess();
-            if (string.CompareOrdinal(currentProcess.ProcessName, @"iisexpress") == 0)
-            {
-                return true;
-            }
-
-            var parentProcess = currentProcess.Parent();
-            if (parentProcess != null &&
-                (string.CompareOrdinal(parentProcess.ProcessName, @"iisexpress") == 0 ||
-                 string.CompareOrdinal(parentProcess.ProcessName, @"VSIISExeLauncher") == 0))
-            {
-                return true;
-            }
-
-            return false;
-        }
-
-        public static bool IsUnderWindowsServiceManager()
-        {
-            var currentProcess = Process.GetCurrentProcess();
-            var parentProcess  = currentProcess.Parent();
-            return (parentProcess != null && parentProcess.ProcessName == @"services");
+            var host = buildHost(args);
+            host.UseWindowsService();
+           
+            host.Build().Run();
+            LogManager.Shutdown();
         }
     }
 }

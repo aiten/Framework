@@ -1,9 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 
-<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>$(TargetFrameworkForFull)</TargetFramework>
+    <TargetFramework>$(TargetFrameworkForWpf)</TargetFramework>
     <UseWPF>true</UseWPF>
   </PropertyGroup>
 

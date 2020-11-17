@@ -20,9 +20,9 @@ namespace Framework.Parser
     {
         private string _error;
 
-        protected CommandStream Reader { get; private set; }
+        protected ParserStreamReader Reader { get; private set; }
 
-        protected Parser(CommandStream reader)
+        protected Parser(ParserStreamReader reader)
         {
             Reader = reader;
         }
@@ -53,7 +53,7 @@ namespace Framework.Parser
 
         protected bool IsToken(string b, bool expectDel, bool ignoreCase)
         {
-            return Reader.IsCommand(b);
+            return Reader.GetString(b);
         }
     }
 }

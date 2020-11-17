@@ -20,7 +20,7 @@ namespace Framework.Parser
     using System.Linq;
     using System.Text;
 
-    public class CommandStream
+    public class ParserStreamReader
     {
         #region privat properties/members
 
@@ -43,13 +43,14 @@ namespace Framework.Parser
 
         public char NextChar        => IsEOF() ? ((char)0) : _line[_idx];
         public char NextCharToUpper => char.ToUpper(NextChar);
+        public char NextButOneChar  => _idx+1 >= _line.Length ? ((char)0) : _line[_idx+1];
 
-        public int PushIdx()
+        public int PushPosition()
         {
             return _idx;
         }
 
-        public void PopIdx(int idx)
+        public void PopPosition(int idx)
         {
             _idx = idx;
         }
@@ -103,47 +104,6 @@ namespace Framework.Parser
         {
             SkipSpaces();
             return IsEOF() || NextChar == _endCommandChar;
-        }
-
-        public bool IsCommand(string cmd)
-        {
-            if (_line.Length < _idx + cmd.Length)
-            {
-                return false;
-            }
-
-            int i = 0;
-            foreach (char ch in cmd)
-            {
-                if (_line[_idx + i] != ch)
-                {
-                    return false;
-                }
-
-                i++;
-            }
-
-//          if (!Line.StartsWith(cmd)) => slow
-//              return false;
-
-            _idx += cmd.Length;
-            return true;
-        }
-
-        public int IsCommand(string[] cmds)
-        {
-            int i = 0;
-            foreach (string cmd in cmds)
-            {
-                if (IsCommand(cmd))
-                {
-                    return i;
-                }
-
-                i++;
-            }
-
-            return -1;
         }
 
         #region next char type
@@ -250,6 +210,52 @@ namespace Framework.Parser
 
         #endregion
 
+        #region GetString(pattern)
+
+        /// <summary>
+        /// Read while "pattern" match.
+        /// No termination char is needed. 
+        /// </summary>
+        public bool GetString(string pattern)
+        {
+            if (_line.Length < _idx + pattern.Length)
+            {
+                return false;
+            }
+
+            int i = 0;
+            foreach (char ch in pattern)
+            {
+                if (_line[_idx + i] != ch)
+                {
+                    return false;
+                }
+
+                i++;
+            }
+
+            _idx += pattern.Length;
+            return true;
+        }
+
+        public int GetString(string[] patterns)
+        {
+            int i = 0;
+            foreach (string pattern in patterns)
+            {
+                if (GetString(pattern))
+                {
+                    return i;
+                }
+
+                i++;
+            }
+
+            return -1;
+        }
+
+        #endregion
+
         #region Read
 
         public string ReadString(char[] termChar)
@@ -281,6 +287,87 @@ namespace Framework.Parser
         public string ReadToEnd()
         {
             return ReadString(new char[0]);
+        }
+
+        /// <summary>
+        /// Read a string until terChar. Do not check for termChar within quote AND remove quote
+        /// </summary>
+        public string ReadQuotedString(char[] termChar, char[] quote)
+        {
+            var sb          = new StringBuilder();
+            var noQuoteChar = '\0';
+            var quoteChar   = noQuoteChar;
+            var ch          = NextChar;
+
+            while (!IsEOF())
+            {
+                if (ch == quoteChar)
+                {
+                    // end of " or ""
+                    if (NextButOneChar == quoteChar)
+                    {
+                        ch = Next();
+                        sb.Append(ch);
+                    }
+                    else
+                    {
+                        quoteChar = noQuoteChar;
+                    }
+                }
+                else if (quoteChar == noQuoteChar && quote.Contains(ch))
+                {
+                    quoteChar = ch;
+                }
+                else if (quoteChar == noQuoteChar && termChar.Contains(ch))
+                {
+                    break;
+                }
+                else
+                {
+                    sb.Append(ch);
+                }
+
+                ch = Next();
+            }
+
+            return sb.ToString();
+        }
+
+        /// <summary>
+        /// Read a string until terChar. Do not check for termChar within quote
+        /// </summary>
+        public string ReadCountedQuotedString(char[] termChar, char[] quote)
+        {
+            var sb             = new StringBuilder();
+            var quoteChar      = '\0';
+            var quoteCharCount = 0;
+
+            var ch = NextChar;
+            while (!IsEOF())
+            {
+                if (quoteCharCount == 0)
+                {
+                    if (quote.Contains(ch))
+                    {
+                        quoteChar = ch;
+                        quoteCharCount++;
+                    }
+                    else if (termChar.Contains(ch))
+
+                    {
+                        return sb.ToString();
+                    }
+                }
+                else if (quoteChar == ch)
+                {
+                    quoteCharCount--;
+                }
+
+                sb.Append(ch);
+                ch = Next();
+            }
+
+            return sb.ToString();
         }
     }
 

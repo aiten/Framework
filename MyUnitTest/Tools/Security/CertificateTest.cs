@@ -28,34 +28,16 @@ namespace Framework.MyUnitTest.Tools.Security
     {
         #region Common Name
 
-        [Fact]
-        public void SplitX500DistinguishedNameLocalhost()
+        [Theory]
+        [InlineData("CN = localhost",                                                          "localhost")]
+        [InlineData("cn=My Development CA  , OU=My Systems Team, O=A123, L=Linz, S=N12, C=AU", "My Development CA")]
+        [InlineData("OU=My Systems Team, O=A123, L=Linz, S=N12, C=AU",                         null)]
+        [InlineData("cn=\"My, Development, CA\"  , OU=My Systems Team, O=A123, L=Linz, S=N12, C=AU", "My, Development, CA")]
+        public void SplitX500DistinguishedName(string subject, string expect)
         {
-            var name = new X500DistinguishedName("CN = localhost");
-
-            var cn = name.CN();
-
-            cn.Should().Be("localhost");
-        }
-
-        [Fact]
-        public void SplitX500DistinguishedNameTest()
-        {
-            var name = new X500DistinguishedName("cn=My Development CA  , OU=My Systems Team, O=A123, L=Linz, S=N12, C=AU");
-
-            var cn = name.CN();
-
-            cn.Should().Be("My Development CA");
-        }
-
-        [Fact]
-        public void SplitX500DistinguishedNameNotFoundTest()
-        {
-            var name = new X500DistinguishedName("OU=My Systems Team, O=A123, L=Linz, S=N12, C=AU");
-
-            var cn = name.CN();
-
-            cn.Should().BeNullOrEmpty();
+            var name = new X500DistinguishedName(subject);
+            var cn   = name.CN();
+            cn.Should().Be(expect);
         }
 
         #endregion

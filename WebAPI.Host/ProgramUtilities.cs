@@ -14,6 +14,8 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
+using Microsoft.Extensions.Hosting.WindowsServices;
+
 namespace Framework.WebAPI.Host
 {
     using System;
@@ -30,7 +32,14 @@ namespace Framework.WebAPI.Host
 
         public static void StartWebService(string[] args, Func<string[], IHostBuilder> buildHost)
         {
-            Environment.CurrentDirectory = BaseDirectory;
+            if (WindowsServiceHelpers.IsWindowsService())
+            {
+                // only set CurrentDirectory in service
+                // otherwise debugging of angular doesn't work any more
+                // spa.Options.SourcePath = @"ClientApp";
+
+                Environment.CurrentDirectory = BaseDirectory;
+            }
 
             var host = buildHost(args);
             host.UseWindowsService();

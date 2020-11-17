@@ -31,7 +31,7 @@ namespace Framework.Parser
         private readonly string MESSAGE_EXPR_UNKNOWN_VARIABLE    = "Unknown variable";
         private readonly string MESSAGE_EXPR_FRACTORIAL          = "factorial";
 
-        public ExpressionParser(CommandStream reader) : base(reader)
+        public ExpressionParser(ParserStreamReader reader) : base(reader)
         {
         }
 
@@ -278,7 +278,7 @@ namespace Framework.Parser
             }
 
             // check for a value
-            if (CommandStream.IsNumber(ch))
+            if (ParserStreamReader.IsNumber(ch))
             {
                 _state._detailToken = ETokenType.FloatSy;
                 _state._number      = Reader.GetDouble(out bool istFloatingPoint);
@@ -389,7 +389,7 @@ namespace Framework.Parser
             sb.Append(ch);
             ch = Reader.Next();
 
-            while (CommandStream.IsAlpha(ch) || CommandStream.IsDigit(ch))
+            while (ParserStreamReader.IsAlpha(ch) || ParserStreamReader.IsDigit(ch))
             {
                 sb.Append(ch);
                 ch = Reader.Next();
@@ -400,7 +400,7 @@ namespace Framework.Parser
 
         protected virtual bool IsIdentStart(char ch)
         {
-            return CommandStream.IsAlpha(ch);
+            return ParserStreamReader.IsAlpha(ch);
         }
 
         protected virtual bool EvalVariable(string var_name, ref double answer)
@@ -439,7 +439,7 @@ namespace Framework.Parser
             if (GetTokenType() == ETokenType.VariableSy)
             {
                 // copy current state
-                var          e_now     = Reader.PushIdx();
+                var          e_now     = Reader.PushPosition();
                 SParserState state_now = _state;
 
                 GetNextToken();
@@ -462,7 +462,7 @@ namespace Framework.Parser
                 }
 
                 // go back to previous token
-                Reader.PopIdx(e_now);
+                Reader.PopPosition(e_now);
                 _state = state_now;
             }
 

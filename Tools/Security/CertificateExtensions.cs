@@ -14,6 +14,10 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
+using System.Collections;
+
+using Framework.Parser;
+
 namespace Framework.Tools.Security
 {
     using System;
@@ -25,6 +29,38 @@ namespace Framework.Tools.Security
     {
         private static IList<Tuple<string, string>> Split(string name)
         {
+            var parser     = new ParserStreamReader() { Line = name };
+            var result     = new List<Tuple<string, string>>();
+            var nameTerm   = new[] { ' ', '=', ',' };
+            var valueTerm  = new[] { ',' };
+            var quoteChars = new[] { '\"', '\'' };
+
+            while (!parser.IsEOF())
+            {
+                parser.SkipSpaces();
+                var partName = parser.ReadString(nameTerm);
+                var ch = parser.SkipSpaces();
+                if (ch == '=')
+                {
+                    parser.Next();
+                    parser.SkipSpaces();
+                    var partValue = parser.ReadQuotedString(valueTerm, quoteChars);
+                    partValue = partValue.TrimEnd();
+                    result.Add(new Tuple<string, string>(partName,partValue));
+                }
+                else if (!string.IsNullOrEmpty(partName))
+                {
+                    result.Add(new Tuple<string, string>(partName, String.Empty));
+                }
+
+                if (parser.NextChar == ',')
+                {
+                    parser.Next();
+                }
+            }
+
+            return result;
+
             var split = name.Split(new[] { ',', '/' }, StringSplitOptions.RemoveEmptyEntries);
 
             return split.Select(x =>

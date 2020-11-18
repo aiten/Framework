@@ -20,7 +20,6 @@ namespace Framework.WebAPI.Host
     using System.IO;
     using System.Reflection;
 
-    using Microsoft.Extensions.Hosting.WindowsServices;
     using Microsoft.Extensions.Hosting;
     using Microsoft.Extensions.Hosting.WindowsServices;
 

@@ -22,6 +22,7 @@ namespace Framework.WebAPI.Host
 
     using Microsoft.Extensions.Hosting.WindowsServices;
     using Microsoft.Extensions.Hosting;
+    using Microsoft.Extensions.Hosting.WindowsServices;
 
     using NLog;
 

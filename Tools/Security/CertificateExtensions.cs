@@ -14,16 +14,14 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-using System.Collections;
-
-using Framework.Parser;
-
 namespace Framework.Tools.Security
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Security.Cryptography.X509Certificates;
+
+    using Framework.Parser;
 
     public static class CertificateExtensions
     {
@@ -60,19 +58,6 @@ namespace Framework.Tools.Security
             }
 
             return result;
-
-            var split = name.Split(new[] { ',', '/' }, StringSplitOptions.RemoveEmptyEntries);
-
-            return split.Select(x =>
-            {
-                var name2 = x.Split('=');
-                if (name2.Length == 2)
-                {
-                    return new Tuple<string, string>(name2[0].Trim(), name2[1].Trim());
-                }
-
-                return new Tuple<string, string>(name2[0].Trim(), String.Empty);
-            }).ToList();
         }
 
         public static ICollection<Tuple<string, string>> List(this X500DistinguishedName name)

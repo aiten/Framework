@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>$(TargetFrameworkForProject)</TargetFramework>
+    <TargetFramework>$(TargetFrameworkForProjects)</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Logic.Abstraction\Logic.Abstraction.csproj" />

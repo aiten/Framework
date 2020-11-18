@@ -1,9 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>$(TargetFrameworkForProject)</TargetFramework>
+    <TargetFramework>$(TargetFrameworkForProjects)</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Dependency\Dependency.csproj" />
-    <ProjectReference Include="..\Parser\Parser.csproj" />
   </ItemGroup>
 </Project>

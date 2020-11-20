@@ -31,19 +31,23 @@ namespace Framework.Parser
         private readonly string MESSAGE_EXPR_UNKNOWN_VARIABLE    = "Unknown variable";
         private readonly string MESSAGE_EXPR_FRACTORIAL          = "factorial";
 
+        protected char LeftParenthesis  { get; set; } = '(';
+        protected char RightParenthesis { get; set; } = ')';
+
+        public ExpressionParser(string line) : base(line)
+        {
+        }
+
         public ExpressionParser(ParserStreamReader reader) : base(reader)
         {
         }
 
-        protected char LeftParenthesis  { get; set; } = '(';
-        protected char RightParenthesis { get; set; } = ')';
-
-        public override void Parse()
+        public virtual void Parse()
         {
             Answer = 0;
 
             GetNextToken();
-            if (GetTokenType() == ETokenType.EndOfLineSy)
+            if (GetToken() == TokenType.EndOfLineSy)
             {
                 ErrorAdd(MESSAGE_EXPR_EMPTY_EXPR);
                 return;
@@ -58,7 +62,7 @@ namespace Framework.Parser
 
             // check for garbage at the end of the expression
             // an expression ends with a character '\0' and GetMainTokenType() = delimiter
-            if (GetTokenType() != ETokenType.EndOfLineSy)
+            if (GetToken() != TokenType.EndOfLineSy)
             {
                 ErrorAdd(MESSAGE_EXPR_FORMAT);
                 return;
@@ -67,7 +71,9 @@ namespace Framework.Parser
 
         public double Answer { get; private set; }
 
-        protected enum ETokenType
+        #region token
+
+        protected enum TokenType
         {
             UnknownSy,
             NothingSy,
@@ -141,25 +147,30 @@ namespace Framework.Parser
 
             public string _varName;
 
-            public bool       _variableOK; // _number = variable with content
-            public ETokenType _detailToken;
+            public bool      _variableOK; // _number = variable with content
+            public TokenType _detailToken;
         }
 
         protected SParserState _state;
 
+        protected TokenType GetToken()
+        {
+            return _state._detailToken;
+        }
+
         protected void GetNextToken()
         {
-            _state._detailToken = ETokenType.NothingSy;
+            _state._detailToken = TokenType.NothingSy;
             if (IsError())
             {
                 return;
             }
 
-            char ch = Reader.SkipSpaces();
+            char ch = SkipSpaces();
 
             if (ch == '\0')
             {
-                _state._detailToken = ETokenType.EndOfLineSy;
+                _state._detailToken = TokenType.EndOfLineSy;
                 return;
             }
 
@@ -169,58 +180,58 @@ namespace Framework.Parser
         protected virtual void ScanNextToken()
         {
             char ch = Reader.NextChar;
-            if (IsToken("||", false, false))
+            if (TryGetString("||"))
             {
-                _state._detailToken = ETokenType.XOrSy;
+                _state._detailToken = TokenType.XOrSy;
                 return;
             }
 
-            if (IsToken("<<", false, false))
+            if (TryGetString("<<"))
             {
-                _state._detailToken = ETokenType.BitShiftLeftSy;
+                _state._detailToken = TokenType.BitShiftLeftSy;
                 return;
             }
 
-            if (IsToken(">>", false, false))
+            if (TryGetString(">>"))
             {
-                _state._detailToken = ETokenType.BitShiftRightSy;
+                _state._detailToken = TokenType.BitShiftRightSy;
                 return;
             }
 
-            if (IsToken("==", false, false))
+            if (TryGetString("=="))
             {
-                _state._detailToken = ETokenType.EqualSy;
+                _state._detailToken = TokenType.EqualSy;
                 return;
             }
 
-            if (IsToken("!=", false, false))
+            if (TryGetString("!="))
             {
-                _state._detailToken = ETokenType.UnEqualSy;
+                _state._detailToken = TokenType.UnEqualSy;
                 return;
             }
 
-            if (IsToken(">=", false, false))
+            if (TryGetString(">="))
             {
-                _state._detailToken = ETokenType.GreaterEqualSy;
+                _state._detailToken = TokenType.GreaterEqualSy;
                 return;
             }
 
-            if (IsToken("<=", false, false))
+            if (TryGetString("<="))
             {
-                _state._detailToken = ETokenType.LessEqualSy;
+                _state._detailToken = TokenType.LessEqualSy;
                 return;
             }
 
             if (ch == LeftParenthesis)
             {
-                _state._detailToken = ETokenType.LeftParenthesisSy;
+                _state._detailToken = TokenType.LeftParenthesisSy;
                 Reader.Next();
                 return;
             }
 
             if (ch == RightParenthesis)
             {
-                _state._detailToken = ETokenType.RightParenthesisSy;
+                _state._detailToken = TokenType.RightParenthesisSy;
                 Reader.Next();
                 return;
             }
@@ -228,60 +239,60 @@ namespace Framework.Parser
             switch (ch)
             {
                 case '>':
-                    _state._detailToken = ETokenType.GreaterSy;
+                    _state._detailToken = TokenType.GreaterSy;
                     Reader.Next();
                     return;
                 case '<':
-                    _state._detailToken = ETokenType.LessSy;
+                    _state._detailToken = TokenType.LessSy;
                     Reader.Next();
                     return;
                 case '&':
-                    _state._detailToken = ETokenType.AndSy;
+                    _state._detailToken = TokenType.AndSy;
                     Reader.Next();
                     return;
                 case '|':
-                    _state._detailToken = ETokenType.OrSy;
+                    _state._detailToken = TokenType.OrSy;
                     Reader.Next();
                     return;
                 case '-':
-                    _state._detailToken = ETokenType.MinusSy;
+                    _state._detailToken = TokenType.MinusSy;
                     Reader.Next();
                     return;
                 case '+':
-                    _state._detailToken = ETokenType.PlusSy;
+                    _state._detailToken = TokenType.PlusSy;
                     Reader.Next();
                     return;
                 case '*':
-                    _state._detailToken = ETokenType.MultiplySy;
+                    _state._detailToken = TokenType.MultiplySy;
                     Reader.Next();
                     return;
                 case '/':
-                    _state._detailToken = ETokenType.DivideSy;
+                    _state._detailToken = TokenType.DivideSy;
                     Reader.Next();
                     return;
                 case '%':
-                    _state._detailToken = ETokenType.ModuloSy;
+                    _state._detailToken = TokenType.ModuloSy;
                     Reader.Next();
                     return;
                 case '^':
-                    _state._detailToken = ETokenType.PowSy;
+                    _state._detailToken = TokenType.PowSy;
                     Reader.Next();
                     return;
                 case '!':
-                    _state._detailToken = ETokenType.FactorialSy;
+                    _state._detailToken = TokenType.FactorialSy;
                     Reader.Next();
                     return;
                 case '=':
-                    _state._detailToken = ETokenType.AssignSy;
+                    _state._detailToken = TokenType.AssignSy;
                     Reader.Next();
                     return;
             }
 
             // check for a value
-            if (ParserStreamReader.IsNumber(ch))
+            if (IsNumber(ch))
             {
-                _state._detailToken = ETokenType.FloatSy;
-                _state._number      = Reader.GetDouble(out bool istFloatingPoint);
+                _state._detailToken = TokenType.FloatSy;
+                _state._number      = GetDouble(out bool isFloatingPoint);
                 return;
             }
 
@@ -289,7 +300,7 @@ namespace Framework.Parser
             if (IsIdentStart(ch))
             {
                 var start = ReadIdent();
-                ch = Reader.SkipSpaces();
+                ch = SkipSpaces();
 
                 // check if this is a variable or a function.
                 // a function has a parenthesis '(' open after the name
@@ -299,67 +310,67 @@ namespace Framework.Parser
                     switch (start.ToUpper())
                     {
                         case "ABS":
-                            _state._detailToken = ETokenType.AbsSy;
+                            _state._detailToken = TokenType.AbsSy;
                             return;
 
                         case "EXP":
-                            _state._detailToken = ETokenType.ExpSy;
+                            _state._detailToken = TokenType.ExpSy;
                             return;
 
                         case "SIGN":
-                            _state._detailToken = ETokenType.SignSy;
+                            _state._detailToken = TokenType.SignSy;
                             return;
 
                         case "SQRT":
-                            _state._detailToken = ETokenType.SqrtSy;
+                            _state._detailToken = TokenType.SqrtSy;
                             return;
 
                         case "LOG":
-                            _state._detailToken = ETokenType.LogSy;
+                            _state._detailToken = TokenType.LogSy;
                             return;
 
                         case "LOG10":
-                            _state._detailToken = ETokenType.Log10Sy;
+                            _state._detailToken = TokenType.Log10Sy;
                             return;
 
                         case "SIN":
-                            _state._detailToken = ETokenType.SinSy;
+                            _state._detailToken = TokenType.SinSy;
                             return;
 
                         case "COS":
-                            _state._detailToken = ETokenType.CosSy;
+                            _state._detailToken = TokenType.CosSy;
                             return;
 
                         case "TAN":
-                            _state._detailToken = ETokenType.TanSy;
+                            _state._detailToken = TokenType.TanSy;
                             return;
 
                         case "ASIN":
-                            _state._detailToken = ETokenType.AsinSy;
+                            _state._detailToken = TokenType.AsinSy;
                             return;
 
                         case "ACOS":
-                            _state._detailToken = ETokenType.AcosSy;
+                            _state._detailToken = TokenType.AcosSy;
                             return;
 
                         case "ATAN":
-                            _state._detailToken = ETokenType.AtanSy;
+                            _state._detailToken = TokenType.AtanSy;
                             return;
 
                         case "FACTORIAL":
-                            _state._detailToken = ETokenType.FactorialFncSy;
+                            _state._detailToken = TokenType.FactorialFncSy;
                             return;
 
                         case "FIX":
-                            _state._detailToken = ETokenType.FixSy;
+                            _state._detailToken = TokenType.FixSy;
                             return;
 
                         case "FUP":
-                            _state._detailToken = ETokenType.FupSy;
+                            _state._detailToken = TokenType.FupSy;
                             return;
 
                         case "ROUND":
-                            _state._detailToken = ETokenType.RoundSy;
+                            _state._detailToken = TokenType.RoundSy;
                             return;
 
                         default:
@@ -369,7 +380,7 @@ namespace Framework.Parser
                 }
                 else
                 {
-                    _state._detailToken = ETokenType.VariableSy;
+                    _state._detailToken = TokenType.VariableSy;
                     _state._variableOK  = EvalVariable(start, ref _state._number);
                 }
 
@@ -377,9 +388,13 @@ namespace Framework.Parser
             }
 
             // something unknown is found, wrong characters -> a syntax error
-            _state._detailToken = ETokenType.UnknownSy;
+            _state._detailToken = TokenType.UnknownSy;
             Error(MESSAGE_EXPR_SYNTAX_ERROR);
         }
+
+        #endregion
+
+        #region Ident
 
         protected virtual string ReadIdent()
         {
@@ -389,7 +404,7 @@ namespace Framework.Parser
             sb.Append(ch);
             ch = Reader.Next();
 
-            while (ParserStreamReader.IsAlpha(ch) || ParserStreamReader.IsDigit(ch))
+            while (IsAlpha(ch) || IsDigit(ch))
             {
                 sb.Append(ch);
                 ch = Reader.Next();
@@ -400,15 +415,15 @@ namespace Framework.Parser
 
         protected virtual bool IsIdentStart(char ch)
         {
-            return ParserStreamReader.IsAlpha(ch);
+            return IsAlpha(ch);
         }
 
-        protected virtual bool EvalVariable(string var_name, ref double answer)
+        protected virtual bool EvalVariable(string varName, ref double answer)
         {
-            _state._varName = var_name;
+            _state._varName = varName;
 
             // check for built-in variables
-            switch (var_name.ToUpper())
+            switch (varName.ToUpper())
             {
                 case "E":
                     answer = (double)2.7182818284590452353602874713527;
@@ -421,14 +436,13 @@ namespace Framework.Parser
             return false;
         }
 
-        protected virtual void AssignVariable(string var_name, double value)
+        protected virtual void AssignVariable(string varName, double value)
         {
         }
 
-        ETokenType GetTokenType()
-        {
-            return _state._detailToken;
-        }
+        #endregion
+
+        #region level 1-10
 
         ////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////
@@ -436,14 +450,14 @@ namespace Framework.Parser
 
         double ParseLevel1()
         {
-            if (GetTokenType() == ETokenType.VariableSy)
+            if (GetToken() == TokenType.VariableSy)
             {
                 // copy current state
                 var          e_now     = Reader.PushPosition();
                 SParserState state_now = _state;
 
                 GetNextToken();
-                if (GetTokenType() == ETokenType.AssignSy)
+                if (GetToken() == TokenType.AssignSy)
                 {
                     // assignment
                     GetNextToken();
@@ -474,14 +488,14 @@ namespace Framework.Parser
 
         double ParseLevel2()
         {
-            double     ans        = ParseLevel3();
-            ETokenType operatorSy = GetTokenType();
+            double    ans        = ParseLevel3();
+            TokenType operatorSy = GetToken();
 
-            while (operatorSy == ETokenType.AndSy || operatorSy == ETokenType.OrSy || operatorSy == ETokenType.BitShiftLeftSy || operatorSy == ETokenType.BitShiftRightSy)
+            while (operatorSy == TokenType.AndSy || operatorSy == TokenType.OrSy || operatorSy == TokenType.BitShiftLeftSy || operatorSy == TokenType.BitShiftRightSy)
             {
                 GetNextToken();
                 ans        = EvalOperator(operatorSy, ans, ParseLevel3());
-                operatorSy = GetTokenType();
+                operatorSy = GetToken();
             }
 
             return ans;
@@ -492,15 +506,15 @@ namespace Framework.Parser
 
         double ParseLevel3()
         {
-            double     ans        = ParseLevel4();
-            ETokenType operatorSy = GetTokenType();
+            double    ans        = ParseLevel4();
+            TokenType operatorSy = GetToken();
 
-            while (operatorSy == ETokenType.EqualSy || operatorSy == ETokenType.UnEqualSy || operatorSy == ETokenType.LessSy || operatorSy == ETokenType.LessEqualSy ||
-                   operatorSy == ETokenType.GreaterSy || operatorSy == ETokenType.GreaterEqualSy)
+            while (operatorSy == TokenType.EqualSy || operatorSy == TokenType.UnEqualSy || operatorSy == TokenType.LessSy || operatorSy == TokenType.LessEqualSy ||
+                   operatorSy == TokenType.GreaterSy || operatorSy == TokenType.GreaterEqualSy)
             {
                 GetNextToken();
                 ans        = EvalOperator(operatorSy, ans, ParseLevel4());
-                operatorSy = GetTokenType();
+                operatorSy = GetToken();
             }
 
             return ans;
@@ -511,14 +525,14 @@ namespace Framework.Parser
 
         double ParseLevel4()
         {
-            double     ans        = ParseLevel5();
-            ETokenType operatorSy = GetTokenType();
+            double    ans        = ParseLevel5();
+            TokenType operatorSy = GetToken();
 
-            while (operatorSy == ETokenType.PlusSy || operatorSy == ETokenType.MinusSy)
+            while (operatorSy == TokenType.PlusSy || operatorSy == TokenType.MinusSy)
             {
                 GetNextToken();
                 ans        = EvalOperator(operatorSy, ans, ParseLevel5());
-                operatorSy = GetTokenType();
+                operatorSy = GetToken();
             }
 
             return ans;
@@ -529,14 +543,14 @@ namespace Framework.Parser
 
         double ParseLevel5()
         {
-            double     ans        = ParseLevel6();
-            ETokenType operatorSy = GetTokenType();
+            double    ans        = ParseLevel6();
+            TokenType operatorSy = GetToken();
 
-            while (operatorSy == ETokenType.MultiplySy || operatorSy == ETokenType.DivideSy || operatorSy == ETokenType.ModuloSy || operatorSy == ETokenType.XOrSy)
+            while (operatorSy == TokenType.MultiplySy || operatorSy == TokenType.DivideSy || operatorSy == TokenType.ModuloSy || operatorSy == TokenType.XOrSy)
             {
                 GetNextToken();
                 ans        = EvalOperator(operatorSy, ans, ParseLevel6());
-                operatorSy = GetTokenType();
+                operatorSy = GetToken();
             }
 
             return ans;
@@ -547,14 +561,14 @@ namespace Framework.Parser
 
         double ParseLevel6()
         {
-            double     ans        = ParseLevel7();
-            ETokenType operatorSy = GetTokenType();
+            double    ans        = ParseLevel7();
+            TokenType operatorSy = GetToken();
 
-            while (operatorSy == ETokenType.PowSy)
+            while (operatorSy == TokenType.PowSy)
             {
                 GetNextToken();
                 ans        = EvalOperator(operatorSy, ans, ParseLevel7());
-                operatorSy = GetTokenType();
+                operatorSy = GetToken();
             }
 
             return ans;
@@ -565,17 +579,17 @@ namespace Framework.Parser
 
         double ParseLevel7()
         {
-            double     ans        = ParseLevel8();
-            ETokenType operatorSy = GetTokenType();
+            double    ans        = ParseLevel8();
+            TokenType operatorSy = GetToken();
 
-            while (operatorSy == ETokenType.FactorialSy)
+            while (operatorSy == TokenType.FactorialSy)
             {
                 GetNextToken();
 
                 // factorial does not need a value right from the
                 // operator, so zero is filled in.
                 ans        = EvalOperator(operatorSy, ans, 0.0);
-                operatorSy = GetTokenType();
+                operatorSy = GetToken();
             }
 
             return ans;
@@ -586,7 +600,7 @@ namespace Framework.Parser
 
         double ParseLevel8()
         {
-            if (GetTokenType() == ETokenType.MinusSy)
+            if (GetToken() == TokenType.MinusSy)
             {
                 GetNextToken();
                 return -ParseLevel9();
@@ -600,9 +614,9 @@ namespace Framework.Parser
 
         double ParseLevel9()
         {
-            if (GetTokenType() >= ETokenType.FirstFunctionSy && GetTokenType() <= ETokenType.LastFunctionSy)
+            if (GetToken() >= TokenType.FirstFunctionSy && GetToken() <= TokenType.LastFunctionSy)
             {
-                ETokenType functionSy = GetTokenType();
+                TokenType functionSy = GetToken();
                 GetNextToken();
                 return EvalFunction(functionSy, ParseLevel10());
             }
@@ -616,11 +630,11 @@ namespace Framework.Parser
         double ParseLevel10()
         {
             // check if it is a parenthesized expression
-            if (GetTokenType() == ETokenType.LeftParenthesisSy)
+            if (GetToken() == TokenType.LeftParenthesisSy)
             {
                 GetNextToken();
                 double ans = ParseLevel2();
-                if (GetTokenType() != ETokenType.RightParenthesisSy)
+                if (GetToken() != TokenType.RightParenthesisSy)
                 {
                     ErrorAdd(MESSAGE_EXPR_MISSINGRPARENTHESIS);
                     return 0;
@@ -634,17 +648,21 @@ namespace Framework.Parser
             return ParseNumber();
         }
 
+        #endregion
+
+        #region eval
+
         ////////////////////////////////////////////////////////////
 
         double ParseNumber()
         {
             double ans;
 
-            switch (GetTokenType())
+            switch (GetToken())
             {
-                case ETokenType.FloatSy:
-                case ETokenType.IntegerSy:
-                case ETokenType.VariableSy:
+                case TokenType.FloatSy:
+                case TokenType.IntegerSy:
+                case TokenType.VariableSy:
 
                     // this is a number
                     ans = _state._number;
@@ -660,73 +678,73 @@ namespace Framework.Parser
             return ans;
         }
 
-        double EvalOperator(ETokenType operatorSy, double lhs, double rhs)
+        double EvalOperator(TokenType operatorSy, double lhs, double rhs)
         {
             switch (operatorSy)
             {
                 // level 2
-                case ETokenType.AndSy:           return (double)((uint)(lhs) & (uint)(rhs));
-                case ETokenType.OrSy:            return (double)((uint)(lhs) | (uint)(rhs));
-                case ETokenType.BitShiftLeftSy:  return (double)((uint)(lhs) << (ushort)(rhs));
-                case ETokenType.BitShiftRightSy: return (double)((uint)(lhs) >> (ushort)(rhs));
+                case TokenType.AndSy:           return (double)((uint)(lhs) & (uint)(rhs));
+                case TokenType.OrSy:            return (double)((uint)(lhs) | (uint)(rhs));
+                case TokenType.BitShiftLeftSy:  return (double)((uint)(lhs) << (ushort)(rhs));
+                case TokenType.BitShiftRightSy: return (double)((uint)(lhs) >> (ushort)(rhs));
 
                 // level 3
                 // ReSharper disable 3 CompareOfFloatsByEqualityOperator
-                case ETokenType.EqualSy:        return lhs == rhs ? 1.0 : 0.0;
-                case ETokenType.UnEqualSy:      return lhs != rhs ? 1.0 : 0.0;
-                case ETokenType.LessSy:         return lhs < rhs ? 1.0 : 0.0;
-                case ETokenType.GreaterSy:      return lhs > rhs ? 1.0 : 0.0;
-                case ETokenType.LessEqualSy:    return lhs <= rhs ? 1.0 : 0.0;
-                case ETokenType.GreaterEqualSy: return lhs >= rhs ? 1.0 : 0.0;
+                case TokenType.EqualSy:        return lhs == rhs ? 1.0 : 0.0;
+                case TokenType.UnEqualSy:      return lhs != rhs ? 1.0 : 0.0;
+                case TokenType.LessSy:         return lhs < rhs ? 1.0 : 0.0;
+                case TokenType.GreaterSy:      return lhs > rhs ? 1.0 : 0.0;
+                case TokenType.LessEqualSy:    return lhs <= rhs ? 1.0 : 0.0;
+                case TokenType.GreaterEqualSy: return lhs >= rhs ? 1.0 : 0.0;
 
                 // level 4
-                case ETokenType.PlusSy:  return lhs + rhs;
-                case ETokenType.MinusSy: return lhs - rhs;
+                case TokenType.PlusSy:  return lhs + rhs;
+                case TokenType.MinusSy: return lhs - rhs;
 
                 // level 5
-                case ETokenType.MultiplySy: return lhs * rhs;
-                case ETokenType.DivideSy:   return lhs / rhs;
-                case ETokenType.ModuloSy:   return (double)((uint)(lhs) % (uint)(rhs));
-                case ETokenType.XOrSy:      return (double)((uint)(lhs) ^ (uint)(rhs));
+                case TokenType.MultiplySy: return lhs * rhs;
+                case TokenType.DivideSy:   return lhs / rhs;
+                case TokenType.ModuloSy:   return (double)((uint)(lhs) % (uint)(rhs));
+                case TokenType.XOrSy:      return (double)((uint)(lhs) ^ (uint)(rhs));
 
                 // level 6
-                case ETokenType.PowSy: return Math.Pow(lhs, rhs);
+                case TokenType.PowSy: return Math.Pow(lhs, rhs);
 
                 // level 7
-                case ETokenType.FactorialSy: return Factorial(lhs);
+                case TokenType.FactorialSy: return Factorial(lhs);
             }
 
             ErrorAdd(MESSAGE_EXPR_ILLEGAL_OPERATOR);
             return 0;
         }
 
-        double EvalFunction(ETokenType operatorSy, double value)
+        double EvalFunction(TokenType operatorSy, double value)
         {
             switch (operatorSy)
             {
                 // arithmetic
-                case ETokenType.AbsSy:   return Math.Abs(value);
-                case ETokenType.ExpSy:   return Math.Exp(value);
-                case ETokenType.SignSy:  return Sign(value);
-                case ETokenType.SqrtSy:  return Math.Sqrt(value);
-                case ETokenType.LogSy:   return Math.Log(value, 2);
-                case ETokenType.Log10Sy: return Math.Log10(value);
+                case TokenType.AbsSy:   return Math.Abs(value);
+                case TokenType.ExpSy:   return Math.Exp(value);
+                case TokenType.SignSy:  return Sign(value);
+                case TokenType.SqrtSy:  return Math.Sqrt(value);
+                case TokenType.LogSy:   return Math.Log(value, 2);
+                case TokenType.Log10Sy: return Math.Log10(value);
 
                 // trigonometric
-                case ETokenType.SinSy:  return Math.Sin(value);
-                case ETokenType.CosSy:  return Math.Cos(value);
-                case ETokenType.TanSy:  return Math.Tan(value);
-                case ETokenType.AsinSy: return Math.Asin(value);
-                case ETokenType.AcosSy: return Math.Acos(value);
-                case ETokenType.AtanSy: return Math.Atan(value);
+                case TokenType.SinSy:  return Math.Sin(value);
+                case TokenType.CosSy:  return Math.Cos(value);
+                case TokenType.TanSy:  return Math.Tan(value);
+                case TokenType.AsinSy: return Math.Asin(value);
+                case TokenType.AcosSy: return Math.Acos(value);
+                case TokenType.AtanSy: return Math.Atan(value);
 
                 // probability
-                case ETokenType.FactorialFncSy: return Factorial(value);
+                case TokenType.FactorialFncSy: return Factorial(value);
 
                 // cnc
-                case ETokenType.FixSy:   return Math.Floor(value);
-                case ETokenType.FupSy:   return Math.Ceiling(value);
-                case ETokenType.RoundSy: return Math.Round(value);
+                case TokenType.FixSy:   return Math.Floor(value);
+                case TokenType.FupSy:   return Math.Ceiling(value);
+                case TokenType.RoundSy: return Math.Round(value);
             }
 
             ErrorAdd(MESSAGE_EXPR_ILLEGAL_FUNCTION);
@@ -774,6 +792,6 @@ namespace Framework.Parser
             return 0;
         }
 
-        // bool SaveAssign(char* buffer, char* current, char ch, uint8_t max);
+        #endregion
     }
 }

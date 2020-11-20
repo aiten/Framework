@@ -14,11 +14,9 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-using System.Globalization;
-
 namespace Framework.MyUnitTest.Parser
 {
-    using System;
+    using System.Globalization;
 
     using FluentAssertions;
 
@@ -26,18 +24,18 @@ namespace Framework.MyUnitTest.Parser
 
     using Xunit;
 
-    public class ParserStreamTest
+    public class ParserTest
     {
         [Fact]
         public void ParseInt()
         {
-            var stream = new ParserStreamReader() { Line = "1" };
+            var parser = new Parser("1");
 
-            stream.IsNumber().Should().BeTrue();
-            stream.NextChar.Should().Be('1');
-            stream.IsEOF().Should().BeFalse();
-            stream.Next().Should().Be('\0');
-            stream.IsEOF().Should().BeTrue();
+            parser.IsNumber().Should().BeTrue();
+            parser.NextChar.Should().Be('1');
+            parser.IsEOF().Should().BeFalse();
+            parser.Next().Should().Be('\0');
+            parser.IsEOF().Should().BeTrue();
         }
 
         [Theory]
@@ -47,12 +45,12 @@ namespace Framework.MyUnitTest.Parser
         [InlineData("0")]
         public void ParseNumberInt(string line)
         {
-            var stream = new ParserStreamReader() { Line = line };
+            var parser = new Parser(line);
 
-            stream.IsNumber().Should().BeTrue();
-            var intValue = stream.GetInt();
-            stream.NextChar.Should().Be('\0');
-            stream.IsEOF().Should().BeTrue();
+            parser.IsNumber().Should().BeTrue();
+            var intValue = parser.GetInt();
+            parser.NextChar.Should().Be('\0');
+            parser.IsEOF().Should().BeTrue();
             intValue.Should().Be(int.Parse(line));
         }
 
@@ -68,13 +66,13 @@ namespace Framework.MyUnitTest.Parser
         [InlineData("-.01",  true)]
         public void ParseNumberDecimal(string line, bool shouldBeFloatingPoint)
         {
-            var  stream = new ParserStreamReader() { Line = line };
+            var  parser = new Parser(line);
             bool isFloatingPoint;
 
-            stream.IsNumber().Should().BeTrue();
-            var decValue = stream.GetDecimal(out isFloatingPoint);
-            stream.NextChar.Should().Be('\0');
-            stream.IsEOF().Should().BeTrue();
+            parser.IsNumber().Should().BeTrue();
+            var decValue = parser.GetDecimal(out isFloatingPoint);
+            parser.NextChar.Should().Be('\0');
+            parser.IsEOF().Should().BeTrue();
             decValue.Should().Be(decimal.Parse(line, CultureInfo.InvariantCulture));
             isFloatingPoint.Should().Be(shouldBeFloatingPoint);
         }
@@ -84,18 +82,18 @@ namespace Framework.MyUnitTest.Parser
         [InlineData(" a   b   c  ")]
         public void SkipSpacesTest(string line)
         {
-            var stream = new ParserStreamReader() { Line = line };
+            var parser = new Parser(line);
 
-            stream.SkipSpaces().Should().Be('a');
-            stream.Next();
-            stream.SkipSpaces().Should().Be('b');
-            ;
-            stream.Next();
-            stream.SkipSpaces().Should().Be('c');
-            ;
-            stream.Next();
-            stream.SkipSpaces();
-            stream.IsEOF().Should().BeTrue();
+            parser.SkipSpaces().Should().Be('a');
+            parser.Next();
+            parser.SkipSpaces().Should().Be('b');
+            
+            parser.Next();
+            parser.SkipSpaces().Should().Be('c');
+            
+            parser.Next();
+            parser.SkipSpaces();
+            parser.IsEOF().Should().BeTrue();
         }
 
         [Theory]
@@ -103,12 +101,12 @@ namespace Framework.MyUnitTest.Parser
         [InlineData("Hallo Welt", "Hallo Welt")]
         public void GetStringTest(string line, string pattern)
         {
-            var stream = new ParserStreamReader() { Line = line };
+            var parser = new Parser(line);
 
-            stream.GetString(pattern).Should().BeTrue();
+            parser.TryGetString(pattern).Should().BeTrue();
 
-            var remaining = stream.ReadToEnd();
-            stream.NextChar.Should().Be('\0');
+            var remaining = parser.ReadToEnd();
+            parser.NextChar.Should().Be('\0');
 
             line.Should().Be(pattern + remaining);
         }
@@ -119,12 +117,12 @@ namespace Framework.MyUnitTest.Parser
         [InlineData("xx\"Hallo\", \"Welt\"", "xx\"Hallo\"")]
         public void ReadCountedQuotedStringTest(string line, string pattern)
         {
-            var stream = new ParserStreamReader() { Line = line };
+            var parser = new Parser(line);
 
-            stream.ReadCountedQuotedString(new[] { ',' }, new[] { '"' }).Should().Be(pattern);
+            parser.ReadCountedQuotedString(new[] { ',' }, new[] { '"' }).Should().Be(pattern);
 
-            var remaining = stream.ReadToEnd();
-            stream.NextChar.Should().Be('\0');
+            var remaining = parser.ReadToEnd();
+            parser.NextChar.Should().Be('\0');
 
             line.Should().Be(pattern + remaining);
         }
@@ -136,12 +134,12 @@ namespace Framework.MyUnitTest.Parser
         [InlineData("\"\"\"Hallo\"\"\", \"Welt\"", "\"Hallo\"",     ", \"Welt\"")]
         public void ReadQuotedStringTest(string line, string pattern, string expectedRemaining)
         {
-            var stream = new ParserStreamReader() { Line = line };
+            var parser = new Parser(line);
 
-            stream.ReadQuotedString(new[] { ',' }, new[] { '"' }).Should().Be(pattern);
+            parser.ReadQuotedString(new[] { ',' }, new[] { '"' }).Should().Be(pattern);
 
-            var remaining = stream.ReadToEnd();
-            stream.NextChar.Should().Be('\0');
+            var remaining = parser.ReadToEnd();
+            parser.NextChar.Should().Be('\0');
 
             expectedRemaining.Should().Be(remaining);
         }

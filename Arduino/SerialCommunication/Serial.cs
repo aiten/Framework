@@ -213,13 +213,9 @@ namespace Framework.Arduino.SerialCommunication
 
             if (join && _readThread != null)
             {
-                try
+                while (!_readThread.Join(100))
                 {
-                    _readThread.Abort();
-                }
-                catch (PlatformNotSupportedException)
-                {
-                    // ignore
+                    await Task.Delay(1);
                 }
             }
 

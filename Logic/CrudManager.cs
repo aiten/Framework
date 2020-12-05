@@ -51,7 +51,7 @@ namespace Framework.Logic
 
         public async Task<TKey> Add(T value)
         {
-            return (await Add(new List<T>() { value })).First();
+            return (await Add(new List<T> { value })).First();
         }
 
         public async Task<IEnumerable<TKey>> Add(IEnumerable<T> values)
@@ -158,7 +158,7 @@ namespace Framework.Logic
 
             var mergeJoin = entitiesInDb.Join(myEntities, GetKey, GetKey, (entityInDb, entity) => new { EntityInDb = entityInDb, Entity = entity }).ToList();
 
-            if (myEntities.Count() != entitiesInDb.Count || myEntities.Count() != mergeJoin.Count())
+            if (myEntities.Count != entitiesInDb.Count || myEntities.Count != mergeJoin.Count)
             {
                 throw new ArgumentException(ErrorMessages.ResourceManager.ToLocalizable(nameof(ErrorMessages.Framework_Logic_JoinResultDifferent)).Message());
             }

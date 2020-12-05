@@ -29,36 +29,33 @@ namespace Framework.Wpf.Views
         {
             vm.MessageBox ??= MessageBox.Show;
 
-            if (vm.BrowseFileNameFunc == null)
+            vm.BrowseFileNameFunc ??= (filename, saveFile) =>
             {
-                vm.BrowseFileNameFunc = (filename, saveFile) =>
+                Microsoft.Win32.FileDialog dlg;
+                if (saveFile)
                 {
-                    Microsoft.Win32.FileDialog dlg;
-                    if (saveFile)
-                    {
-                        dlg = new Microsoft.Win32.SaveFileDialog();
-                    }
-                    else
-                    {
-                        dlg = new Microsoft.Win32.OpenFileDialog();
-                    }
+                    dlg = new Microsoft.Win32.SaveFileDialog();
+                }
+                else
+                {
+                    dlg = new Microsoft.Win32.OpenFileDialog();
+                }
 
-                    dlg.FileName = filename;
-                    string dir = Path.GetDirectoryName(filename);
-                    if (!string.IsNullOrEmpty(dir))
-                    {
-                        dlg.InitialDirectory = dir;
-                        dlg.FileName         = Path.GetFileName(filename);
-                    }
+                dlg.FileName = filename;
+                string dir = Path.GetDirectoryName(filename);
+                if (!string.IsNullOrEmpty(dir))
+                {
+                    dlg.InitialDirectory = dir;
+                    dlg.FileName         = Path.GetFileName(filename);
+                }
 
-                    if (dlg.ShowDialog() ?? false)
-                    {
-                        return dlg.FileName;
-                    }
+                if (dlg.ShowDialog() ?? false)
+                {
+                    return dlg.FileName;
+                }
 
-                    return null;
-                };
-            }
+                return null;
+            };
         }
 
         public static void DefaultInitForBaseViewModel(this Window view)

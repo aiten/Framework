@@ -30,7 +30,7 @@ namespace Framework.Drawing
             set => _points = value.ToArray();
         }
 
-        public bool   IsClosed => _points.Length >= 2 && _points[0].Compare(_points[_points.Length - 1]);
+        public bool   IsClosed => _points.Length >= 2 && _points[0].Compare(_points[^1]);
         public double MaxX     => _points.Max(c => c.X);
         public double MinX     => _points.Min(c => c.X);
         public double MaxY     => _points.Max(c => c.Y);

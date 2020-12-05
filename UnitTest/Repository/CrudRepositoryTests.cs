@@ -67,7 +67,7 @@ namespace Framework.UnitTest.Repository
 
             var allWithAdd = await GetAll();
             allWithAdd.Should().NotBeNull();
-            allWithAdd.Count.Should().Be(allWithoutAdd.Count() + 1);
+            allWithAdd.Count.Should().Be(allWithoutAdd.Count + 1);
 
             // read again and update 
 
@@ -156,7 +156,7 @@ namespace Framework.UnitTest.Repository
 
             var allWithAdd = await GetAll();
             allWithAdd.Should().NotBeNull();
-            allWithAdd.Count().Should().Be(allWithoutAdd.Count() + keys.Count());
+            allWithAdd.Count.Should().Be(allWithoutAdd.Count + keys.Count());
 
             // read again and update 
             using (var ctx = CreateTestDbContext())
@@ -197,7 +197,7 @@ namespace Framework.UnitTest.Repository
                 var compareEntities = createTestEntities();
                 updateEntities(compareEntities);
 
-                for (int i = 0; i < compareEntities.Count(); i++)
+                for (int i = 0; i < compareEntities.Count; i++)
                 {
                     GetEntityKey(entities.ElementAt(i)).Should().Be(keys.ElementAt(i));
                     CompareEntity(compareEntities.ElementAt(i), entities.ElementAt(i)).Should().BeTrue();

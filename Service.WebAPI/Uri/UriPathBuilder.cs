@@ -47,7 +47,7 @@ namespace Framework.Service.WebAPI.Uri
             }
             else
             {
-                if (Path[Path.Length - 1] != '/')
+                if (Path[^1] != '/')
                 {
                     Path += '/';
                 }

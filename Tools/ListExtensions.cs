@@ -26,8 +26,8 @@ namespace Framework.Tools
     {
         public static ICollection<T> ToICollection<T>(this IEnumerable<T> list)
         {
-            var icollection = list as ICollection<T>;
-            return icollection ?? list.ToList();
+            var collection = list as ICollection<T>;
+            return collection ?? list.ToList();
         }
 
         public static IEnumerable<IEnumerable<T>> Split<T>(this IEnumerable<T> list, int size)
@@ -38,7 +38,7 @@ namespace Framework.Tools
             }
 
             var listList = new List<IEnumerable<T>>();
-            int count    = 0;
+            var count    = 0;
             var lastList = new List<T>();
 
             foreach (var element in list)

@@ -38,7 +38,7 @@ namespace Framework.CsvImport
         public CsvImportBase()
         {
             // Retrieve a writable NumberFormatInfo object.
-            CultureInfo enUS = CultureInfo.CreateSpecificCulture("en-US");
+            var enUS = CultureInfo.CreateSpecificCulture("en-US");
             _nfi = enUS.NumberFormat;
         }
 
@@ -117,7 +117,7 @@ namespace Framework.CsvImport
 
             while (true)
             {
-                for (int idx = 0; idx < line.Length; idx++)
+                for (var idx = 0; idx < line.Length; idx++)
                 {
                     var ch = line[idx];
 
@@ -139,6 +139,12 @@ namespace Framework.CsvImport
                         quoteChar = ch;
                     }
                     else if (quoteChar == noQuoteChar && (ch == ListSeparatorChar))
+                    {
+                        columns.Add(sb.ToString());
+                        sb.Clear();
+                    }
+
+                    else if (quoteChar == noQuoteChar && (ch == '|'))
                     {
                         columns.Add(sb.ToString());
                         sb.Clear();

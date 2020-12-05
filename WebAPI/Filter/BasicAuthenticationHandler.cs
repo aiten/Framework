@@ -53,7 +53,7 @@ namespace Framework.WebAPI.Filter
             try
             {
                 var authHeader      = AuthenticationHeaderValue.Parse(Request.Headers["Authorization"]);
-                var credentialBytes = Convert.FromBase64String(authHeader.Parameter);
+                var credentialBytes = Convert.FromBase64String(authHeader.Parameter ?? "");
                 var credentials     = Encoding.UTF8.GetString(credentialBytes).Split(new[] { ':' }, 2);
                 var password        = credentials[1];
                 var userName        = credentials[0];

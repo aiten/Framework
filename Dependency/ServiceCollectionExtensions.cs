@@ -30,10 +30,10 @@ namespace Framework.Dependency
         /// </summary>
         /// <param name="services">Dependency services.</param>
         /// <param name="liveTime"></param>
-        /// <param name="assemblies">List of assemblies in which all types should be registered with their interfaces. 
+        /// <param name="assemblies">List of assemblies in which all types should be registered with their interfaces.
         /// This includes internal types. </param>
         /// <returns>This instance.</returns>
-        public static IServiceCollection AddAssembylIncludingInternals(this IServiceCollection services, ServiceLifetime liveTime, params Assembly[] assemblies)
+        public static IServiceCollection AddAssemblyIncludingInternals(this IServiceCollection services, ServiceLifetime liveTime, params Assembly[] assemblies)
         {
             foreach (var assembly in assemblies)
             {

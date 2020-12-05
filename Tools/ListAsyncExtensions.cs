@@ -14,22 +14,28 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.Arduino.SerialCommunication
+namespace Framework.Tools
 {
-    using Framework.Arduino.SerialCommunication.Abstraction;
-    using Framework.Pattern;
-    using Framework.Dependency;
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Threading.Tasks;
 
-    using Microsoft.Extensions.DependencyInjection;
-
-    public static class LiveServiceCollectionExtensions
+    public static class ListAsyncExtensions
     {
-        public static IServiceCollection AddSerialCommunication(this IServiceCollection services)
+        public static async Task<IEnumerable<TResult>> SelectAsync<TSource, TResult>(this IEnumerable<TSource> source, Func<TSource, Task<TResult>> method)
         {
-            services
-                .AddAssemblyIncludingInternals(ServiceLifetime.Transient, typeof(Serial).Assembly)
-                .AddTransient<IFactory<ISerialPort>, FactoryResolve<ISerialPort>>();
-            return services;
+            return await Task.WhenAll(source.Select(async s => await method(s)));
+        }
+
+        public static async Task<IEnumerable<TResult>> SelectManyAsync<TSource, TResult>(this IEnumerable<TSource> source, Func<TSource, Task<IEnumerable<TResult>>> method)
+        {
+            return (await Task.WhenAll(source.Select(async s => await method(s)))).SelectMany(s => s);
+        }
+
+        public static async Task<IList<TResult>> SelectManyAsync<TSource, TResult>(this IList<TSource> source, Func<TSource, Task<IList<TResult>>> method)
+        {
+            return (await Task.WhenAll(source.Select(async s => await method(s)))).SelectMany(s => s).ToList();
         }
     }
 }

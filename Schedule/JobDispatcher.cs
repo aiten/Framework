@@ -56,11 +56,11 @@ namespace Framework.Schedule
                 {
                     if (_paramContainer != null)
                     {
-                        var jobStateObj = (IJobParamContainer)scope.ServiceProvider.GetService(_paramContainer);
+                        var jobStateObj = (IJobParamContainer)scope.ServiceProvider.GetRequiredService(_paramContainer);
                         jobStateObj.Param = _param;
                     }
 
-                    var job = (IJob)scope.ServiceProvider.GetService(_job);
+                    var job = (IJob)scope.ServiceProvider.GetRequiredService(_job);
 
                     job.JobName = _jobName;
                     job.Param   = _param;

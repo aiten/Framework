@@ -30,7 +30,7 @@ namespace Framework.WebAPI.Tool
 
             public override string ToString()
             {
-                return $"{CallTime.ToString("s")}:{UserName}: {Uri}";
+                return $"{CallTime:s}:{UserName}:{Uri}";
             }
         }
 

@@ -21,6 +21,7 @@ namespace Framework.Tools
     using System;
     using System.Collections;
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Reflection;
 
@@ -69,8 +70,8 @@ namespace Framework.Tools
 
                         var collectionItems1      = ((IEnumerable)valueA)!.Cast<object>().ToList();
                         var collectionItems2      = ((IEnumerable)valueB)!.Cast<object>().ToList();
-                        var collectionItemsCount1 = collectionItems1.Count();
-                        var collectionItemsCount2 = collectionItems2.Count();
+                        var collectionItemsCount1 = collectionItems1.Count;
+                        var collectionItemsCount2 = collectionItems2.Count;
 
                         // check the counts to ensure they match
                         if (collectionItemsCount1 != collectionItemsCount2)
@@ -127,7 +128,7 @@ namespace Framework.Tools
 
         private static bool CanDirectlyCompare(Type type)
         {
-            return typeof(IComparable).IsAssignableFrom(type) || type.IsPrimitive || type.IsValueType;
+            return type != null && (typeof(IComparable).IsAssignableFrom(type) || type.IsPrimitive || type.IsValueType);
         }
 
         ////////////////////////////////////////////////////////

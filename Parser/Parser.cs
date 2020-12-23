@@ -38,8 +38,8 @@ namespace Framework.Parser
         {
             Reader = new ParserStreamReader { Line = line };
         }
-        
-        public void Reset(ParserStreamReader stream) 
+
+        public void Reset(ParserStreamReader stream)
         {
             Reader = stream;
         }

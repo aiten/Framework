@@ -42,7 +42,7 @@ namespace Framework.WebAPI.Host
 
             var host = buildHost(args);
             host.UseWindowsService();
-           
+
             host.Build().Run();
             LogManager.Shutdown();
         }

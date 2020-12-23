@@ -87,10 +87,10 @@ namespace Framework.MyUnitTest.Parser
             parser.SkipSpaces().Should().Be('a');
             parser.Next();
             parser.SkipSpaces().Should().Be('b');
-            
+
             parser.Next();
             parser.SkipSpaces().Should().Be('c');
-            
+
             parser.Next();
             parser.SkipSpaces();
             parser.IsEOF().Should().BeTrue();
@@ -128,10 +128,10 @@ namespace Framework.MyUnitTest.Parser
         }
 
         [Theory]
-        [InlineData("\"Hallo, Welt\"",       "Hallo, Welt", "")]
-        [InlineData("\"Hallo\", \"Welt\"",   "Hallo",       ", \"Welt\"")]
-        [InlineData("xx\"Hallo\", \"Welt\"", "xxHallo",     ", \"Welt\"")]
-        [InlineData("\"\"\"Hallo\"\"\", \"Welt\"", "\"Hallo\"",     ", \"Welt\"")]
+        [InlineData("\"Hallo, Welt\"",             "Hallo, Welt", "")]
+        [InlineData("\"Hallo\", \"Welt\"",         "Hallo",       ", \"Welt\"")]
+        [InlineData("xx\"Hallo\", \"Welt\"",       "xxHallo",     ", \"Welt\"")]
+        [InlineData("\"\"\"Hallo\"\"\", \"Welt\"", "\"Hallo\"",   ", \"Welt\"")]
         public void ReadQuotedStringTest(string line, string pattern, string expectedRemaining)
         {
             var parser = new Parser(line);

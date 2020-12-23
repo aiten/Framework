@@ -29,9 +29,9 @@ namespace Framework.MyUnitTest.Tools.Security
         #region Common Name
 
         [Theory]
-        [InlineData("CN = localhost",                                                          "localhost")]
-        [InlineData("cn=My Development CA  , OU=My Systems Team, O=A123, L=Linz, S=N12, C=AU", "My Development CA")]
-        [InlineData("OU=My Systems Team, O=A123, L=Linz, S=N12, C=AU",                         null)]
+        [InlineData("CN = localhost",                                                                "localhost")]
+        [InlineData("cn=My Development CA  , OU=My Systems Team, O=A123, L=Linz, S=N12, C=AU",       "My Development CA")]
+        [InlineData("OU=My Systems Team, O=A123, L=Linz, S=N12, C=AU",                               null)]
         [InlineData("cn=\"My, Development, CA\"  , OU=My Systems Team, O=A123, L=Linz, S=N12, C=AU", "My, Development, CA")]
         public void SplitX500DistinguishedName(string subject, string expect)
         {

@@ -37,14 +37,14 @@ namespace Framework.Tools.Security
             {
                 parser.SkipSpaces();
                 var partName = parser.ReadString(nameTerm);
-                var ch = parser.SkipSpaces();
+                var ch       = parser.SkipSpaces();
                 if (ch == '=')
                 {
                     parser.Next();
                     parser.SkipSpaces();
                     var partValue = parser.ReadQuotedString(valueTerm, quoteChars);
                     partValue = partValue.TrimEnd();
-                    result.Add(new Tuple<string, string>(partName,partValue));
+                    result.Add(new Tuple<string, string>(partName, partValue));
                 }
                 else if (!string.IsNullOrEmpty(partName))
                 {

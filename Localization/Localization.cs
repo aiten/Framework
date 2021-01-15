@@ -23,7 +23,9 @@ namespace Framework.Localization
     using System.Linq;
     using System.Resources;
 
-    public class LocalizationCollector
+    using Framework.Localization.Abstraction;
+
+    public class LocalizationCollector : ILocalizationCollector
     {
         public LocalizationCollector()
         {

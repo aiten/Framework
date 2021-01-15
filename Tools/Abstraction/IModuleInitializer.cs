@@ -16,8 +16,6 @@
 
 namespace Framework.Tools.Abstraction
 {
-    using System.Security.Claims;
-
     using Framework.Localization.Abstraction;
 
     using Microsoft.Extensions.DependencyInjection;

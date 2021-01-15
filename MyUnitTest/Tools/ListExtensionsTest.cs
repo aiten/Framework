@@ -16,7 +16,6 @@
 
 namespace Framework.MyUnitTest.Tools
 {
-    using System.Collections;
     using System.Linq;
 
     using FluentAssertions;

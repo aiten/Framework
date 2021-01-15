@@ -14,14 +14,11 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-
 namespace Framework.Localization.Abstraction
 {
-    using System;
     using System.Collections.Generic;
     using System.Globalization;
     using System.Resources;
-    using System.Runtime.CompilerServices;
 
     public interface ILocalizationCollector
     {

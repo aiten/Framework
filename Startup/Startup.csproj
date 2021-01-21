@@ -5,7 +5,5 @@
   <ItemGroup>
     <ProjectReference Include="..\Dependency\Dependency.csproj" />
     <ProjectReference Include="..\Localization\Localization.csproj" />
-    <ProjectReference Include="..\Parser\Parser.csproj" />
-    <ProjectReference Include="..\Startup\Startup.csproj" />
   </ItemGroup>
 </Project>

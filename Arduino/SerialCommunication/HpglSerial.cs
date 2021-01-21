@@ -19,8 +19,8 @@ namespace Framework.Arduino.SerialCommunication
     using System;
     using System.Collections.Generic;
 
-    using Framework.Pattern;
     using Framework.Arduino.SerialCommunication.Abstraction;
+    using Framework.Pattern;
 
     using Microsoft.Extensions.Logging;
 

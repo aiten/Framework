@@ -22,13 +22,12 @@ namespace Framework.WebAPI.Controller
     using System.Linq;
     using System.Threading.Tasks;
 
-    using Microsoft.AspNetCore.Mvc;
-
+    using Framework.Tools;
     using Framework.WebAPI.Tool;
 
     using Logic.Abstraction;
 
-    using Framework.Tools;
+    using Microsoft.AspNetCore.Mvc;
 
     public static class ControllerExtensions
     {
@@ -229,11 +228,16 @@ namespace Framework.WebAPI.Controller
 
         #region Upload/Download
 
-        public static string GetContentType(this Controller controller, string path)
+        public static string GetContentType(this Controller controller, string path, string defaultMine = "text/plain")
         {
             var types = controller.GetMimeTypes();
             var ext   = Path.GetExtension(path).ToLowerInvariant();
-            return types[ext];
+            if (types.ContainsKey(ext))
+            {
+                return types[ext];
+            }
+
+            return defaultMine;
         }
 
         public static Dictionary<string, string> GetMimeTypes(this Controller controller)
@@ -250,7 +254,10 @@ namespace Framework.WebAPI.Controller
                 { ".jpg", "image/jpeg" },
                 { ".jpeg", "image/jpeg" },
                 { ".gif", "image/gif" },
-                { ".csv", "text/csv" }
+                { ".csv", "text/csv" },
+                { ".zip", "application/zip" },
+                { ".7z", "application/x-7z-compressed" },
+                { ".rar", "application/x-rar-compressed" },
             };
         }
 

@@ -14,19 +14,31 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.Tools
+namespace Framework.Startup
 {
-    using Abstraction;
+    using System.Collections.Generic;
+
+    using Framework.Localization.Abstraction;
+    using Framework.Startup.Abstraction;
 
     using Microsoft.Extensions.DependencyInjection;
 
-    public static class LiveServiceCollectionExtensions
+    public class InitializationManager
     {
-        public static IServiceCollection AddFrameWorkTools(this IServiceCollection services)
-        {
-            services.AddTransient<ICurrentDateTime, CurrentDateTime>();
+        private List<IModuleInitializer> _moduleInitializers = new List<IModuleInitializer>();
 
-            return services;
+        public void Add(IModuleInitializer initializer)
+        {
+            _moduleInitializers.Add(initializer);
+        }
+
+        public void Initialize(IServiceCollection services, ILocalizationCollector localizationCollector)
+        {
+            foreach (var moduleInitializer in _moduleInitializers)
+            {
+                moduleInitializer.AddTranslationResources(localizationCollector);
+                moduleInitializer.AddServices(services);
+            }
         }
     }
 }

@@ -18,19 +18,18 @@ namespace Framework.Arduino.SerialCommunication
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
+    using System.IO;
     using System.Linq;
     using System.Text;
-    using System.IO;
     using System.Threading;
     using System.Threading.Tasks;
-    using System.Diagnostics;
 
     using Framework.Arduino.SerialCommunication.Abstraction;
+    using Framework.Pattern;
+    using Framework.WinAPI;
 
     using Microsoft.Extensions.Logging;
-
-    using Framework.WinAPI;
-    using Framework.Pattern;
 
     public class Serial : ISerial
     {

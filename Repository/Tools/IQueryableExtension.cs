@@ -19,8 +19,8 @@
 namespace Framework.Repository.Tools
 {
     using System.Collections.Generic;
-    using System.Reflection;
     using System.Linq;
+    using System.Reflection;
 
     using Microsoft.EntityFrameworkCore.Query;
     using Microsoft.EntityFrameworkCore.Query.SqlExpressions;

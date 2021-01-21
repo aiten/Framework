@@ -21,9 +21,9 @@ namespace Framework.Repository
     using System.Linq;
     using System.Threading.Tasks;
 
-    using Microsoft.EntityFrameworkCore;
-
     using Framework.Repository.Abstraction;
+
+    using Microsoft.EntityFrameworkCore;
 
     public abstract class CrudRepository<TDbContext, TEntity, TKey> : GetRepository<TDbContext, TEntity, TKey>
         where TDbContext : DbContext where TEntity : class

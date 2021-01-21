@@ -19,10 +19,10 @@ namespace Framework.Schedule
     using System;
     using System.Collections.Generic;
 
-    using Microsoft.Extensions.Logging;
-
     using Framework.Schedule.Abstraction;
     using Framework.Tools.Abstraction;
+
+    using Microsoft.Extensions.Logging;
 
     public sealed class JobScheduler : IJobScheduler
     {

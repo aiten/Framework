@@ -14,22 +14,23 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.Arduino.SerialCommunication
+namespace Framework.Tools
 {
-    using Framework.Arduino.SerialCommunication.Abstraction;
-    using Framework.Dependency;
-    using Framework.Pattern;
+    using Framework.Localization.Abstraction;
+    using Framework.Startup.Abstraction;
+    using Framework.Tools.Abstraction;
 
     using Microsoft.Extensions.DependencyInjection;
 
-    public static class LiveServiceCollectionExtensions
+    public class ModuleInitializer : IModuleInitializer
     {
-        public static IServiceCollection AddSerialCommunication(this IServiceCollection services)
+        public void AddServices(IServiceCollection services)
         {
-            services
-                .AddAssemblyIncludingInternals(ServiceLifetime.Transient, typeof(Serial).Assembly)
-                .AddTransient<IFactory<ISerialPort>, FactoryResolve<ISerialPort>>();
-            return services;
+            services.AddTransient<ICurrentDateTime, CurrentDateTime>();
+        }
+
+        public void AddTranslationResources(ILocalizationCollector localisation)
+        {
         }
     }
 }

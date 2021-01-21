@@ -24,9 +24,9 @@ namespace Framework.WebAPI.Tool
     {
         private class MethodCall
         {
-            public DateTime CallTime { get; set; }
-            public string   UserName { get; set; }
-            public string   Uri      { get; set; }
+            public DateTime CallTime { get; init; }
+            public string   UserName { get; init; }
+            public string   Uri      { get; init; }
 
             public override string ToString()
             {

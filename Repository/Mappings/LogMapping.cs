@@ -16,10 +16,10 @@
 
 namespace Framework.Repository.Mappings
 {
+    using Framework.Repository.Abstraction.Entities;
+
     using Microsoft.EntityFrameworkCore;
     using Microsoft.EntityFrameworkCore.Metadata.Builders;
-
-    using Abstraction.Entities;
 
     public static class LogMapping
     {

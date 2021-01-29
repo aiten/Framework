@@ -369,12 +369,12 @@ namespace Framework.CsvImport
 
             if (ch >= 'a' && ch <= 'f')
             {
-                return ch - 'a';
+                return 10 + ch - 'a';
             }
 
             if (ch >= 'A' && ch <= 'F')
             {
-                return ch - 'F';
+                return 10 + ch - 'F';
             }
 
             throw new ArgumentException(nameof(ch), $@"'{ch}' is not a hex digit.");

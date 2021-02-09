@@ -89,7 +89,7 @@ namespace Framework.Schedule
         {
         }
 
-        protected async Task Execute()
+        public async Task Execute()
         {
             var jobController = new JobDispatcher(_job, JobName, ParamContainer, Param, CtSource, _serviceProvider, _logger);
 

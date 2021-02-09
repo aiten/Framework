@@ -18,10 +18,13 @@ namespace Framework.Schedule.Abstraction
 {
     using System;
     using System.Threading;
+    using System.Threading.Tasks;
 
     public interface IJobExecutor : IDisposable
     {
         void Start();
+
+        Task Execute();
 
         string JobName { get; set; }
 

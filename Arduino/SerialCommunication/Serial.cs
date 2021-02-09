@@ -141,7 +141,7 @@ namespace Framework.Arduino.SerialCommunication
         /// <param name="password"></param>
         public async Task ConnectAsync(string portName, string serverName, string userName, string password)
         {
-            await Task.Delay(0); // avoid CS1998
+            await Task.CompletedTask; // avoid CS1998
             Logger?.LogInformation($@"Connect: {portName}");
 
             // Create a new SerialPort object with default settings.
@@ -386,7 +386,7 @@ namespace Framework.Arduino.SerialCommunication
             }
             else
             {
-                await Task.Delay(0); // avoid CS1998
+                await Task.CompletedTask; // avoid CS1998
             }
 
             return list;

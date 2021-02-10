@@ -37,9 +37,14 @@ namespace Framework.Repository.Tools
 
         #region Csv Import
 
+        public IList<T> Read<T>(string fileName) where T : new()
+        {
+            return ReadFromCsv<T>($@"{CsvDir}\{fileName}");
+        }
+
         protected Dictionary<TKey, TEntity> ImportCsv<TKey, TEntity>(string fileName, Func<TEntity, TKey> getKey, Action<TEntity, TKey> setKey) where TEntity : class, new()
         {
-            var entities = ReadFromCsv<TEntity>($@"{CsvDir}\{fileName}");
+            var entities = Read<TEntity>(fileName);
             return PrepareAndAdd<TKey, TEntity>(entities, getKey, setKey);
         }
 

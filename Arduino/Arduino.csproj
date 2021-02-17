@@ -7,7 +7,9 @@
     <PackageReference Include="System.IO.Ports" Version="5.0.0" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Localization\Localization.csproj" />
     <ProjectReference Include="..\Pattern\Pattern.csproj" />
+    <ProjectReference Include="..\Startup\Startup.csproj" />
     <ProjectReference Include="..\WinAPI\WinAPI.csproj" />
   </ItemGroup>
 </Project>

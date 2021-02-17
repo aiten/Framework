@@ -18,18 +18,25 @@ namespace Framework.Logic
 {
     using AutoMapper;
 
+    using Framework.Localization.Abstraction;
+    using Framework.Startup.Abstraction;
+
     using Microsoft.Extensions.DependencyInjection;
 
-    public static class LiveServiceCollectionExtensions
+    public class ModuleInitializer : IModuleInitializer
     {
-        public static IServiceCollection AddMapper(this IServiceCollection services, MapperConfiguration mapperConfiguration)
+        public MapperConfiguration MapperConfiguration { get; set; }
+        
+        public void AddServices(IServiceCollection services)
         {
-            mapperConfiguration.AssertConfigurationIsValid();
+            MapperConfiguration.AssertConfigurationIsValid();
 
-            IMapper mapper = mapperConfiguration.CreateMapper();
+            IMapper mapper = MapperConfiguration.CreateMapper();
             services.AddSingleton(mapper);
+        }
 
-            return services;
+        public void AddTranslationResources(ILocalizationCollector localisation)
+        {
         }
     }
 }

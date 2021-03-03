@@ -20,10 +20,12 @@ namespace Framework.CsvImport
     using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
+    using System.Reflection.Metadata.Ecma335;
     using System.Threading.Tasks;
 
     public class CsvImport<T> : CsvImportBase where T : new()
     {
+      
         public IList<T> Read(string[] csvLines)
         {
             var lines = ReadStringMatrixFromCsv(csvLines, false);
@@ -102,7 +104,7 @@ namespace Framework.CsvImport
 
                 type = type.GenericTypeArguments[0];
             }
-
+          
             if (type == typeof(string))
             {
                 return ExcelString(valueAsString);

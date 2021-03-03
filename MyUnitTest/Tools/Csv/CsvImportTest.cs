@@ -17,6 +17,7 @@
 namespace Framework.MyUnitTest.Tools.Csv
 {
     using System;
+    using System.Globalization;
 
     using FluentAssertions;
     using FluentAssertions.Extensions;
@@ -28,6 +29,52 @@ namespace Framework.MyUnitTest.Tools.Csv
 
     public class CsvImportTest
     {
+        #region CsvDateTime
+
+        [Fact]
+        public void DateTest()
+        {
+            var csvImport = new CsvImportBase();
+
+            var testDate = 9.January(2009);
+
+            csvImport.ExcelDate(testDate.ToString("yyyy/MM/dd", CultureInfo.InvariantCulture)).Should().Be(testDate);
+        }
+
+        [Fact]
+        public void TimeTest()
+        {
+            var csvImport = new CsvImportBase();
+
+            var date             = 9.January(2009).AddHours(13).AddMinutes(59).AddSeconds(58);
+            var dateFraction     = date.AddMilliseconds(123);
+            var dateLongFraction = date.AddMilliseconds(12345);
+
+            csvImport.ExcelDateTime(date.ToString("yyyy/MM/dd HH:mm:ss", CultureInfo.InvariantCulture)).Should().Be(date);
+            csvImport.ExcelDateTime(dateFraction.ToString("yyyy/MM/dd HH:mm:ss.fff", CultureInfo.InvariantCulture)).Should().Be(dateFraction);
+            csvImport.ExcelDateTime(dateLongFraction.ToString("yyyy/MM/dd HH:mm:ss.fffff", CultureInfo.InvariantCulture)).Should().Be(dateLongFraction);
+        }
+
+        [Fact]
+        public void DateTimeOverwriteTest()
+        {
+            var csvImport = new CsvImportBase();
+            var format    = "MM/dd/yyyy";
+            csvImport.DateFormat = format;
+
+            var date             = 9.January(2009);
+            var time             = date.AddHours(13).AddMinutes(59).AddSeconds(58);
+            var timeFraction     = time.AddMilliseconds(123);
+            var timeLongFraction = time.AddMilliseconds(12345);
+
+            csvImport.ExcelDate(date.ToString(format, CultureInfo.InvariantCulture)).Should().Be(date);
+            csvImport.ExcelDateTime(time.ToString($"{format} HH:mm:ss", CultureInfo.InvariantCulture)).Should().Be(time);
+            csvImport.ExcelDateTime(timeFraction.ToString($"{format} HH:mm:ss.fff", CultureInfo.InvariantCulture)).Should().Be(timeFraction);
+            csvImport.ExcelDateTime(timeLongFraction.ToString($"{format} HH:mm:ss.fffff", CultureInfo.InvariantCulture)).Should().Be(timeLongFraction);
+        }
+
+        #endregion
+
         #region CsvImport
 
         public class CsvImportClass

@@ -55,7 +55,7 @@ namespace Framework.UnitTest.Repository
             using (var ctx = CreateTestDbContext())
             using (var trans = ctx.UnitOfWork.BeginTransaction())
             {
-                TEntity entityToAdd = createTestEntity();
+                var entityToAdd = createTestEntity();
                 ctx.Repository.Add(entityToAdd);
 
                 await ctx.UnitOfWork.SaveChangesAsync();
@@ -74,7 +74,7 @@ namespace Framework.UnitTest.Repository
             using (var ctx = CreateTestDbContext())
             using (var trans = ctx.UnitOfWork.BeginTransaction())
             {
-                TEntity entity = await ctx.Repository.GetTracking(key);
+                var entity = await ctx.Repository.GetTracking(key);
                 GetEntityKey(entity).Should().Be(key);
                 CompareEntity(createTestEntity(), entity).Should().BeTrue();
                 updateEntity(entity);
@@ -88,7 +88,7 @@ namespace Framework.UnitTest.Repository
             using (var ctx = CreateTestDbContext())
             using (var trans = ctx.UnitOfWork.BeginTransaction())
             {
-                TEntity entity = await ctx.Repository.Get(key);
+                var entity = await ctx.Repository.Get(key);
                 GetEntityKey(entity).Should().Be(key);
                 entityState = GetEntityState(entity);
             }
@@ -113,7 +113,7 @@ namespace Framework.UnitTest.Repository
             using (var ctx = CreateTestDbContext())
             using (var trans = ctx.UnitOfWork.BeginTransaction())
             {
-                TEntity entity = await ctx.Repository.GetTracking(key);
+                var entity = await ctx.Repository.GetTracking(key);
                 GetEntityKey(entity).Should().Be(key);
 
                 var compareEntity = createTestEntity();
@@ -129,7 +129,7 @@ namespace Framework.UnitTest.Repository
 
             using (var ctx = CreateTestDbContext())
             {
-                TEntity entity = await ctx.Repository.GetTracking(key);
+                var entity = await ctx.Repository.GetTracking(key);
                 entity.Should().BeNull();
             }
         }
@@ -145,7 +145,7 @@ namespace Framework.UnitTest.Repository
             using (var ctx = CreateTestDbContext())
             using (var trans = ctx.UnitOfWork.BeginTransaction())
             {
-                IEnumerable<TEntity> entitiesToAdd = createTestEntities();
+                var entitiesToAdd = createTestEntities();
                 ctx.Repository.AddRange(entitiesToAdd);
 
                 await ctx.UnitOfWork.SaveChangesAsync();
@@ -162,9 +162,9 @@ namespace Framework.UnitTest.Repository
             using (var ctx = CreateTestDbContext())
             using (var trans = ctx.UnitOfWork.BeginTransaction())
             {
-                IEnumerable<TEntity> entities        = await ctx.Repository.GetTracking(keys);
-                IEnumerable<TEntity> compareEntities = createTestEntities();
-                for (int i = 0; i < compareEntities.Count(); i++)
+                var entities        = await ctx.Repository.GetTracking(keys);
+                var compareEntities = createTestEntities();
+                for (var i = 0; i < compareEntities.Count(); i++)
                 {
                     GetEntityKey(entities.ElementAt(i)).Should().Be(keys.ElementAt(i));
                     CompareEntity(compareEntities.ElementAt(i), entities.ElementAt(i)).Should().BeTrue();
@@ -180,8 +180,8 @@ namespace Framework.UnitTest.Repository
             using (var ctx = CreateTestDbContext())
             using (var trans = ctx.UnitOfWork.BeginTransaction())
             {
-                IEnumerable<TEntity> entities = await ctx.Repository.Get(keys);
-                for (int i = 0; i < entities.Count(); i++)
+                var entities = await ctx.Repository.Get(keys);
+                for (var i = 0; i < entities.Count(); i++)
                 {
                     GetEntityKey(entities.ElementAt(i)).Should().Be(keys.ElementAt(i));
                 }
@@ -192,12 +192,12 @@ namespace Framework.UnitTest.Repository
             using (var ctx = CreateTestDbContext())
             using (var trans = ctx.UnitOfWork.BeginTransaction())
             {
-                IEnumerable<TEntity> entities = await ctx.Repository.GetTracking(keys);
+                var entities = await ctx.Repository.GetTracking(keys);
 
                 var compareEntities = createTestEntities();
                 updateEntities(compareEntities);
 
-                for (int i = 0; i < compareEntities.Count; i++)
+                for (var i = 0; i < compareEntities.Count; i++)
                 {
                     GetEntityKey(entities.ElementAt(i)).Should().Be(keys.ElementAt(i));
                     CompareEntity(compareEntities.ElementAt(i), entities.ElementAt(i)).Should().BeTrue();
@@ -213,7 +213,7 @@ namespace Framework.UnitTest.Repository
 
             using (var ctx = CreateTestDbContext())
             {
-                IEnumerable<TEntity> entities = await ctx.Repository.GetTracking(keys);
+                var entities = await ctx.Repository.GetTracking(keys);
                 entities.Count().Should().Be(0);
             }
         }
@@ -226,7 +226,7 @@ namespace Framework.UnitTest.Repository
             using (var ctx = CreateTestDbContext())
             using (var trans = ctx.UnitOfWork.BeginTransaction())
             {
-                TEntity entityToAdd = createTestEntity();
+                var entityToAdd = createTestEntity();
                 ctx.Repository.Add(entityToAdd);
 
                 await ctx.UnitOfWork.SaveChangesAsync();
@@ -241,7 +241,7 @@ namespace Framework.UnitTest.Repository
             using (var ctx = CreateTestDbContext())
             using (var trans = ctx.UnitOfWork.BeginTransaction())
             {
-                TEntity entity = await ctx.Repository.GetTracking(key);
+                var entity = await ctx.Repository.GetTracking(key);
                 entity.Should().BeNull();
             }
         }
@@ -250,13 +250,13 @@ namespace Framework.UnitTest.Repository
         {
             // test if entry not exist in DB
 
-            TKey key = GetEntityKey(createTestEntity());
+            var key = GetEntityKey(createTestEntity());
 
             using (var ctx = CreateTestDbContext())
             using (var trans = ctx.UnitOfWork.BeginTransaction())
             {
-                TEntity entityToTest = createTestEntity();
-                var     notFound     = await ctx.Repository.Get(key);
+                var entityToTest = createTestEntity();
+                var notFound     = await ctx.Repository.Get(key);
                 notFound.Should().BeNull();
             }
 
@@ -266,7 +266,7 @@ namespace Framework.UnitTest.Repository
             using (var ctx = CreateTestDbContext())
             using (var trans = ctx.UnitOfWork.BeginTransaction())
             {
-                TEntity entityToAdd = createTestEntity();
+                var entityToAdd = createTestEntity();
                 await ctx.Repository.Store(entityToAdd, key);
 
                 await ctx.UnitOfWork.SaveChangesAsync();
@@ -289,7 +289,7 @@ namespace Framework.UnitTest.Repository
             using (var ctx = CreateTestDbContext())
             using (var trans = ctx.UnitOfWork.BeginTransaction())
             {
-                TEntity entityToUpdate = createTestEntity();
+                var entityToUpdate = createTestEntity();
                 updateEntity(entityToUpdate);
 
                 await ctx.Repository.Store(entityToUpdate, key);
@@ -306,7 +306,7 @@ namespace Framework.UnitTest.Repository
                 var entityInDb = await ctx.Repository.Get(key);
                 entityInDb.Should().NotBeNull();
 
-                TEntity entityToCompare = createTestEntity();
+                var entityToCompare = createTestEntity();
                 updateEntity(entityToCompare);
 
                 CompareEntity(entityToCompare, entityInDb).Should().BeTrue();

@@ -30,15 +30,6 @@ namespace Framework.UnitTest.Repository
             ScriptDir = $"{Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)}\\Repository\\SQL\\";
         }
 
-/*
-        public void InitializeDatabase()
-        {
-            Context = CreateDbContext();
-            Task.Run(() => RestoreTestDb()).Wait();
-
-            Context = null;
-        }
-*/
         public string ScriptDir { get; set; }
 
         private TDbContext Context { get; set; }

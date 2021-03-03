@@ -17,25 +17,35 @@
 namespace Framework.Tools
 {
     using System;
-    using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
-    using System.Threading.Tasks;
+    using System.Reflection;
 
-    public static class ListAsyncExtensions
+    public static class CopyPropertiesExtensions
     {
-        public static async Task<IEnumerable<TResult>> SelectAsync<TSource, TResult>(this IEnumerable<TSource> source, Func<TSource, Task<TResult>> method)
+        public static void CopyProperties<T>(this T dest, T src, params string[] excludeList) where T : class
         {
-            return await Task.WhenAll(source.Select(async s => await method(s)));
+            var objectType = dest.GetType();
+            var propertyInfos = objectType
+                .GetProperties(BindingFlags.Public | BindingFlags.Instance)
+                .Where(p => p.CanRead && p.CanWrite && !excludeList.Contains(p.Name));
+
+            foreach (var propertyInfo in propertyInfos)
+            {
+                if (CanAssign(propertyInfo.PropertyType))
+                {
+                    propertyInfo.SetValue(dest, propertyInfo.GetValue(src));
+                }
+                else
+                {
+                    throw new ArgumentException($@"{propertyInfo.Name}: please exclude this property from assignment");
+                }
+            }
         }
 
-        public static async Task<IEnumerable<TResult>> SelectManyAsync<TSource, TResult>(this IEnumerable<TSource> source, Func<TSource, Task<IEnumerable<TResult>>> method)
+        private static bool CanAssign([NotNull] Type type)
         {
-            return (await Task.WhenAll(source.Select(async s => await method(s)))).SelectMany(s => s);
-        }
-
-        public static async Task<IList<TResult>> SelectManyAsync<TSource, TResult>(this IList<TSource> source, Func<TSource, Task<IList<TResult>>> method)
-        {
-            return (await Task.WhenAll(source.Select(async s => await method(s)))).SelectMany(s => s).ToList();
+            return typeof(IComparable).IsAssignableFrom(type) || type.IsPrimitive || type.IsValueType;
         }
     }
 }

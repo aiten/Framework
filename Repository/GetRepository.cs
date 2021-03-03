@@ -78,7 +78,7 @@ namespace Framework.Repository
 
         protected virtual IQueryable<TEntity> AddOptionalWhere(IQueryable<TEntity> query) => query;
 
-        protected abstract IQueryable<TEntity> AddInclude(IQueryable<TEntity> query);
+        protected virtual IQueryable<TEntity> AddInclude(IQueryable<TEntity> query) => query;
 
         protected virtual IQueryable<TEntity> AddPrimaryWhere(IQueryable<TEntity> query, TKey key)
         {

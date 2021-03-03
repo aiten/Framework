@@ -14,8 +14,6 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-// based on https://www.codeproject.com/Articles/318877/Comparing-the-properties-of-two-objects-via-Reflec
-
 namespace Framework.Tools
 {
     using System;
@@ -24,11 +22,16 @@ namespace Framework.Tools
     using System.Linq;
     using System.Reflection;
 
-    ////////////////////////////////////////////////////////
-
-    public class CompareProperties
+    public static class ComparePropertiesExtensions
     {
-        public static bool AreObjectsPropertiesEqual(object objectA, object objectB, params string[] ignoreList)
+        #region CompareProperties
+
+        public static bool ArePropertiesEqual<T>(this T objectA, T objectB, params string[] ignoreList) where T : class
+        {
+            return AreObjectsPropertiesEqual(objectA, objectB, new HashSet<object>(), ignoreList);
+        }
+
+        public static bool ArePropertiesEqual(object objectA, object objectB, params string[] ignoreList)
         {
             return AreObjectsPropertiesEqual(objectA, objectB, new HashSet<object>(), ignoreList);
         }
@@ -127,7 +130,7 @@ namespace Framework.Tools
 
         private static bool CanDirectlyCompare(Type type)
         {
-            return type != null && (typeof(IComparable).IsAssignableFrom(type) || type.IsPrimitive || type.IsValueType);
+            return type != null && (typeof(IComparable).IsAssignableFrom((Type?)type) || type.IsPrimitive || type.IsValueType);
         }
 
         ////////////////////////////////////////////////////////
@@ -153,5 +156,7 @@ namespace Framework.Tools
 
             return true;
         }
+
+        #endregion
     }
 }

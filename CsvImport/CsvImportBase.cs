@@ -29,6 +29,17 @@ namespace Framework.CsvImport
 
         public Encoding Encoding { get; set; } = Encoding.Default;
 
+        public string DateFormat      { get; set; } = "yyyy/MM/dd";
+        public string TimeFormat      { get; set; } = "HH:mm:ss";
+        public string Fraction3Format { get; set; } = ".fff";
+        public string Fraction5Format { get; set; } = ".fffff";
+
+        public string DateTimeFormat          => GetDateTimeFormat(DateFormat, TimeFormat);
+        public string DateTimeFraction1Format => GetDateTimeFormat(DateFormat, TimeFormat, Fraction3Format);
+        public string DateTimeFraction5Format => GetDateTimeFormat(DateFormat, TimeFormat, Fraction5Format);
+
+        public string GetDateTimeFormat(string dateFormat, string timeFormat, string fractionFormat = null) => $"{dateFormat} {timeFormat}{fractionFormat ?? ""}";
+
         public event EventHandler<IList<string>> ReadFirstLine;
 
         public char ListSeparatorChar { get; set; } = ';';
@@ -49,6 +60,8 @@ namespace Framework.CsvImport
             _nfi.NumberDecimalSeparator = ",";
             _nfi.NumberGroupSeparator   = ".";
         }
+
+        #region read
 
         public IList<IList<string>> ReadStringMatrixFromCsv(string[] lines, bool skipTitleLine)
         {
@@ -170,6 +183,10 @@ namespace Framework.CsvImport
             return columns;
         }
 
+        #endregion
+
+        #region convert
+
         public string ExcelString(string excelField)
         {
             return excelField;
@@ -207,7 +224,7 @@ namespace Framework.CsvImport
 
         public float ExcelFloat(string excelField)
         {
-            return float.Parse(excelField);
+            return float.Parse(excelField, NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint | NumberStyles.AllowThousands, _nfi);
         }
 
         public byte ExcelByte(string excelField)
@@ -240,16 +257,21 @@ namespace Framework.CsvImport
             return double.Parse(excelField, NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint | NumberStyles.AllowThousands, _nfi);
         }
 
-        public DateTime ExcelDateDMY(string excelField)
+        public DateTime ExcelDateOrDateTime(string excelField)
+        {
+            if (excelField.Length > DateFormat.Length)
+            {
+                return ExcelDateTime(excelField, DateFormat, TimeFormat, Fraction3Format, Fraction3Format);
+            }
+
+            return ExcelDate(excelField, DateFormat);
+        }
+
+        public DateTime ExcelDate(string excelField, string format)
         {
             try
             {
-                // Parse date and time with custom specifier.
-                // e.g. string dateString = "19.01.2018";
-                var format   = "dd.MM.yyyy";
-                var provider = CultureInfo.InvariantCulture;
-
-                return DateTime.ParseExact(excelField, format, provider);
+                return DateTime.ParseExact(excelField, format, CultureInfo.InvariantCulture);
             }
             catch (Exception)
             {
@@ -257,31 +279,23 @@ namespace Framework.CsvImport
             }
         }
 
-        public DateTime ExcelDateOrDateTime(string excelField)
+        public DateTime ExcelDate(string excelField)
         {
-            if (excelField.Length > "yyyy/MM/dd".Length)
-            {
-                return ExcelDateTimeYMD(excelField);
-            }
+            return ExcelDate(excelField, DateFormat);
+        }
 
-            return ExcelDateYMD(excelField);
+        public DateTime ExcelDateDMY(string excelField)
+        {
+            // Parse date and time with custom specifier.
+            // e.g. string dateString = "19.01.2018";
+            return ExcelDate(excelField, "dd.MM.yyyy");
         }
 
         public DateTime ExcelDateYMD(string excelField)
         {
-            try
-            {
-                // Parse date and time with custom specifier.
-                // e.g. string dateString = "19.01.2018";
-                var format   = "yyyy/MM/dd";
-                var provider = CultureInfo.InvariantCulture;
-
-                return DateTime.ParseExact(excelField, format, provider);
-            }
-            catch (Exception)
-            {
-                throw;
-            }
+            // Parse date and time with custom specifier.
+            // e.g. string dateString = "19.01.2018";
+            return ExcelDate(excelField, "yyyy/MM/dd");
         }
 
         public object ExcelTimeSpan(string excelField)
@@ -297,24 +311,35 @@ namespace Framework.CsvImport
             }
         }
 
-        public DateTime ExcelDateTimeYMD(string excelField)
+        public DateTime ExcelDateTime(string excelField, string formatDate, string formatTime, string formatFraction3, string formatFraction5)
         {
             try
             {
-                // Parse date and time with custom specifier.
-                // e.g. string dateString = "2017/09/20 00:00:00.000";
+                var fractionFormat = string.Empty;
 
-                var hasFraction = excelField.IndexOf('.') > 0;
-                var format      = hasFraction ? "yyyy/MM/dd HH:mm:ss.fff" : "yyyy/MM/dd HH:mm:ss";
+                var dotIdx = excelField.LastIndexOf('.');
+                if (dotIdx > formatDate.Length)
+                {
+                    var fractionLength = excelField.Length - dotIdx - 1;
+                    fractionFormat = fractionLength == 3 ? formatFraction3 : formatFraction5;
+                }
 
-                var provider = CultureInfo.InvariantCulture;
-
-                return DateTime.ParseExact(excelField, format, provider);
+                return DateTime.ParseExact(excelField, GetDateTimeFormat(formatDate, formatTime, fractionFormat), CultureInfo.InvariantCulture);
             }
             catch (Exception)
             {
                 throw;
             }
+        }
+
+        public DateTime ExcelDateTime(string excelField)
+        {
+            return ExcelDateTime(excelField, DateFormat, TimeFormat, Fraction3Format, Fraction5Format);
+        }
+
+        public DateTime ExcelDateTimeYMD(string excelField)
+        {
+            return ExcelDateTime(excelField, "yyyy/MM/dd", TimeFormat, Fraction3Format, Fraction5Format);
         }
 
         public object ExcelEnum(Type enumType, string excelField)
@@ -379,5 +404,7 @@ namespace Framework.CsvImport
 
             throw new ArgumentException(nameof(ch), $@"'{ch}' is not a hex digit.");
         }
+
+        #endregion
     }
 }

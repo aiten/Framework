@@ -21,9 +21,29 @@ namespace Framework.Tools
     using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
+    using System.Threading.Tasks;
 
     public static class ListExtensions
     {
+        #region Async
+
+        public static async Task<IEnumerable<TResult>> SelectAsync<TSource, TResult>(this IEnumerable<TSource> source, Func<TSource, Task<TResult>> method)
+        {
+            return await Task.WhenAll(source.Select(async s => await method(s)));
+        }
+
+        public static async Task<IEnumerable<TResult>> SelectManyAsync<TSource, TResult>(this IEnumerable<TSource> source, Func<TSource, Task<IEnumerable<TResult>>> method)
+        {
+            return (await Task.WhenAll(source.Select(async s => await method(s)))).SelectMany(s => s);
+        }
+
+        public static async Task<IList<TResult>> SelectManyAsync<TSource, TResult>(this IList<TSource> source, Func<TSource, Task<IList<TResult>>> method)
+        {
+            return (await Task.WhenAll(source.Select(async s => await method(s)))).SelectMany(s => s).ToList();
+        }
+
+        #endregion
+
         public static ICollection<T> ToICollection<T>(this IEnumerable<T> list)
         {
             var collection = list as ICollection<T>;

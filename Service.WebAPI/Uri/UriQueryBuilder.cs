@@ -24,7 +24,7 @@ namespace Framework.Service.WebAPI.Uri
     public class UriQueryBuilder
     {
         private readonly List<Tuple<string, object>> _list = new List<Tuple<string, object>>();
-        private readonly string                      _old  = "";
+        private readonly string                      _old  = string.Empty;
 
         public UriQueryBuilder()
         {

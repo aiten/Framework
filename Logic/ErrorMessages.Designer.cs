@@ -68,5 +68,14 @@ namespace Framework.Logic {
                 return ResourceManager.GetString("Framework.Logic.JoinResultDifferent", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot read object with id = {0}.
+        /// </summary>
+        public static string Framework_Logic_ObjectNotFound {
+            get {
+                return ResourceManager.GetString("Framework.Logic.ObjectNotFound", resourceCulture);
+            }
+        }
     }
 }

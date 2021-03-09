@@ -28,6 +28,8 @@ namespace Framework.Logic
     using Framework.Localization;
     using Framework.Tools;
 
+    using Microsoft.AspNetCore.JsonPatch;
+
     using Repository.Abstraction;
 
     public abstract class CrudManager<T, TKey, TEntity> : GetManager<T, TKey, TEntity>, ICrudManager<T, TKey> where T : class where TEntity : class
@@ -169,6 +171,23 @@ namespace Framework.Logic
             }
 
             await Task.CompletedTask;
+        }
+
+        #endregion
+
+        #region Patch
+
+        public async Task Patch(TKey key, JsonPatchDocument<T> patch)
+        {
+            var value = await Get(key);
+
+            if (value == null)
+            {
+                throw new ArgumentException(ErrorMessages.ResourceManager.ToLocalizable(nameof(ErrorMessages.Framework_Logic_ObjectNotFound), new object[] { key }).Message());
+            }
+
+            patch.ApplyTo(value);
+            await Update(value);
         }
 
         #endregion

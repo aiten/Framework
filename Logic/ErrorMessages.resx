@@ -120,4 +120,7 @@
   <data name="Framework.Logic.JoinResultDifferent" xml:space="preserve">
     <value>Join result is different.</value>
   </data>
+  <data name="Framework.Logic.ObjectNotFound" xml:space="preserve">
+    <value>Cannot read object with id = {0}</value>
+  </data>
 </root>

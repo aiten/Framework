@@ -18,6 +18,8 @@
     <ProjectReference Include="..\Arduino\Arduino.csproj" />
     <ProjectReference Include="..\Dependency\Dependency.csproj" />
     <ProjectReference Include="..\Drawing\Drawing.csproj" />
+    <ProjectReference Include="..\Logic.Abstraction\Logic.Abstraction.csproj" />
+    <ProjectReference Include="..\Logic\Logic.csproj" />
     <ProjectReference Include="..\Parser\Parser.csproj" />
     <ProjectReference Include="..\Tools\Tools.csproj" />
     <ProjectReference Include="..\UnitTest\UnitTest.csproj" />

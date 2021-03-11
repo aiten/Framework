@@ -25,7 +25,27 @@ namespace Framework.CsvImport
 
     public class CsvImport<T> : CsvImportBase where T : new()
     {
-      
+        public class ColumnMapping
+        {
+            public string       ColumnName { get; set; }
+            public PropertyInfo MapTo      { get; set; }
+            public bool         Ignore     { get; set; }
+
+#pragma warning disable CS8632 // The annotation for nullable reference types should only be used in code within a '#nullable' annotations context.
+            public Func<string, object?>  GetValue    { get; set; }
+            public Func<object?, object?> AdjustValue { get; set; }
+            public Action<T, string>      SetValue    { get; set; }
+
+#pragma warning restore CS8632
+
+            public bool IsConfigured => Ignore || MapTo != null || SetValue != null;
+            public bool IsMapped     => !Ignore && MapTo != null;
+            public bool IsSetValue   => !Ignore && SetValue != null;
+        }
+
+        public ICollection<string>         IgnoreColumns { get; set; }
+        public IDictionary<string, string> MapColumns    { get; set; }
+
         public IList<T> Read(string[] csvLines)
         {
             var lines = ReadStringMatrixFromCsv(csvLines, false);
@@ -48,14 +68,11 @@ namespace Framework.CsvImport
         {
             // first line is columnLineHeader!!!!
 
-            var list  = new List<T>();
-            var props = GetPropertyMapping(lines[0]);
-            var first = true;
+            var mapping = GetPropertyMapping(lines[0]);
+            CheckPropertyMapping(mapping);
 
-            if (props.Any(prop => prop == null))
-            {
-                throw new ArgumentException($"Column cannot be mapped: {string.Join(", ", lines[0].Where((p, idx) => props[idx] == null))}");
-            }
+            var list  = new List<T>();
+            var first = true;
 
             foreach (var line in lines)
             {
@@ -65,27 +82,68 @@ namespace Framework.CsvImport
                 }
                 else
                 {
-                    list.Add(Map(line, props));
+                    list.Add(Map(line, mapping));
                 }
             }
 
             return list;
         }
 
-        private PropertyInfo[] GetPropertyMapping(IList<string> columnNames)
+        private void CheckPropertyMapping(ColumnMapping[] mapping)
         {
-            var t = typeof(T);
-            return columnNames.Select(columnName => t.GetProperty(columnName, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance)).ToArray();
+            var notConfigured = mapping.Where(m => !m.IsConfigured).ToList();
+            if (notConfigured.Any())
+            {
+                var columnList = string.Join(", ", notConfigured.Select(m => m.ColumnName));
+                throw new ArgumentException($"Column cannot be mapped: {columnList}");
+            }
+
+            var notCanWrite = mapping.Where(x => x.IsMapped && !x.MapTo.CanWrite).ToList();
+            if (notCanWrite.Any())
+            {
+                var columnList = string.Join(", ", notCanWrite.Select(m => m.ColumnName));
+                throw new ArgumentException($"Column is readonly: {columnList}");
+            }
         }
 
-        private T Map(IList<string> line, IReadOnlyList<PropertyInfo> props)
+        protected virtual ColumnMapping[] GetPropertyMapping(IList<string> columnNames)
+        {
+            return columnNames
+                .Select(GetColumnMapping)
+                .ToArray();
+        }
+
+        public Action<ColumnMapping> ConfigureColumnMapping { get; set; }
+
+        protected virtual ColumnMapping GetColumnMapping(string columnName)
+        {
+            var ignoreColumn = IgnoreColumns?.Contains(columnName) ?? false;
+            var mapToColumn  = (MapColumns?.ContainsKey(columnName) ?? false) ? MapColumns[columnName] : columnName;
+
+            var columnMapping = new ColumnMapping
+            {
+                ColumnName = columnName,
+                Ignore     = ignoreColumn,
+                MapTo      = ignoreColumn ? null : GetPropertyInfo(mapToColumn),
+            };
+
+            ConfigureColumnMapping?.Invoke(columnMapping);
+            return columnMapping;
+        }
+
+        public static PropertyInfo GetPropertyInfo(string columnName)
+        {
+            return typeof(T).GetProperty(columnName, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
+        }
+
+        private T Map(IList<string> line, ColumnMapping[] mapping)
         {
             var newT = new T();
-            var idx  = 0;
 
+            var idx = 0;
             foreach (var column in line)
             {
-                AssignProperty(newT, column, props[idx++]);
+                AssignProperty(newT, column, mapping[idx++]);
             }
 
             return newT;
@@ -104,7 +162,7 @@ namespace Framework.CsvImport
 
                 type = type.GenericTypeArguments[0];
             }
-          
+
             if (type == typeof(string))
             {
                 return ExcelString(valueAsString);
@@ -169,11 +227,27 @@ namespace Framework.CsvImport
             throw new NotImplementedException();
         }
 
-        private void AssignProperty(object obj, string valueAsString, PropertyInfo pi)
+        private void AssignProperty(object obj, string valueAsString, ColumnMapping mapping)
         {
-            if (pi != null && pi.CanWrite)
+            if (mapping.IsSetValue)
             {
-                pi.SetValue(obj, GetValue(valueAsString, pi.PropertyType));
+                mapping.SetValue((T)obj, valueAsString);
+            }
+            else if (mapping.IsMapped)
+            {
+                var mapTo = mapping.MapTo;
+#pragma warning disable 8632
+                object? val = mapping.GetValue != null
+                    ? mapping.GetValue(valueAsString)
+                    : GetValue(valueAsString, mapTo.PropertyType);
+#pragma warning restore 8632
+
+                if (mapping.AdjustValue != null)
+                {
+                    val = mapping.AdjustValue(val);
+                }
+
+                mapTo.SetValue(obj, val);
             }
         }
     }

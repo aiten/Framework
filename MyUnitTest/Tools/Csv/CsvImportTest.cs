@@ -17,6 +17,7 @@
 namespace Framework.MyUnitTest.Tools.Csv
 {
     using System;
+    using System.Collections.Generic;
     using System.Globalization;
 
     using FluentAssertions;
@@ -29,6 +30,296 @@ namespace Framework.MyUnitTest.Tools.Csv
 
     public class CsvImportTest
     {
+        #region ColumnMapping
+
+        public class CsvMappingImportClass
+        {
+            public string    ColString { get; set; }
+            public int?      ColInt    { get; set; }
+            public DateTime? ColDate   { get; set; }
+            public bool?     ColBool   { get; set; }
+        }
+
+        [Fact]
+        public void CsvConfigureColumnMappingTest()
+        {
+            var lines = new[]
+            {
+                "ColNewString;ColInt",
+                "Str;1",
+            };
+
+            var csvImporter = new CsvImport<CsvMappingImportClass>()
+            {
+                ConfigureColumnMapping = (c) =>
+                {
+                    if (c.ColumnName == "ColNewString")
+                    {
+                        c.MapTo = CsvImport<CsvMappingImportClass>.GetPropertyInfo("ColString");
+                    }
+                }
+            };
+            var csvList = csvImporter.Read(lines);
+            csvList.Should().HaveCount(1);
+            csvList.Should().Contain(x => x.ColString == "Str");
+        }
+
+        [Fact]
+        public void CsvColumnMappingTest()
+        {
+            var lines = new[]
+            {
+                "ColNewString;ColInt",
+                "Str;1",
+            };
+
+            var csvImporter = new CsvImport<CsvMappingImportClass>
+            {
+                MapColumns = new Dictionary<string, string>() { { "ColNewString", "ColString" } }
+            };
+            var csvList = csvImporter.Read(lines);
+            csvList.Should().HaveCount(1);
+            csvList.Should().Contain(x => x.ColString == "Str");
+        }
+
+        [Fact]
+        public void CsvIgnoreWithConfigureColumnMappingTest()
+        {
+            var lines = new[]
+            {
+                "ColString;ColInt;ColXXX",
+                "Str;1;0"
+            };
+
+            var csvImporter = new CsvImport<CsvMappingImportClass>()
+            {
+                ConfigureColumnMapping = (c) =>
+                {
+                    if (c.ColumnName == "ColXXX")
+                    {
+                        c.Ignore = true;
+                    }
+                }
+            };
+            var csvList = csvImporter.Read(lines);
+            csvList.Should().HaveCount(1);
+            csvList.Should().Contain(x => x.ColString == "Str");
+        }
+
+        [Fact]
+        public void CsvIgnoreColumnMappingTest()
+        {
+            var lines = new[]
+            {
+                "ColString;ColInt;ColXXX",
+                "Str;1;0"
+            };
+
+            var csvImporter = new CsvImport<CsvMappingImportClass>()
+            {
+                IgnoreColumns = new[] { "ColXXX" }
+            };
+
+            var csvList = csvImporter.Read(lines);
+            csvList.Should().HaveCount(1);
+            csvList.Should().Contain(x => x.ColString == "Str");
+        }
+
+        [Fact]
+        public void CsvGetValueTest()
+        {
+            var lines = new[]
+            {
+                "ColString;ColInt",
+                " Str With Blanks;1",
+            };
+
+            var csvImporter = new CsvImport<CsvMappingImportClass>()
+            {
+                ConfigureColumnMapping = (c) =>
+                {
+                    if (c.ColumnName == "ColString")
+                    {
+                        c.GetValue = (val) => val.Replace(" ", "");
+                    }
+                }
+            };
+
+            var csv = csvImporter.Read(lines);
+            csv.Should().HaveCount(1);
+            csv.Should().Contain(x => x.ColString == "StrWithBlanks");
+        }
+
+        [Fact]
+        public void CsvAdjustValueTest()
+        {
+            var lines = new[]
+            {
+                "ColString;ColInt",
+                " Str;1",
+                " Str;",
+            };
+
+            var csvImporter = new CsvImport<CsvMappingImportClass>()
+            {
+                ConfigureColumnMapping = (c) =>
+                {
+                    if (c.ColumnName == "ColInt")
+                    {
+                        c.AdjustValue = (val) => val == null ? null : (int)val + 100;
+                    }
+                }
+            };
+
+            var csv = csvImporter.Read(lines);
+            csv.Should().HaveCount(2);
+            csv.Should().Contain(x => x.ColInt == 101);
+            csv.Should().Contain(x => !x.ColInt.HasValue);
+        }
+
+        [Fact]
+        public void CsvCustomDateTest()
+        {
+            var lines = new[]
+            {
+                "ColString;ColInt;ColDate",
+                " Str;1;10/2021/03",
+                " Str;1;",
+            };
+
+            var csvImporter = new CsvImport<CsvMappingImportClass>();
+            csvImporter.ConfigureColumnMapping = (c) =>
+            {
+                if (c.ColumnName == "ColDate")
+                {
+                    c.GetValue    = (val) => string.IsNullOrEmpty(val) ? null : csvImporter.ExcelDate(val, "dd/yyyy/MM");
+                    c.AdjustValue = (val) => val == null ? null : ((DateTime)val).AddDays(1);
+                }
+            };
+
+            var csv = csvImporter.Read(lines);
+            csv.Should().HaveCount(2);
+            csv.Should().Contain(x => x.ColDate == 11.March(2021));
+            csv.Should().Contain(x => !x.ColDate.HasValue);
+        }
+
+        [Fact]
+        public void CsvCustomSetValueTest()
+        {
+            var lines = new[]
+            {
+                "ColString;ColInt;ColSetValue",
+                " Str;1;10/2021/03",
+                " Str;2;",
+            };
+
+            var csvImporter = new CsvImport<CsvMappingImportClass>();
+            csvImporter.ConfigureColumnMapping = (c) =>
+            {
+                if (c.ColumnName == "ColSetValue")
+                {
+                    c.SetValue = (obj, str) =>
+                    {
+                        if (!string.IsNullOrEmpty(str))
+                        {
+                            obj.ColDate = csvImporter.ExcelDate(str, "dd/yyyy/MM");
+                            obj.ColBool = obj.ColDate.Value.DayOfWeek == DayOfWeek.Wednesday;
+                        }
+                    };
+                }
+                else if (c.ColumnName == "ColInt")
+                {
+                    // test if SetValue has priority
+                    c.SetValue = (obj, str) =>
+                    {
+                        if (!string.IsNullOrEmpty(str))
+                        {
+                            obj.ColInt = int.Parse(str)*1000;
+                        }
+                    };
+                }
+            };
+
+            var csv = csvImporter.Read(lines);
+            csv.Should().HaveCount(2);
+            csv.Should().Contain(x => x.ColDate == 10.March(2021) && x.ColBool.Value && x.ColInt == 1000);
+            csv.Should().Contain(x => !x.ColDate.HasValue);
+        }
+
+        [Fact]
+        public void CsvForAllStringsTest()
+        {
+            var lines = new[]
+            {
+                "ColString;ColInt",
+                "NULL;1",
+                "Str;1",
+            };
+
+            var csvImporter = new CsvImport<CsvMappingImportClass>
+            {
+                ConfigureColumnMapping = (c) =>
+                {
+                    if (c.MapTo.PropertyType == typeof(string))
+                    {
+                        c.AdjustValue = (val) => val == null || ((string)val) == "NULL" ? null : val;
+                    }
+                }
+            };
+
+            var csv = csvImporter.Read(lines);
+            csv.Should().HaveCount(2);
+            csv.Should().Contain(x => x.ColString == null);
+            csv.Should().Contain(x => x.ColString == "Str");
+            csv.Should().NotContain(x => x.ColString == "NULL");
+        }
+
+        #endregion
+
+        #region ColumnCanWriteMapping
+
+        public class CsvCanWriteImportClass
+        {
+            public string ColString { get; }
+            public int    ColInt    { get; set; }
+        }
+
+        [Fact]
+        public void CsvCanWriteTest()
+        {
+            var lines = new[]
+            {
+                "ColString;ColInt",
+                "Str;1",
+            };
+
+            var csvImporter = new CsvImport<CsvCanWriteImportClass>();
+
+            Action action = () => csvImporter.Read(lines);
+            action.Should().Throw<ArgumentException>()
+                .And.Message.Should().Contain("readonly");
+        }
+
+        [Fact]
+        public void CsvCanWriteWithIgnoreTest()
+        {
+            var lines = new[]
+            {
+                "ColString;ColInt",
+                "Str;1",
+            };
+
+            var csvImporter = new CsvImport<CsvCanWriteImportClass>()
+            {
+                IgnoreColumns = new List<string>() { nameof(CsvCanWriteImportClass.ColString) }
+            };
+
+            var csv = csvImporter.Read(lines);
+            csv.Should().HaveCount(1);
+        }
+
+        #endregion
+
         #region CsvDateTime
 
         [Fact]

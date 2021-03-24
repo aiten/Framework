@@ -17,6 +17,7 @@
 namespace Framework.Tools
 {
     using System;
+    using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Reflection;
@@ -25,27 +26,87 @@ namespace Framework.Tools
     {
         public static void CopyProperties<T>(this T dest, T src, params string[] excludeList) where T : class
         {
-            var objectType = dest.GetType();
-            var propertyInfos = objectType
-                .GetProperties(BindingFlags.Public | BindingFlags.Instance)
-                .Where(p => p.CanRead && p.CanWrite && !excludeList.Contains(p.Name));
+            var propertyInfos = GetCanWriteProperties(dest.GetType(), excludeList);
 
             foreach (var propertyInfo in propertyInfos)
             {
-                if (CanAssign(propertyInfo.PropertyType))
-                {
-                    propertyInfo.SetValue(dest, propertyInfo.GetValue(src));
-                }
-                else
-                {
-                    throw new ArgumentException($@"{propertyInfo.Name}: please exclude this property from assignment");
-                }
+                propertyInfo.SetValue(dest, propertyInfo.GetValue(src));
             }
         }
 
-        private static bool CanAssign([NotNull] Type type)
+        public static IList<PropertyInfo> CopyChangedProperties<T>(this T dest, T src, params string[] excludeList)
         {
-            return typeof(IComparable).IsAssignableFrom(type) || type.IsPrimitive || type.IsValueType;
+            var propertyInfos = GetCanWriteProperties(dest.GetType(), excludeList);
+
+            var assigned = new List<PropertyInfo>();
+
+            foreach (var propertyInfo in propertyInfos)
+            {
+                var currentValue = propertyInfo.GetValue(dest);
+                var newValue     = propertyInfo.GetValue(src);
+                var type         = propertyInfo.PropertyType;
+
+                bool isNullableType = type.IsGenericType && type.Name.StartsWith(@"Nullable");
+
+                if (isNullableType || !type.IsValueType)
+                {
+                    switch ((currentValue == null ? 0 : 1) + (newValue == null ? 0 : 1))
+                    {
+                        case 0: break; // both null => no change
+                        case 1:        // one is null => change
+                            propertyInfo.SetValue(dest, newValue);
+                            assigned.Add(propertyInfo);
+                            break;
+                        case 2:
+
+                            if (AssignValues(isNullableType ? type.GenericTypeArguments[0] : type, propertyInfo, dest, currentValue, newValue))
+                            {
+                                assigned.Add(propertyInfo);
+                            }
+
+                            break;
+                    }
+                }
+                else
+                {
+                    if (AssignValues(type, propertyInfo, dest, currentValue, newValue))
+                    {
+                        assigned.Add(propertyInfo);
+                    }
+                }
+            }
+
+            return assigned;
+        }
+
+        private static IList<PropertyInfo> GetCanWriteProperties(Type type, params string[] excludeList)
+        {
+            return type
+                .GetProperties(BindingFlags.Public | BindingFlags.Instance)
+                .Where(p =>
+                    p.CanRead &&
+                    p.CanWrite &&
+                    (typeof(IComparable).IsAssignableFrom(p.PropertyType) || p.PropertyType.IsPrimitive || p.PropertyType.IsValueType) &&
+                    !excludeList.Contains(p.Name))
+                .ToList();
+        }
+
+        private static bool AssignValues(Type type, PropertyInfo propertyInfo, object dest, object valueDesc, object valueSrc)
+        {
+            if (!typeof(IComparable).IsAssignableFrom(type))
+            {
+                throw new ArgumentException($@"{propertyInfo.Name}: cannot compare property, please exclude this property from assignment");
+            }
+
+            if ((valueDesc as IComparable).CompareTo(valueSrc) == 0)
+            {
+                // no change
+                return false;
+            }
+
+            propertyInfo.SetValue(dest, valueSrc);
+
+            return true;
         }
     }
 }

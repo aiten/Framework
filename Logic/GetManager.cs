@@ -17,6 +17,7 @@
 namespace Framework.Logic
 {
     using System.Collections.Generic;
+    using System.Linq;
     using System.Threading.Tasks;
 
     using Abstraction;
@@ -65,22 +66,20 @@ namespace Framework.Logic
             return await Task.FromResult(dto);
         }
 
-        protected virtual async Task<IEnumerable<T>> SetDto(IEnumerable<T> dtos)
+        protected virtual async Task<IEnumerable<T>> SetDto(IList<T> dtos)
         {
-            var myDtos = dtos.ToICollection();
-
-            foreach (var dto in myDtos)
+            foreach (var dto in dtos)
             {
                 await SetDto(dto);
             }
 
-            return myDtos;
+            return dtos;
         }
 
         protected async Task<IEnumerable<T>> MapToDto(IList<TEntity> entities)
         {
             var dtos = _mapper.Map<IEnumerable<TEntity>, IEnumerable<T>>(entities);
-            return await SetDto(dtos);
+            return await SetDto(dtos.ToList());
         }
 
         protected async Task<T> MapToDto(TEntity entity)

@@ -137,24 +137,17 @@ namespace Framework.Tools
 
         private static bool AreValuesEqual(object valueA, object valueB)
         {
-            var selfValueComparer = valueA as IComparable;
-
-            if (valueA == null && valueB != null || valueA != null && valueB == null)
+            if (((valueA == null ? 0 : 1) + (valueB == null ? 0 : 1)) == 1)
             {
-                return false; // one of the values is null
+                return false; // one (and not more) of the values is null
             }
 
-            if (selfValueComparer != null && selfValueComparer.CompareTo(valueB) != 0)
+            if (valueA is IComparable selfValueComparer)
             {
-                return false; // the comparison using IComparable failed
+                return selfValueComparer.CompareTo(valueB) != 0;
             }
 
-            if (!Equals(valueA, valueB))
-            {
-                return false; // the comparison using Equals failed
-            }
-
-            return true;
+            return Equals(valueA, valueB);
         }
 
         #endregion

@@ -186,8 +186,13 @@ namespace Framework.Logic
                 throw new ArgumentException(ErrorMessages.ResourceManager.ToLocalizable(nameof(ErrorMessages.Framework_Logic_ObjectNotFound), new object[] { key }).Message());
             }
 
-            patch.ApplyTo(value);
+            ApplyToPatch(value, patch);
             await Update(value);
+        }
+
+        protected virtual void ApplyToPatch(T dto, JsonPatchDocument<T> patch)
+        {
+            patch.ApplyTo(dto);
         }
 
         #endregion

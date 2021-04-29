@@ -115,7 +115,7 @@ namespace Framework.Logic
         {
             using (var trans = _unitOfWork.BeginTransaction())
             {
-                var entities = await _repository.GetTracking(keys);
+                var entities = PrepareEntities(await _repository.GetTracking(keys));
 
                 foreach (var entity in entities)
                 {
@@ -146,7 +146,7 @@ namespace Framework.Logic
                 await ValidateDto(myValues, ValidationType.UpdateValidation);
 
                 var entities     = MapFromDtos(myValues, ValidationType.UpdateValidation).ToICollection();
-                var entitiesInDb = await _repository.GetTracking(entities.Select(GetKey));
+                var entitiesInDb = PrepareEntities(await _repository.GetTracking(entities.Select(GetKey)));
 
                 await Update(myValues, entitiesInDb, entities);
                 await CommitTransaction(trans);

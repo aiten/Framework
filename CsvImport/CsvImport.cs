@@ -117,7 +117,7 @@ namespace Framework.CsvImport
 
         protected virtual ColumnMapping GetColumnMapping(string columnName)
         {
-            var ignoreColumn = IgnoreColumns?.Contains(columnName,StringComparer.InvariantCultureIgnoreCase) ?? false;
+            var ignoreColumn = IgnoreColumns?.Contains(columnName, StringComparer.InvariantCultureIgnoreCase) ?? false;
             var mapToColumn  = (MapColumns?.ContainsKey(columnName) ?? false) ? MapColumns[columnName] : columnName;
 
             var columnMapping = new ColumnMapping

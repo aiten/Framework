@@ -26,7 +26,7 @@ namespace Framework.Logic
     public class ModuleInitializer : IModuleInitializer
     {
         public MapperConfiguration MapperConfiguration { get; set; }
-        
+
         public void AddServices(IServiceCollection services)
         {
             MapperConfiguration.AssertConfigurationIsValid();

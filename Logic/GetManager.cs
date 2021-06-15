@@ -43,22 +43,32 @@ namespace Framework.Logic
 
         public async Task<IEnumerable<T>> GetAll()
         {
-            return await MapToDto(await GetAllEntities());
+            return await MapToDto(PrepareEntities(await GetAllEntities()));
         }
 
         public async Task<T> Get(TKey key)
         {
-            return await MapToDto(await _repository.Get(key));
+            return await MapToDto(PrepareEntity(await _repository.Get(key)));
         }
 
         public async Task<IEnumerable<T>> Get(IEnumerable<TKey> keys)
         {
-            return await MapToDto(await _repository.Get(keys));
+            return await MapToDto(PrepareEntities(await _repository.Get(keys)));
         }
 
         protected virtual async Task<IList<TEntity>> GetAllEntities()
         {
             return await _repository.GetAll();
+        }
+
+        protected virtual TEntity PrepareEntity(TEntity entity)
+        {
+            return entity;
+        }
+
+        protected virtual IList<TEntity> PrepareEntities(IList<TEntity> entities)
+        {
+            return entities.Where(entity => PrepareEntity(entity) != null).ToList();
         }
 
         protected virtual async Task<T> SetDto(T dto)

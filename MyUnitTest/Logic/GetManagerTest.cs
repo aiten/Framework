@@ -80,7 +80,7 @@ namespace Framework.MyUnitTest.Logic
         }
 
         private IGetRepository<MyEntity, int> _repository;
-        private IUnitOfWork                           _unitOfWork;
+        private IUnitOfWork                   _unitOfWork;
 
         [Fact]
         public async Task GetAllEmpty()

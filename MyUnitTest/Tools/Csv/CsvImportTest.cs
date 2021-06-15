@@ -234,7 +234,7 @@ namespace Framework.MyUnitTest.Tools.Csv
                     {
                         if (!string.IsNullOrEmpty(str))
                         {
-                            obj.ColInt = int.Parse(str)*1000;
+                            obj.ColInt = int.Parse(str) * 1000;
                         }
                     };
                 }

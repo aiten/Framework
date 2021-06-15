@@ -144,7 +144,7 @@ namespace Framework.Tools
 
             if (valueA is IComparable selfValueComparer)
             {
-                return selfValueComparer.CompareTo(valueB) != 0;
+                return selfValueComparer.CompareTo(valueB) == 0;
             }
 
             return Equals(valueA, valueB);

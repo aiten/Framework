@@ -67,7 +67,7 @@ namespace Framework.UnitTest.Repository
 
             var allWithAdd = await GetAll();
             allWithAdd.Should().NotBeNull();
-            allWithAdd.Count.Should().Be(allWithoutAdd.Count + 1);
+            allWithAdd.Should().HaveCount(allWithoutAdd.Count + 1);
 
             // read again and update 
 
@@ -156,7 +156,7 @@ namespace Framework.UnitTest.Repository
 
             var allWithAdd = await GetAll();
             allWithAdd.Should().NotBeNull();
-            allWithAdd.Count.Should().Be(allWithoutAdd.Count + keys.Count());
+            allWithAdd.Should().HaveCount(allWithoutAdd.Count + keys.Count());
 
             // read again and update 
             using (var ctx = CreateTestDbContext())
@@ -214,7 +214,7 @@ namespace Framework.UnitTest.Repository
             using (var ctx = CreateTestDbContext())
             {
                 var entities = await ctx.Repository.GetTracking(keys);
-                entities.Count().Should().Be(0);
+                entities.Should().HaveCount(0);
             }
         }
 

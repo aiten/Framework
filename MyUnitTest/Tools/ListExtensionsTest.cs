@@ -131,7 +131,7 @@ namespace Framework.MyUnitTest.Tools
             var result = testArray.SplitBefore((e) => e % 2 == 0).ToList();
 
             result.Count.Should().Be(2);
-            result[0].Count().Should().Be(1);
+            result[0].Should().HaveCount(1);
             result[0].ElementAt(0).Should().Be(1);
             result[1].ElementAt(0).Should().Be(2);
         }
@@ -144,7 +144,7 @@ namespace Framework.MyUnitTest.Tools
             var result = testArray.SplitBefore((e) => e % 2 != 0).ToList();
 
             result.Count.Should().Be(1);
-            result[0].Count().Should().Be(2);
+            result[0].Should().HaveCount(2);
             result[0].ElementAt(0).Should().Be(1);
             result[0].ElementAt(1).Should().Be(2);
         }
@@ -190,7 +190,7 @@ namespace Framework.MyUnitTest.Tools
             var result = testArray.SplitAfter((e) => e % 2 != 0).ToList();
 
             result.Count.Should().Be(2);
-            result[0].Count().Should().Be(1);
+            result[0].Should().HaveCount(1);
             result[0].ElementAt(0).Should().Be(1);
             result[1].ElementAt(0).Should().Be(2);
         }
@@ -203,7 +203,7 @@ namespace Framework.MyUnitTest.Tools
             var result = testArray.SplitAfter((e) => e % 2 == 0).ToList();
 
             result.Count.Should().Be(1);
-            result[0].Count().Should().Be(2);
+            result[0].Should().HaveCount(2);
             result[0].ElementAt(0).Should().Be(1);
             result[0].ElementAt(1).Should().Be(2);
         }

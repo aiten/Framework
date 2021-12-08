@@ -36,7 +36,7 @@ namespace Framework.Tools
                 execute();
 
                 _timer = new Timer(
-                    (x) =>
+                    (_) =>
                     {
                         if (_needExecute)
                         {

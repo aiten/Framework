@@ -221,7 +221,7 @@ namespace Framework.MyUnitTest.Tools
         [Fact]
         public void SelectPropertyTest()
         {
-            var testArray = new SelectTest[] { new SelectTest() { Property1 = 1, Property2 = 1.1 }, new SelectTest() { Property1 = 2, Property2 = 2.2 } };
+            var testArray = new [] { new SelectTest() { Property1 = 1, Property2 = 1.1 }, new SelectTest() { Property1 = 2, Property2 = 2.2 } };
 
             var pi1 = typeof(SelectTest).GetProperty("Property1");
             var pi2 = typeof(SelectTest).GetProperty("Property2");

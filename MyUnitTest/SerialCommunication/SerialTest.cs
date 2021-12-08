@@ -174,17 +174,17 @@ namespace Framework.MyUnitTest.SerialCommunication
         private EventCalls SubscribeForEventCall(ISerial serial)
         {
             var eventCounts = new EventCalls();
-            serial.WaitForSend         += (sender, e) => eventCounts.EventWaitForSend++;
-            serial.CommandSending      += (sender, e) => eventCounts.EventCommandSending++;
-            serial.CommandSent         += (sender, e) => eventCounts.EventCommandSent++;
-            serial.WaitCommandSent     += (sender, e) => eventCounts.EventWaitCommandSent++;
-            serial.ReplyReceived       += (sender, e) => eventCounts.EventReplyReceived++;
-            serial.ReplyOk             += (sender, e) => eventCounts.EventReplyOK++;
-            serial.ReplyError          += (sender, e) => eventCounts.EventReplyError++;
-            serial.ReplyInfo           += (sender, e) => eventCounts.EventReplyInfo++;
-            serial.ReplyUnknown        += (sender, e) => eventCounts.EventReplyUnknown++;
-            serial.CommandQueueChanged += (sender, e) => eventCounts.EventCommandQueueChanged++;
-            serial.CommandQueueEmpty   += (sender, e) => eventCounts.EventCommandQueueEmpty++;
+            serial.WaitForSend         += (_, _) => eventCounts.EventWaitForSend++;
+            serial.CommandSending      += (_, _) => eventCounts.EventCommandSending++;
+            serial.CommandSent         += (_, _) => eventCounts.EventCommandSent++;
+            serial.WaitCommandSent     += (_, _) => eventCounts.EventWaitCommandSent++;
+            serial.ReplyReceived       += (_, _) => eventCounts.EventReplyReceived++;
+            serial.ReplyOk             += (_, _) => eventCounts.EventReplyOK++;
+            serial.ReplyError          += (_, _) => eventCounts.EventReplyError++;
+            serial.ReplyInfo           += (_, _) => eventCounts.EventReplyInfo++;
+            serial.ReplyUnknown        += (_, _) => eventCounts.EventReplyUnknown++;
+            serial.CommandQueueChanged += (_, _) => eventCounts.EventCommandQueueChanged++;
+            serial.CommandQueueEmpty   += (_, _) => eventCounts.EventCommandQueueEmpty++;
             return eventCounts;
         }
 

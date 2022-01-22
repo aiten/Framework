@@ -91,7 +91,7 @@ namespace Framework.Wpf.Views
 
                 RoutedEventHandler unloadedEvent = null;
 
-                unloadedEvent = (v, e) =>
+                unloadedEvent = (v, _) =>
                 {
                     vm.CloseAction        =  null;
                     vm.DialogOKAction     =  null;
@@ -117,7 +117,7 @@ namespace Framework.Wpf.Views
             {
                 vm.DefaultInitForBaseViewModel();
 
-                view.Loaded += async (v, e) =>
+                view.Loaded += async (v, _) =>
                 {
                     var vmm = view.DataContext as BaseViewModel;
                     if (vmm != null)

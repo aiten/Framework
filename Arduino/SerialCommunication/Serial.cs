@@ -746,7 +746,15 @@ namespace Framework.Arduino.SerialCommunication
             int readMaxSize = 256;
             var buffer      = new byte[readMaxSize];
 
-            int readSize = await _serialPort.BaseStream.ReadAsync(buffer, 0, readMaxSize, _serialPortCancellationTokenSource.Token);
+            // int readSize = await _serialPort.BaseStream.ReadAsync(buffer, 0, readMaxSize, _serialPortCancellationTokenSource.Token);
+            // above code does not work: after Token.Cancel() not exit of call.
+
+            var readTask = _serialPort.BaseStream.ReadAsync(buffer, 0, readMaxSize, _serialPortCancellationTokenSource.Token);
+            await await Task.WhenAny(
+                readTask,
+                Task.Delay(-1, _serialPortCancellationTokenSource.Token));
+            var readSize = await readTask;
+
             return _serialPort.Encoding.GetString(buffer, 0, readSize);
         }
 

@@ -14,27 +14,26 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.Tools
+namespace Framework.Tools;
+
+using System;
+using System.IO;
+
+public class IOHelper
 {
-    using System;
-    using System.IO;
-
-    public class IOHelper
+    public static bool IsWindows
     {
-        public static bool IsWindows
+        get
         {
-            get
-            {
-                PlatformID id = Environment.OSVersion.Platform;
-                return id == PlatformID.Win32Windows || id == PlatformID.Win32NT; // WinCE not supported
-            }
+            PlatformID id = Environment.OSVersion.Platform;
+            return id == PlatformID.Win32Windows || id == PlatformID.Win32NT; // WinCE not supported
         }
+    }
 
-        public static string ExpandEnvironmentVariables(string fileName)
-        {
-            string pathName = Environment.ExpandEnvironmentVariables(fileName);
-            string fullPath = Path.GetFullPath(pathName);
-            return fullPath;
-        }
+    public static string ExpandEnvironmentVariables(string fileName)
+    {
+        string pathName = Environment.ExpandEnvironmentVariables(fileName);
+        string fullPath = Path.GetFullPath(pathName);
+        return fullPath;
     }
 }

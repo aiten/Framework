@@ -14,49 +14,48 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.Service.WebAPI.Uri
+namespace Framework.Service.WebAPI.Uri;
+
+using System;
+using System.Linq;
+using System.Web;
+
+public static class UriPathExtensions
 {
-    using System;
-    using System.Linq;
-    using System.Web;
-
-    public static class UriPathExtensions
+    public static string ToUriAsQuery(this object val)
     {
-        public static string ToUriAsQuery(this object val)
+        if (val is DateTime dt)
         {
-            if (val is DateTime dt)
+            if (dt.TimeOfDay != TimeSpan.Zero)
             {
-                if (dt.TimeOfDay != TimeSpan.Zero)
-                {
-                    return HttpUtility.UrlEncode(dt.ToString("o"));
-                }
-
-                return dt.ToString("yyyy-MM-dd");
+                return HttpUtility.UrlEncode(dt.ToString("o"));
             }
 
-            Type[] _types =
-            {
-                typeof(string),
-                typeof(int),
-                typeof(uint),
-                typeof(byte),
-                typeof(long),
-                typeof(ulong),
-                typeof(short),
-                typeof(ushort),
-            };
-
-            if (_types.Contains(val.GetType()) == false)
-            {
-                throw new ArgumentException($"{nameof(val)}-{val.GetType().ToString()}: cannot be used for UrlEncode.");
-            }
-
-            return HttpUtility.UrlEncode(val.ToString());
+            return dt.ToString("yyyy-MM-dd");
         }
 
-        public static string ToUriAsPath(this object val)
+        Type[] _types =
         {
-            return val.ToUriAsQuery();
+            typeof(string),
+            typeof(int),
+            typeof(uint),
+            typeof(byte),
+            typeof(long),
+            typeof(ulong),
+            typeof(short),
+            typeof(ushort),
+        };
+
+        if (_types.Contains(val.GetType()) == false)
+        {
+            throw new ArgumentException($"{nameof(val)}-{val.GetType().ToString()}: cannot be used for UrlEncode.");
         }
+
+        return HttpUtility.UrlEncode(val.ToString());
+    }
+
+    public static string ToUriAsPath(this object val)
+    {
+        return val.ToUriAsQuery();
     }
 }

@@ -14,25 +14,24 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.Pattern
+namespace Framework.Pattern;
+
+using Microsoft.Extensions.DependencyInjection;
+
+// Factory/Scope using Resolve of dependencyInjection
+
+public class FactoryResolve<T> : IFactory<T> where T : class
 {
-    using Microsoft.Extensions.DependencyInjection;
+    private readonly IServiceScopeFactory _serviceScopeFactory;
 
-    // Factory/Scope using Resolve of dependencyInjection
-
-    public class FactoryResolve<T> : IFactory<T> where T : class
+    public FactoryResolve(IServiceScopeFactory serviceScopeFactory)
     {
-        private readonly IServiceScopeFactory _serviceScopeFactory;
+        _serviceScopeFactory = serviceScopeFactory;
+    }
 
-        public FactoryResolve(IServiceScopeFactory serviceScopeFactory)
-        {
-            _serviceScopeFactory = serviceScopeFactory;
-        }
-
-        public IScope<T> Create()
-        {
-            var childContainer = _serviceScopeFactory.CreateScope();
-            return new ScopeResolve<T>(childContainer, childContainer.ServiceProvider.GetService<T>());
-        }
+    public IScope<T> Create()
+    {
+        var childContainer = _serviceScopeFactory.CreateScope();
+        return new ScopeResolve<T>(childContainer, childContainer.ServiceProvider.GetService<T>());
     }
 }

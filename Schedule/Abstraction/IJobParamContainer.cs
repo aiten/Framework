@@ -14,10 +14,9 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.Schedule.Abstraction
+namespace Framework.Schedule.Abstraction;
+
+public interface IJobParamContainer
 {
-    public interface IJobParamContainer
-    {
-        object Param { get; set; }
-    }
+    object Param { get; set; }
 }

@@ -14,23 +14,22 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.Tools
+namespace Framework.Tools;
+
+using Framework.Localization.Abstraction;
+using Framework.Startup.Abstraction;
+using Framework.Tools.Abstraction;
+
+using Microsoft.Extensions.DependencyInjection;
+
+public class ModuleInitializer : IModuleInitializer
 {
-    using Framework.Localization.Abstraction;
-    using Framework.Startup.Abstraction;
-    using Framework.Tools.Abstraction;
-
-    using Microsoft.Extensions.DependencyInjection;
-
-    public class ModuleInitializer : IModuleInitializer
+    public void AddServices(IServiceCollection services)
     {
-        public void AddServices(IServiceCollection services)
-        {
-            services.AddTransient<ICurrentDateTime, CurrentDateTime>();
-        }
+        services.AddTransient<ICurrentDateTime, CurrentDateTime>();
+    }
 
-        public void AddTranslationResources(ILocalizationCollector localisation)
-        {
-        }
+    public void AddTranslationResources(ILocalizationCollector localisation)
+    {
     }
 }

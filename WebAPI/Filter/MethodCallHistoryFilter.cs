@@ -14,41 +14,40 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.WebAPI.Filter
+namespace Framework.WebAPI.Filter;
+
+using Framework.WebAPI.Tool;
+
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Filters;
+
+public sealed class MethodCallHistoryFilter : IActionFilter
 {
-    using Framework.WebAPI.Tool;
+    private MethodCallHistory _methodCallHistory;
 
-    using Microsoft.AspNetCore.Http;
-    using Microsoft.AspNetCore.Mvc.Filters;
-
-    public sealed class MethodCallHistoryFilter : IActionFilter
+    public MethodCallHistoryFilter(MethodCallHistory methodCallHistory)
     {
-        private MethodCallHistory _methodCallHistory;
+        _methodCallHistory = methodCallHistory;
+    }
 
-        public MethodCallHistoryFilter(MethodCallHistory methodCallHistory)
+    public void OnActionExecuting(ActionExecutingContext context)
+    {
+    }
+
+    public void OnActionExecuted(ActionExecutedContext context)
+    {
+        string userName = null;
+
+        if (context.Controller is Microsoft.AspNetCore.Mvc.Controller controller)
         {
-            _methodCallHistory = methodCallHistory;
+            userName = controller.User?.Identity?.Name;
         }
 
-        public void OnActionExecuting(ActionExecutingContext context)
-        {
-        }
+        _methodCallHistory.Add(GetCurrentUri(context.HttpContext.Request), userName);
+    }
 
-        public void OnActionExecuted(ActionExecutedContext context)
-        {
-            string userName = null;
-
-            if (context.Controller is Microsoft.AspNetCore.Mvc.Controller controller)
-            {
-                userName = controller.User?.Identity?.Name;
-            }
-
-            _methodCallHistory.Add(GetCurrentUri(context.HttpContext.Request), userName);
-        }
-
-        public string GetCurrentUri(HttpRequest request)
-        {
-            return $"{request.Method} {request.Scheme}://{request.Host}{request.Path}{request.QueryString}";
-        }
+    public string GetCurrentUri(HttpRequest request)
+    {
+        return $"{request.Method} {request.Scheme}://{request.Host}{request.Path}{request.QueryString}";
     }
 }

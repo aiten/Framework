@@ -14,20 +14,19 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.UnitTest.Repository
+namespace Framework.UnitTest.Repository;
+
+using Microsoft.EntityFrameworkCore;
+
+using Xunit;
+
+[Collection("Framework.Repository.UnitTest")]
+public class RepositoryTestBase<TDbContext> : UnitTestBase where TDbContext : DbContext
 {
-    using Microsoft.EntityFrameworkCore;
-
-    using Xunit;
-
-    [Collection("Framework.Repository.UnitTest")]
-    public class RepositoryTestBase<TDbContext> : UnitTestBase where TDbContext : DbContext
+    protected RepositoryTestBase(RepositoryTestFixtureBase<TDbContext> testFixture)
     {
-        protected RepositoryTestBase(RepositoryTestFixtureBase<TDbContext> testFixture)
-        {
-            TestFixture = testFixture;
-        }
-
-        public RepositoryTestFixtureBase<TDbContext> TestFixture { get; }
+        TestFixture = testFixture;
     }
+
+    public RepositoryTestFixtureBase<TDbContext> TestFixture { get; }
 }

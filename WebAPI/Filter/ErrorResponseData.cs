@@ -14,27 +14,26 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.WebAPI.Filter
+namespace Framework.WebAPI.Filter;
+
+using System;
+using System.Text.RegularExpressions;
+
+public sealed class ErrorResponseData
 {
-    using System;
-    using System.Text.RegularExpressions;
-
-    public sealed class ErrorResponseData
+    public ErrorResponseData(string error, object message)
     {
-        public ErrorResponseData(string error, object message)
-        {
-            Error   = error;
-            Message = message;
-        }
-
-        public ErrorResponseData(Exception exception)
-        {
-            Error   = Regex.Replace(exception.GetType().Name, "(Error|Exception)$", string.Empty);
-            Message = exception.Message;
-        }
-
-        public string Error { get; set; }
-
-        public object Message { get; set; }
+        Error   = error;
+        Message = message;
     }
+
+    public ErrorResponseData(Exception exception)
+    {
+        Error   = Regex.Replace(exception.GetType().Name, "(Error|Exception)$", string.Empty);
+        Message = exception.Message;
+    }
+
+    public string Error { get; set; }
+
+    public object Message { get; set; }
 }

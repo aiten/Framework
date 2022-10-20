@@ -14,14 +14,13 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.WebAPI.Controller
+namespace Framework.WebAPI.Controller;
+
+using System.Threading.Tasks;
+
+using Microsoft.AspNetCore.Mvc;
+
+public interface IGetController<T, TId>
 {
-    using System.Threading.Tasks;
-
-    using Microsoft.AspNetCore.Mvc;
-
-    public interface IGetController<T, TId>
-    {
-        Task<ActionResult<T>> Get(TId id);
-    }
+    Task<ActionResult<T>> Get(TId id);
 }

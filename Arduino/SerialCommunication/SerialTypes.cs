@@ -14,19 +14,18 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.Arduino.SerialCommunication
+namespace Framework.Arduino.SerialCommunication;
+
+using System;
+
+public delegate void CommandEventHandler(object sender, SerialEventArgs e);
+
+[Flags]
+public enum EReplyType
 {
-    using System;
-
-    public delegate void CommandEventHandler(object sender, SerialEventArgs e);
-
-    [Flags]
-    public enum EReplyType
-    {
-        NoReply      = 0, // no reply received (other options must not be set)
-        ReplyOk      = 1,
-        ReplyError   = 2,
-        ReplyInfo    = 4,
-        ReplyUnknown = 8
-    }
+    NoReply      = 0, // no reply received (other options must not be set)
+    ReplyOk      = 1,
+    ReplyError   = 2,
+    ReplyInfo    = 4,
+    ReplyUnknown = 8
 }

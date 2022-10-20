@@ -14,86 +14,85 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.Logic
+namespace Framework.Logic;
+
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+
+using Abstraction;
+
+using AutoMapper;
+
+using Repository.Abstraction;
+
+public abstract class GetManager<T, TKey, TEntity> : ManagerBase, IGetManager<T, TKey> where T : class where TEntity : class
 {
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Threading.Tasks;
+    private readonly IMapper                       _mapper;
+    private readonly IGetRepository<TEntity, TKey> _repository;
 
-    using Abstraction;
-
-    using AutoMapper;
-
-    using Repository.Abstraction;
-
-    public abstract class GetManager<T, TKey, TEntity> : ManagerBase, IGetManager<T, TKey> where T : class where TEntity : class
+    protected GetManager(IUnitOfWork unitOfWork, IGetRepository<TEntity, TKey> repository, IMapper mapper)
     {
-        private readonly IMapper                       _mapper;
-        private readonly IGetRepository<TEntity, TKey> _repository;
+        _repository = repository;
+        _mapper     = mapper;
+    }
 
-        protected GetManager(IUnitOfWork unitOfWork, IGetRepository<TEntity, TKey> repository, IMapper mapper)
+    protected abstract TKey GetKey(TEntity entity);
+
+    public async Task<IEnumerable<T>> GetAllAsync()
+    {
+        return await MapToDtoAsync(PrepareEntities(await GetAllEntitiesAsync()));
+    }
+
+    public async Task<T> GetAsync(TKey key)
+    {
+        return await MapToDtoAsync(PrepareEntity(await _repository.GetAsync(key)));
+    }
+
+    public async Task<IEnumerable<T>> GetAsync(IEnumerable<TKey> keys)
+    {
+        return await MapToDtoAsync(PrepareEntities(await _repository.GetAsync(keys)));
+    }
+
+    protected virtual async Task<IList<TEntity>> GetAllEntitiesAsync()
+    {
+        return await _repository.GetAllAsync();
+    }
+
+    protected virtual TEntity PrepareEntity(TEntity entity)
+    {
+        return entity;
+    }
+
+    protected virtual IList<TEntity> PrepareEntities(IList<TEntity> entities)
+    {
+        return entities.Where(entity => PrepareEntity(entity) != null).ToList();
+    }
+
+    protected virtual async Task<T> SetDtoAsync(T dto)
+    {
+        return await Task.FromResult(dto);
+    }
+
+    protected virtual async Task<IEnumerable<T>> SetDtoAsync(IList<T> dtos)
+    {
+        foreach (var dto in dtos)
         {
-            _repository = repository;
-            _mapper     = mapper;
+            await SetDtoAsync(dto);
         }
 
-        protected abstract TKey GetKey(TEntity entity);
+        return dtos;
+    }
 
-        public async Task<IEnumerable<T>> GetAll()
-        {
-            return await MapToDto(PrepareEntities(await GetAllEntities()));
-        }
+    protected async Task<IEnumerable<T>> MapToDtoAsync(IList<TEntity> entities)
+    {
+        var dtos = _mapper.Map<IEnumerable<TEntity>, IEnumerable<T>>(entities);
+        return await SetDtoAsync(dtos.ToList());
+    }
 
-        public async Task<T> Get(TKey key)
-        {
-            return await MapToDto(PrepareEntity(await _repository.Get(key)));
-        }
-
-        public async Task<IEnumerable<T>> Get(IEnumerable<TKey> keys)
-        {
-            return await MapToDto(PrepareEntities(await _repository.Get(keys)));
-        }
-
-        protected virtual async Task<IList<TEntity>> GetAllEntities()
-        {
-            return await _repository.GetAll();
-        }
-
-        protected virtual TEntity PrepareEntity(TEntity entity)
-        {
-            return entity;
-        }
-
-        protected virtual IList<TEntity> PrepareEntities(IList<TEntity> entities)
-        {
-            return entities.Where(entity => PrepareEntity(entity) != null).ToList();
-        }
-
-        protected virtual async Task<T> SetDto(T dto)
-        {
-            return await Task.FromResult(dto);
-        }
-
-        protected virtual async Task<IEnumerable<T>> SetDto(IList<T> dtos)
-        {
-            foreach (var dto in dtos)
-            {
-                await SetDto(dto);
-            }
-
-            return dtos;
-        }
-
-        protected async Task<IEnumerable<T>> MapToDto(IList<TEntity> entities)
-        {
-            var dtos = _mapper.Map<IEnumerable<TEntity>, IEnumerable<T>>(entities);
-            return await SetDto(dtos.ToList());
-        }
-
-        protected async Task<T> MapToDto(TEntity entity)
-        {
-            var dto = _mapper.Map<TEntity, T>(entity);
-            return await SetDto(dto);
-        }
+    protected async Task<T> MapToDtoAsync(TEntity entity)
+    {
+        var dto = _mapper.Map<TEntity, T>(entity);
+        return await SetDtoAsync(dto);
     }
 }

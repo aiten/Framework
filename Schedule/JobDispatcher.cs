@@ -14,96 +14,95 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.Schedule
+namespace Framework.Schedule;
+
+using System;
+using System.Threading;
+using System.Threading.Tasks;
+
+using Framework.Schedule.Abstraction;
+
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+
+internal class JobDispatcher
 {
-    using System;
-    using System.Threading;
-    using System.Threading.Tasks;
+    private readonly IServiceProvider        _serviceProvider;
+    private readonly ILogger                 _logger;
+    private readonly Type                    _job;
+    private readonly string                  _jobName;
+    private readonly Type                    _paramContainer;
+    private readonly object                  _param;
+    private readonly CancellationTokenSource _ctSource;
 
-    using Framework.Schedule.Abstraction;
+    public DateTime? NextExecutionRequest { get; private set; }
 
-    using Microsoft.Extensions.DependencyInjection;
-    using Microsoft.Extensions.Logging;
-
-    internal class JobDispatcher
+    public JobDispatcher(Type job, string jobName, Type paramContainer, object param, CancellationTokenSource ctSource, IServiceProvider serviceProvider, ILogger logger)
     {
-        private readonly IServiceProvider        _serviceProvider;
-        private readonly ILogger                 _logger;
-        private readonly Type                    _job;
-        private readonly string                  _jobName;
-        private readonly Type                    _paramContainer;
-        private readonly object                  _param;
-        private readonly CancellationTokenSource _ctSource;
+        _job             = job;
+        _jobName         = jobName;
+        _paramContainer  = paramContainer;
+        _param           = param;
+        _ctSource        = ctSource;
+        _serviceProvider = serviceProvider;
+        _logger          = logger;
+    }
 
-        public DateTime? NextExecutionRequest { get; private set; }
-
-        public JobDispatcher(Type job, string jobName, Type paramContainer, object param, CancellationTokenSource ctSource, IServiceProvider serviceProvider, ILogger logger)
+    public async Task Run()
+    {
+        try
         {
-            _job             = job;
-            _jobName         = jobName;
-            _paramContainer  = paramContainer;
-            _param           = param;
-            _ctSource        = ctSource;
-            _serviceProvider = serviceProvider;
-            _logger          = logger;
-        }
-
-        public async Task Run()
-        {
-            try
+            using (var scope = _serviceProvider.CreateScope())
             {
-                using (var scope = _serviceProvider.CreateScope())
+                if (_paramContainer != null)
                 {
-                    if (_paramContainer != null)
-                    {
-                        var jobStateObj = (IJobParamContainer)scope.ServiceProvider.GetRequiredService(_paramContainer);
-                        jobStateObj.Param = _param;
-                    }
-
-                    var job = (IJob)scope.ServiceProvider.GetRequiredService(_job);
-
-                    job.JobName = _jobName;
-                    job.Param   = _param;
-                    job.CToken  = _ctSource.Token;
-
-                    await Run(job);
+                    var jobStateObj = (IJobParamContainer)scope.ServiceProvider.GetRequiredService(_paramContainer);
+                    jobStateObj.Param = _param;
                 }
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, $"Unhandled exception by job: {_jobName}.");
-            }
-        }
 
-        protected async Task Run(IJob job)
-        {
-            await job.SetContext();
+                var job = (IJob)scope.ServiceProvider.GetRequiredService(_job);
 
-            if (job is ISupervisedJob supervisedJob)
-            {
-                await RunSupervised(supervisedJob);
-            }
-            else
-            {
-                await job.Execute();
-            }
+                job.JobName = _jobName;
+                job.Param   = _param;
+                job.CToken  = _ctSource.Token;
 
-            if (job is ISelfScheduledJob timedJob)
-            {
-                NextExecutionRequest = await timedJob.GetNextExecutionTime();
+                await Run(job);
             }
         }
-
-        protected async Task RunSupervised(ISupervisedJob supervisedJob)
+        catch (Exception e)
         {
-            var wasExecutedAlready = await supervisedJob.IsAlreadyExecuted();
+            _logger.LogError(e, $"Unhandled exception by job: {_jobName}.");
+        }
+    }
 
-            if (!wasExecutedAlready)
-            {
-                await supervisedJob.Execute();
+    protected async Task Run(IJob job)
+    {
+        await job.SetContextAsync();
 
-                await supervisedJob.SetAsExecuted();
-            }
+        if (job is ISupervisedJob supervisedJob)
+        {
+            await RunSupervised(supervisedJob);
+        }
+        else
+        {
+            await job.ExecuteAsync();
+        }
+
+        if (job is ISelfScheduledJob timedJob)
+        {
+            NextExecutionRequest = await timedJob.GetNextExecutionTime();
+        }
+    }
+
+    protected async Task RunSupervised(ISupervisedJob supervisedJob)
+    {
+        var wasExecutedAlready = await supervisedJob.IsAlreadyExecutedAsync();
+
+        if (!wasExecutedAlready)
+        {
+            await supervisedJob.ExecuteAsync();
+
+            await supervisedJob.SetAsExecutedAsync();
         }
     }
 }

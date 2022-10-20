@@ -14,43 +14,42 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.Pattern
+namespace Framework.Pattern;
+
+using System;
+
+public sealed class ScopeDispose<T> : IScope<T>, IDisposable where T : class, IDisposable
 {
-    using System;
+    private readonly T _instance;
 
-    public sealed class ScopeDispose<T> : IScope<T>, IDisposable where T : class, IDisposable
+    private bool _isDisposed;
+
+    public ScopeDispose(T instance)
     {
-        private readonly T _instance;
+        _instance = instance;
+    }
 
-        private bool _isDisposed;
-
-        public ScopeDispose(T instance)
-        {
-            _instance = instance;
-        }
-
-        public T Instance
-        {
-            get
-            {
-                if (_isDisposed)
-                {
-                    throw new ObjectDisposedException("this", "Dispose must not be called twice.");
-                }
-
-                return _instance;
-            }
-        }
-
-        public void Dispose()
+    public T Instance
+    {
+        get
         {
             if (_isDisposed)
             {
-                return;
+                throw new ObjectDisposedException("this", "Dispose must not be called twice.");
             }
 
-            _isDisposed = true;
-            _instance.Dispose();
+            return _instance;
         }
+    }
+
+    public void Dispose()
+    {
+        if (_isDisposed)
+        {
+            return;
+        }
+
+        _isDisposed = true;
+        _instance.Dispose();
     }
 }

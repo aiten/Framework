@@ -14,30 +14,29 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.Repository
+namespace Framework.Repository;
+
+using System.Linq;
+
+using Microsoft.EntityFrameworkCore;
+
+public abstract class QueryRepository<TDbContext, TEntity> : RepositoryBase<TDbContext>
+    where TDbContext : DbContext where TEntity : class
 {
-    using System.Linq;
-
-    using Microsoft.EntityFrameworkCore;
-
-    public abstract class QueryRepository<TDbContext, TEntity> : RepositoryBase<TDbContext>
-        where TDbContext : DbContext where TEntity : class
+    protected QueryRepository(TDbContext dbContext)
+        : base(dbContext)
     {
-        protected QueryRepository(TDbContext dbContext)
-            : base(dbContext)
-        {
-        }
-
-        /// <summary>
-        /// Gets an IQueryable of the default entity of the DA with AsNoTracking set. This should be the default.
-        /// </summary>
-        /// <returns>Queryable with AsNoTracking() set</returns>
-        protected IQueryable<TEntity> Query => Query<TEntity>();
-
-        /// <summary>
-        /// Gets an IQueryable of the default entity of the DA that has tracking enabled.
-        /// </summary>
-        /// <returns>Queryable with tracking enabled</returns>
-        protected IQueryable<TEntity> TrackingQuery => TrackingQuery<TEntity>();
     }
+
+    /// <summary>
+    /// Gets an IQueryable of the default entity of the DA with AsNoTracking set. This should be the default.
+    /// </summary>
+    /// <returns>Queryable with AsNoTracking() set</returns>
+    protected IQueryable<TEntity> Query => Query<TEntity>();
+
+    /// <summary>
+    /// Gets an IQueryable of the default entity of the DA that has tracking enabled.
+    /// </summary>
+    /// <returns>Queryable with tracking enabled</returns>
+    protected IQueryable<TEntity> TrackingQuery => TrackingQuery<TEntity>();
 }

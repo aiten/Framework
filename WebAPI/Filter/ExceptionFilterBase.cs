@@ -14,52 +14,51 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.WebAPI.Filter
+namespace Framework.WebAPI.Filter;
+
+using System;
+using System.Net;
+
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.Extensions.Logging;
+
+public abstract class ExceptionFilterBase : ActionContextLoggerProvider, IExceptionFilter
 {
-    using System;
-    using System.Net;
-
-    using Microsoft.AspNetCore.Mvc;
-    using Microsoft.AspNetCore.Mvc.Filters;
-    using Microsoft.Extensions.Logging;
-
-    public abstract class ExceptionFilterBase : ActionContextLoggerProvider, IExceptionFilter
+    protected ExceptionFilterBase(ILoggerFactory loggerFactory) : base(loggerFactory)
     {
-        protected ExceptionFilterBase(ILoggerFactory loggerFactory) : base(loggerFactory)
-        {
-        }
+    }
 
-        public void OnException(ExceptionContext context)
+    public void OnException(ExceptionContext context)
+    {
+        if (context.Exception != null && !context.ExceptionHandled)
         {
-            if (context.Exception != null && !context.ExceptionHandled)
+            var response = GetResponse(context);
+            if (response.HasValue)
             {
-                var response = GetResponse(context);
-                if (response.HasValue)
+                context.ExceptionHandled = true;
+                var errorResponseData = new ErrorResponseData(context.Exception);
+                var jsonResult = new JsonResult(errorResponseData)
                 {
-                    context.ExceptionHandled = true;
-                    var errorResponseData = new ErrorResponseData(context.Exception);
-                    var jsonResult = new JsonResult(errorResponseData)
-                    {
-                        StatusCode = (int)response.Value.StatusCode
-                    };
-                    context.Result = jsonResult;
-                }
+                    StatusCode = (int)response.Value.StatusCode
+                };
+                context.Result = jsonResult;
             }
         }
+    }
 
-        protected abstract ExceptionResponse? GetResponse(ExceptionContext exceptionContext);
+    protected abstract ExceptionResponse? GetResponse(ExceptionContext exceptionContext);
 
-        protected readonly struct ExceptionResponse
+    protected readonly struct ExceptionResponse
+    {
+        public ExceptionResponse(HttpStatusCode statusCode, Exception exception)
         {
-            public ExceptionResponse(HttpStatusCode statusCode, Exception exception)
-            {
-                StatusCode = statusCode;
-                Exception  = exception;
-            }
-
-            public HttpStatusCode StatusCode { get; }
-
-            public Exception Exception { get; }
+            StatusCode = statusCode;
+            Exception  = exception;
         }
+
+        public HttpStatusCode StatusCode { get; }
+
+        public Exception Exception { get; }
     }
 }

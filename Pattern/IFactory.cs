@@ -14,17 +14,16 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.Pattern
+namespace Framework.Pattern;
+
+using System;
+
+public interface IScope<T> : IDisposable where T : class
 {
-    using System;
+    T Instance { get; }
+}
 
-    public interface IScope<T> : IDisposable where T : class
-    {
-        T Instance { get; }
-    }
-
-    public interface IFactory<T> where T : class
-    {
-        IScope<T> Create();
-    }
+public interface IFactory<T> where T : class
+{
+    IScope<T> Create();
 }

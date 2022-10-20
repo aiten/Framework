@@ -14,28 +14,27 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.Wpf.Helpers
+namespace Framework.Wpf.Helpers;
+
+using System;
+using System.Linq.Expressions;
+using System.Windows.Input;
+
+public class DelegateCommand : Prism.Commands.DelegateCommand
 {
-    using System;
-    using System.Linq.Expressions;
-    using System.Windows.Input;
-
-    public class DelegateCommand : Prism.Commands.DelegateCommand
+    public override event EventHandler CanExecuteChanged
     {
-        public override event EventHandler CanExecuteChanged
-        {
-            add => CommandManager.RequerySuggested += value;
-            remove => CommandManager.RequerySuggested -= value;
-        }
+        add => CommandManager.RequerySuggested += value;
+        remove => CommandManager.RequerySuggested -= value;
+    }
 
-        public DelegateCommand(Action command, Func<bool> canExecute) : base(command, canExecute)
-        {
-        }
+    public DelegateCommand(Action command, Func<bool> canExecute) : base(command, canExecute)
+    {
+    }
 
-        public new DelegateCommand ObservesProperty<T>(Expression<Func<T>> propertyExpression)
-        {
-            base.ObservesProperty(propertyExpression);
-            return this;
-        }
+    public new DelegateCommand ObservesProperty<T>(Expression<Func<T>> propertyExpression)
+    {
+        base.ObservesProperty(propertyExpression);
+        return this;
     }
 }

@@ -14,37 +14,36 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.WebAPI.Host
+namespace Framework.WebAPI.Host;
+
+using System;
+using System.IO;
+using System.Reflection;
+
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Hosting.WindowsServices;
+
+using NLog;
+
+public static class ProgramUtilities
 {
-    using System;
-    using System.IO;
-    using System.Reflection;
+    private static string BaseDirectory => Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
-    using Microsoft.Extensions.Hosting;
-    using Microsoft.Extensions.Hosting.WindowsServices;
-
-    using NLog;
-
-    public static class ProgramUtilities
+    public static void StartWebService(string[] args, Func<string[], IHostBuilder> buildHost)
     {
-        private static string BaseDirectory => Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-
-        public static void StartWebService(string[] args, Func<string[], IHostBuilder> buildHost)
+        if (WindowsServiceHelpers.IsWindowsService())
         {
-            if (WindowsServiceHelpers.IsWindowsService())
-            {
-                // only set CurrentDirectory in service
-                // otherwise debugging of angular doesn't work any more
-                // spa.Options.SourcePath = @"ClientApp";
+            // only set CurrentDirectory in service
+            // otherwise debugging of angular doesn't work any more
+            // spa.Options.SourcePath = @"ClientApp";
 
-                Environment.CurrentDirectory = BaseDirectory;
-            }
-
-            var host = buildHost(args);
-            host.UseWindowsService();
-
-            host.Build().Run();
-            LogManager.Shutdown();
+            Environment.CurrentDirectory = BaseDirectory;
         }
+
+        var host = buildHost(args);
+        host.UseWindowsService();
+
+        host.Build().Run();
+        LogManager.Shutdown();
     }
 }

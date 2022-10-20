@@ -14,17 +14,16 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.UnitTest.Repository
+namespace Framework.UnitTest.Repository;
+
+using Framework.Repository.Abstraction;
+
+using Microsoft.EntityFrameworkCore;
+
+public class QueryTestDbContext<TDbContext, TEntity, TIRepository> : TestDbContext<TDbContext, TIRepository>
+    where TEntity : class where TIRepository : IQueryRepository<TEntity> where TDbContext : DbContext
 {
-    using Framework.Repository.Abstraction;
-
-    using Microsoft.EntityFrameworkCore;
-
-    public class QueryTestDbContext<TDbContext, TEntity, TIRepository> : TestDbContext<TDbContext, TIRepository>
-        where TEntity : class where TIRepository : IQueryRepository<TEntity> where TDbContext : DbContext
+    public QueryTestDbContext(TDbContext dbContext, IUnitOfWork uow, TIRepository repository) : base(dbContext, uow, repository)
     {
-        public QueryTestDbContext(TDbContext dbContext, IUnitOfWork uow, TIRepository repository) : base(dbContext, uow, repository)
-        {
-        }
     }
 }

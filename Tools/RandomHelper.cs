@@ -14,68 +14,68 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.Tools
+namespace Framework.Tools;
+
+using System;
+using System.Text;
+
+public static class RandomHelper
 {
-    using System;
-    using System.Text;
+    private static readonly Random _randomSeed = new Random();
 
-    public static class RandomHelper
+    /// <summary>
+    /// Generates a random string with the given length
+    /// </summary>
+    /// <param name="size">Size of the string</param>
+    /// <param name="lowerCase">If true, generate lowercase string</param>
+    /// <returns>Random string</returns>
+    public static string RandomString(int size, bool lowerCase)
     {
-        private static readonly Random _randomSeed = new Random();
+        // StringBuilder is faster than using strings (+=)
+        var randStr = new StringBuilder(size);
 
-        /// <summary>
-        /// Generates a random string with the given length
-        /// </summary>
-        /// <param name="size">Size of the string</param>
-        /// <param name="lowerCase">If true, generate lowercase string</param>
-        /// <returns>Random string</returns>
-        public static string RandomString(int size, bool lowerCase)
+        // Ascii start position (65 = A / 97 = a)
+        int start = lowerCase ? 97 : 65;
+
+        // Add random chars
+        for (var i = 0; i < size; i++)
         {
-            // StringBuilder is faster than using strings (+=)
-            var randStr = new StringBuilder(size);
-
-            // Ascii start position (65 = A / 97 = a)
-            int start = lowerCase ? 97 : 65;
-
-            // Add random chars
-            for (var i = 0; i < size; i++)
-            {
-                randStr.Append((char)(26 * _randomSeed.NextDouble() + start));
-            }
-
-            return randStr.ToString();
+            randStr.Append((char)(26 * _randomSeed.NextDouble() + start));
         }
 
-        public static int RandomInt(int min, int max)
-        {
-            return _randomSeed.Next(min, max);
-        }
+        return randStr.ToString();
+    }
 
-        public static double RandomDouble()
-        {
-            return _randomSeed.NextDouble();
-        }
+    public static int RandomInt(int min, int max)
+    {
+        return _randomSeed.Next(min, max);
+    }
 
-        public static double RandomNumber(int min, int max, int digits)
-        {
-            return Math.Round(_randomSeed.Next(min, max - 1) + _randomSeed.NextDouble(), digits);
-        }
+    public static double RandomDouble()
+    {
+        return _randomSeed.NextDouble();
+    }
 
-        public static bool RandomBool()
-        {
-            return _randomSeed.NextDouble() > 0.5;
-        }
+    public static double RandomNumber(int min, int max, int digits)
+    {
+        return Math.Round(_randomSeed.Next(min, max - 1) + _randomSeed.NextDouble(), digits);
+    }
 
-        public static DateTime RandomDate()
-        {
-            return RandomDate(new DateTime(1900, 1, 1), DateTime.Now);
-        }
+    public static bool RandomBool()
+    {
+        return _randomSeed.NextDouble() > 0.5;
+    }
 
-        public static DateTime RandomDate(DateTime from, DateTime to)
-        {
-            var range = new TimeSpan(to.Ticks - from.Ticks);
-            return from + new TimeSpan((long)(range.Ticks * _randomSeed.NextDouble()));
-        }
+    public static DateTime RandomDate()
+    {
+        return RandomDate(new DateTime(1900, 1, 1), DateTime.Now);
+    }
+
+    public static DateTime RandomDate(DateTime from, DateTime to)
+    {
+        var range = new TimeSpan(to.Ticks - from.Ticks);
+        return from + new TimeSpan((long)(range.Ticks * _randomSeed.NextDouble()));
+    }
 
 /*
         public static Color RandomColor()
@@ -83,5 +83,4 @@ namespace Framework.Tools
             return Color.FromRgb((byte)RandomSeed.Next(255), (byte)RandomSeed.Next(255), (byte)RandomSeed.Next(255));
         }
 */
-    }
 }

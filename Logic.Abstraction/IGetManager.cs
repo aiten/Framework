@@ -14,16 +14,15 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.Logic.Abstraction
+namespace Framework.Logic.Abstraction;
+
+using System.Collections.Generic;
+using System.Threading.Tasks;
+
+public interface IGetManager<T, in TId> : IManager where T : class
 {
-    using System.Collections.Generic;
-    using System.Threading.Tasks;
+    Task<T> GetAsync(TId id);
 
-    public interface IGetManager<T, in TId> : IManager where T : class
-    {
-        Task<T> Get(TId id);
-
-        Task<IEnumerable<T>> Get(IEnumerable<TId> keys);
-        Task<IEnumerable<T>> GetAll();
-    }
+    Task<IEnumerable<T>> GetAsync(IEnumerable<TId> keys);
+    Task<IEnumerable<T>> GetAllAsync();
 }

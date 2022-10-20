@@ -14,308 +14,307 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.UnitTest.Repository
+namespace Framework.UnitTest.Repository;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+
+using FluentAssertions;
+
+using Framework.Repository;
+using Framework.Repository.Abstraction;
+
+using Microsoft.EntityFrameworkCore;
+
+public class CrudRepositoryTests<TDbContext, TEntity, TKey, TIRepository> : GetRepositoryTests<TDbContext, TEntity, TKey, TIRepository>
+    where TEntity : class where TIRepository : ICrudRepository<TEntity, TKey> where TDbContext : DbContext
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Threading.Tasks;
-
-    using FluentAssertions;
-
-    using Framework.Repository;
-    using Framework.Repository.Abstraction;
-
-    using Microsoft.EntityFrameworkCore;
-
-    public class CrudRepositoryTests<TDbContext, TEntity, TKey, TIRepository> : GetRepositoryTests<TDbContext, TEntity, TKey, TIRepository>
-        where TEntity : class where TIRepository : ICrudRepository<TEntity, TKey> where TDbContext : DbContext
+    public async Task<TEntity> GetTrackingOK(TKey key)
     {
-        public async Task<TEntity> GetTrackingOK(TKey key)
+        using (var ctx = CreateTestDbContext())
         {
-            using (var ctx = CreateTestDbContext())
+            var entity = await ctx.Repository.GetTrackingAsync(key);
+            entity.Should().NotBeNull();
+            entity.Should().BeOfType(typeof(TEntity));
+            return entity;
+        }
+    }
+
+    public async Task AddUpdateDelete(Func<TEntity> createTestEntity, Action<TEntity> updateEntity)
+    {
+        var allWithoutAdd = await GetAll();
+        allWithoutAdd.Should().NotBeNull();
+
+        // first add entity
+
+        TKey   key;
+        object entityState;
+
+        using (var ctx = CreateTestDbContext())
+        using (var trans = ctx.UnitOfWork.BeginTransaction())
+        {
+            var entityToAdd = createTestEntity();
+            ctx.Repository.Add(entityToAdd);
+
+            await ctx.UnitOfWork.SaveChangesAsync();
+            await trans.CommitTransactionAsync();
+
+            key         = GetEntityKey(entityToAdd);
+            entityState = GetEntityState(entityToAdd);
+        }
+
+        var allWithAdd = await GetAll();
+        allWithAdd.Should().NotBeNull();
+        allWithAdd.Should().HaveCount(allWithoutAdd.Count + 1);
+
+        // read again and update 
+
+        using (var ctx = CreateTestDbContext())
+        using (var trans = ctx.UnitOfWork.BeginTransaction())
+        {
+            var entity = await ctx.Repository.GetTrackingAsync(key);
+            GetEntityKey(entity).Should().Be(key);
+            CompareEntity(createTestEntity(), entity).Should().BeTrue();
+            updateEntity(entity);
+
+            await ctx.UnitOfWork.SaveChangesAsync();
+            await trans.CommitTransactionAsync();
+        }
+
+        // read again
+
+        using (var ctx = CreateTestDbContext())
+        using (var trans = ctx.UnitOfWork.BeginTransaction())
+        {
+            var entity = await ctx.Repository.GetAsync(key);
+            GetEntityKey(entity).Should().Be(key);
+            entityState = GetEntityState(entity);
+        }
+
+        // update (with method update)
+
+        using (var ctx = CreateTestDbContext())
+        using (var trans = ctx.UnitOfWork.BeginTransaction())
+        {
+            var entity = createTestEntity();
+            SetEntityKey(entity, key);
+            SetEntityState(entity, entityState);
+
+            await ctx.Repository.UpdateAsync(key, entity);
+
+            await ctx.UnitOfWork.SaveChangesAsync();
+            await trans.CommitTransactionAsync();
+        }
+
+        // read again and delete 
+
+        using (var ctx = CreateTestDbContext())
+        using (var trans = ctx.UnitOfWork.BeginTransaction())
+        {
+            var entity = await ctx.Repository.GetTrackingAsync(key);
+            GetEntityKey(entity).Should().Be(key);
+
+            var compareEntity = createTestEntity();
+            CompareEntity(compareEntity, entity).Should().BeTrue();
+
+            ctx.Repository.Delete(entity);
+
+            await ctx.UnitOfWork.SaveChangesAsync();
+            await trans.CommitTransactionAsync();
+        }
+
+        // read again to test is not exist
+
+        using (var ctx = CreateTestDbContext())
+        {
+            var entity = await ctx.Repository.GetTrackingAsync(key);
+            entity.Should().BeNull();
+        }
+    }
+
+    public async Task AddUpdateDeleteBulk(Func<ICollection<TEntity>> createTestEntities, Action<IEnumerable<TEntity>> updateEntities)
+    {
+        var allWithoutAdd = await GetAll();
+        allWithoutAdd.Should().NotBeNull();
+
+        // first add entity
+
+        IEnumerable<TKey> keys;
+        using (var ctx = CreateTestDbContext())
+        using (var trans = ctx.UnitOfWork.BeginTransaction())
+        {
+            var entitiesToAdd = createTestEntities();
+            ctx.Repository.AddRange(entitiesToAdd);
+
+            await ctx.UnitOfWork.SaveChangesAsync();
+            await trans.CommitTransactionAsync();
+
+            keys = entitiesToAdd.Select(GetEntityKey).ToList();
+        }
+
+        var allWithAdd = await GetAll();
+        allWithAdd.Should().NotBeNull();
+        allWithAdd.Should().HaveCount(allWithoutAdd.Count + keys.Count());
+
+        // read again and update 
+        using (var ctx = CreateTestDbContext())
+        using (var trans = ctx.UnitOfWork.BeginTransaction())
+        {
+            var entities        = await ctx.Repository.GetTrackingAsync(keys);
+            var compareEntities = createTestEntities();
+            for (var i = 0; i < compareEntities.Count(); i++)
             {
-                var entity = await ctx.Repository.GetTracking(key);
-                entity.Should().NotBeNull();
-                entity.Should().BeOfType(typeof(TEntity));
-                return entity;
+                GetEntityKey(entities.ElementAt(i)).Should().Be(keys.ElementAt(i));
+                CompareEntity(compareEntities.ElementAt(i), entities.ElementAt(i)).Should().BeTrue();
+            }
+
+            updateEntities(entities);
+
+            await ctx.UnitOfWork.SaveChangesAsync();
+            await trans.CommitTransactionAsync();
+        }
+
+        // read again
+        using (var ctx = CreateTestDbContext())
+        using (var trans = ctx.UnitOfWork.BeginTransaction())
+        {
+            var entities = await ctx.Repository.GetAsync(keys);
+            for (var i = 0; i < entities.Count(); i++)
+            {
+                GetEntityKey(entities.ElementAt(i)).Should().Be(keys.ElementAt(i));
             }
         }
 
-        public async Task AddUpdateDelete(Func<TEntity> createTestEntity, Action<TEntity> updateEntity)
+        // read again and delete 
+
+        using (var ctx = CreateTestDbContext())
+        using (var trans = ctx.UnitOfWork.BeginTransaction())
         {
-            var allWithoutAdd = await GetAll();
-            allWithoutAdd.Should().NotBeNull();
+            var entities = await ctx.Repository.GetTrackingAsync(keys);
 
-            // first add entity
+            var compareEntities = createTestEntities();
+            updateEntities(compareEntities);
 
-            TKey   key;
-            object entityState;
-
-            using (var ctx = CreateTestDbContext())
-            using (var trans = ctx.UnitOfWork.BeginTransaction())
+            for (var i = 0; i < compareEntities.Count; i++)
             {
-                var entityToAdd = createTestEntity();
-                ctx.Repository.Add(entityToAdd);
-
-                await ctx.UnitOfWork.SaveChangesAsync();
-                await trans.CommitTransactionAsync();
-
-                key         = GetEntityKey(entityToAdd);
-                entityState = GetEntityState(entityToAdd);
+                GetEntityKey(entities.ElementAt(i)).Should().Be(keys.ElementAt(i));
+                CompareEntity(compareEntities.ElementAt(i), entities.ElementAt(i)).Should().BeTrue();
             }
 
-            var allWithAdd = await GetAll();
-            allWithAdd.Should().NotBeNull();
-            allWithAdd.Should().HaveCount(allWithoutAdd.Count + 1);
+            ctx.Repository.DeleteRange(entities);
 
-            // read again and update 
-
-            using (var ctx = CreateTestDbContext())
-            using (var trans = ctx.UnitOfWork.BeginTransaction())
-            {
-                var entity = await ctx.Repository.GetTracking(key);
-                GetEntityKey(entity).Should().Be(key);
-                CompareEntity(createTestEntity(), entity).Should().BeTrue();
-                updateEntity(entity);
-
-                await ctx.UnitOfWork.SaveChangesAsync();
-                await trans.CommitTransactionAsync();
-            }
-
-            // read again
-
-            using (var ctx = CreateTestDbContext())
-            using (var trans = ctx.UnitOfWork.BeginTransaction())
-            {
-                var entity = await ctx.Repository.Get(key);
-                GetEntityKey(entity).Should().Be(key);
-                entityState = GetEntityState(entity);
-            }
-
-            // update (with method update)
-
-            using (var ctx = CreateTestDbContext())
-            using (var trans = ctx.UnitOfWork.BeginTransaction())
-            {
-                var entity = createTestEntity();
-                SetEntityKey(entity, key);
-                SetEntityState(entity, entityState);
-
-                await ctx.Repository.Update(key, entity);
-
-                await ctx.UnitOfWork.SaveChangesAsync();
-                await trans.CommitTransactionAsync();
-            }
-
-            // read again and delete 
-
-            using (var ctx = CreateTestDbContext())
-            using (var trans = ctx.UnitOfWork.BeginTransaction())
-            {
-                var entity = await ctx.Repository.GetTracking(key);
-                GetEntityKey(entity).Should().Be(key);
-
-                var compareEntity = createTestEntity();
-                CompareEntity(compareEntity, entity).Should().BeTrue();
-
-                ctx.Repository.Delete(entity);
-
-                await ctx.UnitOfWork.SaveChangesAsync();
-                await trans.CommitTransactionAsync();
-            }
-
-            // read again to test is not exist
-
-            using (var ctx = CreateTestDbContext())
-            {
-                var entity = await ctx.Repository.GetTracking(key);
-                entity.Should().BeNull();
-            }
+            await ctx.UnitOfWork.SaveChangesAsync();
+            await trans.CommitTransactionAsync();
         }
 
-        public async Task AddUpdateDeleteBulk(Func<ICollection<TEntity>> createTestEntities, Action<IEnumerable<TEntity>> updateEntities)
+        // read again to test if not exist
+
+        using (var ctx = CreateTestDbContext())
         {
-            var allWithoutAdd = await GetAll();
-            allWithoutAdd.Should().NotBeNull();
+            var entities = await ctx.Repository.GetTrackingAsync(keys);
+            entities.Should().HaveCount(0);
+        }
+    }
 
-            // first add entity
+    public async Task AddRollBack(Func<TEntity> createTestEntity)
+    {
+        // first add entity
 
-            IEnumerable<TKey> keys;
-            using (var ctx = CreateTestDbContext())
-            using (var trans = ctx.UnitOfWork.BeginTransaction())
-            {
-                var entitiesToAdd = createTestEntities();
-                ctx.Repository.AddRange(entitiesToAdd);
+        TKey key;
+        using (var ctx = CreateTestDbContext())
+        using (var trans = ctx.UnitOfWork.BeginTransaction())
+        {
+            var entityToAdd = createTestEntity();
+            ctx.Repository.Add(entityToAdd);
 
-                await ctx.UnitOfWork.SaveChangesAsync();
-                await trans.CommitTransactionAsync();
+            await ctx.UnitOfWork.SaveChangesAsync();
 
-                keys = entitiesToAdd.Select(GetEntityKey).ToList();
-            }
+            // await trans.CommitTransactionAsync(); => no commit => Rollback
 
-            var allWithAdd = await GetAll();
-            allWithAdd.Should().NotBeNull();
-            allWithAdd.Should().HaveCount(allWithoutAdd.Count + keys.Count());
-
-            // read again and update 
-            using (var ctx = CreateTestDbContext())
-            using (var trans = ctx.UnitOfWork.BeginTransaction())
-            {
-                var entities        = await ctx.Repository.GetTracking(keys);
-                var compareEntities = createTestEntities();
-                for (var i = 0; i < compareEntities.Count(); i++)
-                {
-                    GetEntityKey(entities.ElementAt(i)).Should().Be(keys.ElementAt(i));
-                    CompareEntity(compareEntities.ElementAt(i), entities.ElementAt(i)).Should().BeTrue();
-                }
-
-                updateEntities(entities);
-
-                await ctx.UnitOfWork.SaveChangesAsync();
-                await trans.CommitTransactionAsync();
-            }
-
-            // read again
-            using (var ctx = CreateTestDbContext())
-            using (var trans = ctx.UnitOfWork.BeginTransaction())
-            {
-                var entities = await ctx.Repository.Get(keys);
-                for (var i = 0; i < entities.Count(); i++)
-                {
-                    GetEntityKey(entities.ElementAt(i)).Should().Be(keys.ElementAt(i));
-                }
-            }
-
-            // read again and delete 
-
-            using (var ctx = CreateTestDbContext())
-            using (var trans = ctx.UnitOfWork.BeginTransaction())
-            {
-                var entities = await ctx.Repository.GetTracking(keys);
-
-                var compareEntities = createTestEntities();
-                updateEntities(compareEntities);
-
-                for (var i = 0; i < compareEntities.Count; i++)
-                {
-                    GetEntityKey(entities.ElementAt(i)).Should().Be(keys.ElementAt(i));
-                    CompareEntity(compareEntities.ElementAt(i), entities.ElementAt(i)).Should().BeTrue();
-                }
-
-                ctx.Repository.DeleteRange(entities);
-
-                await ctx.UnitOfWork.SaveChangesAsync();
-                await trans.CommitTransactionAsync();
-            }
-
-            // read again to test if not exist
-
-            using (var ctx = CreateTestDbContext())
-            {
-                var entities = await ctx.Repository.GetTracking(keys);
-                entities.Should().HaveCount(0);
-            }
+            key = GetEntityKey(entityToAdd);
         }
 
-        public async Task AddRollBack(Func<TEntity> createTestEntity)
+        // read again to test is not exist
+
+        using (var ctx = CreateTestDbContext())
+        using (var trans = ctx.UnitOfWork.BeginTransaction())
         {
-            // first add entity
+            var entity = await ctx.Repository.GetTrackingAsync(key);
+            entity.Should().BeNull();
+        }
+    }
 
-            TKey key;
-            using (var ctx = CreateTestDbContext())
-            using (var trans = ctx.UnitOfWork.BeginTransaction())
-            {
-                var entityToAdd = createTestEntity();
-                ctx.Repository.Add(entityToAdd);
+    public async Task Store(Func<TEntity> createTestEntity, Action<TEntity> updateEntity)
+    {
+        // test if entry not exist in DB
 
-                await ctx.UnitOfWork.SaveChangesAsync();
+        var key = GetEntityKey(createTestEntity());
 
-                // await trans.CommitTransactionAsync(); => no commit => Rollback
-
-                key = GetEntityKey(entityToAdd);
-            }
-
-            // read again to test is not exist
-
-            using (var ctx = CreateTestDbContext())
-            using (var trans = ctx.UnitOfWork.BeginTransaction())
-            {
-                var entity = await ctx.Repository.GetTracking(key);
-                entity.Should().BeNull();
-            }
+        using (var ctx = CreateTestDbContext())
+        using (var trans = ctx.UnitOfWork.BeginTransaction())
+        {
+            var entityToTest = createTestEntity();
+            var notFound     = await ctx.Repository.GetAsync(key);
+            notFound.Should().BeNull();
         }
 
-        public async Task Store(Func<TEntity> createTestEntity, Action<TEntity> updateEntity)
+        // first add entity
+        // only useful if key is no identity
+
+        using (var ctx = CreateTestDbContext())
+        using (var trans = ctx.UnitOfWork.BeginTransaction())
         {
-            // test if entry not exist in DB
+            var entityToAdd = createTestEntity();
+            await ctx.Repository.StoreAsync(entityToAdd, key);
 
-            var key = GetEntityKey(createTestEntity());
+            await ctx.UnitOfWork.SaveChangesAsync();
+            await trans.CommitTransactionAsync();
+        }
 
-            using (var ctx = CreateTestDbContext())
-            using (var trans = ctx.UnitOfWork.BeginTransaction())
-            {
-                var entityToTest = createTestEntity();
-                var notFound     = await ctx.Repository.Get(key);
-                notFound.Should().BeNull();
-            }
+        // Read and UpdateAsync Entity
+        // only useful if key is no identity
 
-            // first add entity
-            // only useful if key is no identity
+        using (var ctx = CreateTestDbContext())
+        using (var trans = ctx.UnitOfWork.BeginTransaction())
+        {
+            var entityInDb = await ctx.Repository.GetAsync(key);
+            entityInDb.Should().NotBeNull();
+            CompareEntity(createTestEntity(), entityInDb).Should().BeTrue();
+        }
 
-            using (var ctx = CreateTestDbContext())
-            using (var trans = ctx.UnitOfWork.BeginTransaction())
-            {
-                var entityToAdd = createTestEntity();
-                await ctx.Repository.Store(entityToAdd, key);
+        // modify existing
 
-                await ctx.UnitOfWork.SaveChangesAsync();
-                await trans.CommitTransactionAsync();
-            }
+        using (var ctx = CreateTestDbContext())
+        using (var trans = ctx.UnitOfWork.BeginTransaction())
+        {
+            var entityToUpdate = createTestEntity();
+            updateEntity(entityToUpdate);
 
-            // Read and Update Entity
-            // only useful if key is no identity
+            await ctx.Repository.StoreAsync(entityToUpdate, key);
 
-            using (var ctx = CreateTestDbContext())
-            using (var trans = ctx.UnitOfWork.BeginTransaction())
-            {
-                var entityInDb = await ctx.Repository.Get(key);
-                entityInDb.Should().NotBeNull();
-                CompareEntity(createTestEntity(), entityInDb).Should().BeTrue();
-            }
+            await ctx.UnitOfWork.SaveChangesAsync();
+            await trans.CommitTransactionAsync();
+        }
 
-            // modify existing
+        // read again (modified)
 
-            using (var ctx = CreateTestDbContext())
-            using (var trans = ctx.UnitOfWork.BeginTransaction())
-            {
-                var entityToUpdate = createTestEntity();
-                updateEntity(entityToUpdate);
+        using (var ctx = CreateTestDbContext())
+        using (var trans = ctx.UnitOfWork.BeginTransaction())
+        {
+            var entityInDb = await ctx.Repository.GetAsync(key);
+            entityInDb.Should().NotBeNull();
 
-                await ctx.Repository.Store(entityToUpdate, key);
+            var entityToCompare = createTestEntity();
+            updateEntity(entityToCompare);
 
-                await ctx.UnitOfWork.SaveChangesAsync();
-                await trans.CommitTransactionAsync();
-            }
+            CompareEntity(entityToCompare, entityInDb).Should().BeTrue();
 
-            // read again (modified)
+            ctx.Repository.Delete(entityInDb);
 
-            using (var ctx = CreateTestDbContext())
-            using (var trans = ctx.UnitOfWork.BeginTransaction())
-            {
-                var entityInDb = await ctx.Repository.Get(key);
-                entityInDb.Should().NotBeNull();
-
-                var entityToCompare = createTestEntity();
-                updateEntity(entityToCompare);
-
-                CompareEntity(entityToCompare, entityInDb).Should().BeTrue();
-
-                ctx.Repository.Delete(entityInDb);
-
-                await ctx.UnitOfWork.SaveChangesAsync();
-                await trans.CommitTransactionAsync();
-            }
+            await ctx.UnitOfWork.SaveChangesAsync();
+            await trans.CommitTransactionAsync();
         }
     }
 }

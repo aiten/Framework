@@ -14,29 +14,28 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.Logic
+namespace Framework.Logic;
+
+using AutoMapper;
+
+using Framework.Localization.Abstraction;
+using Framework.Startup.Abstraction;
+
+using Microsoft.Extensions.DependencyInjection;
+
+public class ModuleInitializer : IModuleInitializer
 {
-    using AutoMapper;
+    public MapperConfiguration MapperConfiguration { get; set; }
 
-    using Framework.Localization.Abstraction;
-    using Framework.Startup.Abstraction;
-
-    using Microsoft.Extensions.DependencyInjection;
-
-    public class ModuleInitializer : IModuleInitializer
+    public void AddServices(IServiceCollection services)
     {
-        public MapperConfiguration MapperConfiguration { get; set; }
+        MapperConfiguration.AssertConfigurationIsValid();
 
-        public void AddServices(IServiceCollection services)
-        {
-            MapperConfiguration.AssertConfigurationIsValid();
+        IMapper mapper = MapperConfiguration.CreateMapper();
+        services.AddSingleton(mapper);
+    }
 
-            IMapper mapper = MapperConfiguration.CreateMapper();
-            services.AddSingleton(mapper);
-        }
-
-        public void AddTranslationResources(ILocalizationCollector localisation)
-        {
-        }
+    public void AddTranslationResources(ILocalizationCollector localisation)
+    {
     }
 }

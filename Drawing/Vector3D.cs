@@ -14,12 +14,11 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.Drawing
-{
-    public class Vector3D
-    {
-        public Point3D From { get; set; }
+namespace Framework.Drawing;
 
-        public Point3D To { get; set; }
-    }
+public class Vector3D
+{
+    public Point3D From { get; set; }
+
+    public Point3D To { get; set; }
 }

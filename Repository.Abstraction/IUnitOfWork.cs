@@ -14,21 +14,20 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.Repository.Abstraction
+namespace Framework.Repository.Abstraction;
+
+using System.Threading.Tasks;
+
+public interface IUnitOfWork
 {
-    using System.Threading.Tasks;
+    Task<int> SaveChangesAsync();
 
-    public interface IUnitOfWork
-    {
-        Task<int> SaveChangesAsync();
+    // SQL Commands
 
-        // SQL Commands
+    Task<int> ExecuteSqlCommandAsync(string sql);
+    Task<int> ExecuteSqlCommandAsync(string sql, params object[] parameters);
 
-        Task<int> ExecuteSqlCommand(string sql);
-        Task<int> ExecuteSqlCommand(string sql, params object[] parameters);
+    // Transaction
 
-        // Transaction
-
-        ITransaction BeginTransaction();
-    }
+    ITransaction BeginTransaction();
 }

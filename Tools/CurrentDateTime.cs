@@ -14,16 +14,15 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.Tools
+namespace Framework.Tools;
+
+using System;
+
+using Abstraction;
+
+public class CurrentDateTime : ICurrentDateTime
 {
-    using System;
+    public DateTime Now => DateTime.Now;
 
-    using Abstraction;
-
-    public class CurrentDateTime : ICurrentDateTime
-    {
-        public DateTime Now => DateTime.Now;
-
-        public DateTime Today => DateTime.Today;
-    }
+    public DateTime Today => DateTime.Today;
 }

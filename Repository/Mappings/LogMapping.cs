@@ -14,34 +14,33 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.Repository.Mappings
+namespace Framework.Repository.Mappings;
+
+using Framework.Repository.Abstraction.Entities;
+
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
+public static class LogMapping
 {
-    using Framework.Repository.Abstraction.Entities;
-
-    using Microsoft.EntityFrameworkCore;
-    using Microsoft.EntityFrameworkCore.Metadata.Builders;
-
-    public static class LogMapping
+    public static void Map(this EntityTypeBuilder<Log> entity)
     {
-        public static void Map(this EntityTypeBuilder<Log> entity)
-        {
-            entity.ToTable("Log");
+        entity.ToTable("Log");
 
-            entity.HasKey(m => m.Id);
+        entity.HasKey(m => m.Id);
 
-            entity.Property(l => l.Application).IsRequired().IsUnicode().HasMaxLength(50);
-            entity.Property(l => l.Level).IsRequired().IsUnicode().HasMaxLength(50);
-            entity.Property(l => l.Message).IsRequired().IsUnicode();
-            entity.Property(l => l.UserName).IsUnicode().HasMaxLength(250);
-            entity.Property(l => l.MachineName).IsUnicode().HasMaxLength(64);
-            entity.Property(l => l.ServerName).IsUnicode().HasMaxLength(64);
-            entity.Property(l => l.Port).IsUnicode().HasMaxLength(256);
-            entity.Property(l => l.Url).IsUnicode().HasMaxLength(500);
-            entity.Property(l => l.ServerAddress).IsUnicode().HasMaxLength(100);
-            entity.Property(l => l.RemoteAddress).IsUnicode().HasMaxLength(100);
-            entity.Property(l => l.Logger).IsUnicode().HasMaxLength(250);
-            entity.Property(l => l.StackTrace).IsUnicode();
-            entity.Property(l => l.Exception).IsUnicode();
-        }
+        entity.Property(l => l.Application).IsRequired().IsUnicode().HasMaxLength(50);
+        entity.Property(l => l.Level).IsRequired().IsUnicode().HasMaxLength(50);
+        entity.Property(l => l.Message).IsRequired().IsUnicode();
+        entity.Property(l => l.UserName).IsUnicode().HasMaxLength(250);
+        entity.Property(l => l.MachineName).IsUnicode().HasMaxLength(64);
+        entity.Property(l => l.ServerName).IsUnicode().HasMaxLength(64);
+        entity.Property(l => l.Port).IsUnicode().HasMaxLength(256);
+        entity.Property(l => l.Url).IsUnicode().HasMaxLength(500);
+        entity.Property(l => l.ServerAddress).IsUnicode().HasMaxLength(100);
+        entity.Property(l => l.RemoteAddress).IsUnicode().HasMaxLength(100);
+        entity.Property(l => l.Logger).IsUnicode().HasMaxLength(250);
+        entity.Property(l => l.StackTrace).IsUnicode();
+        entity.Property(l => l.Exception).IsUnicode();
     }
 }

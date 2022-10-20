@@ -14,83 +14,82 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.Service.WebAPI
+namespace Framework.Service.WebAPI;
+
+using System.Collections.Generic;
+using System.Net;
+using System.Net.Http;
+using System.Threading.Tasks;
+
+using Framework.Pattern;
+using Framework.Service.WebAPI.Uri;
+
+public abstract class ServiceBase : DisposeWrapper
 {
-    using System.Collections.Generic;
-    using System.Net;
-    using System.Net.Http;
-    using System.Threading.Tasks;
+    public string BaseApi { get; set; }
 
-    using Framework.Pattern;
-    using Framework.Service.WebAPI.Uri;
+    protected abstract IScope<HttpClient> CreateScope();
 
-    public abstract class ServiceBase : DisposeWrapper
+    #region Read / GetAsync
+
+    public async Task<IList<T>> ReadList<T>(string uri)
     {
-        public string BaseApi { get; set; }
-
-        protected abstract IScope<HttpClient> CreateScope();
-
-        #region Read / Get
-
-        public async Task<IList<T>> ReadList<T>(string uri)
+        using (var scope = CreateScope())
         {
-            using (var scope = CreateScope())
-            {
-                var response = await scope.Instance.GetAsync(uri);
-                response.EnsureSuccessStatusCode();
-                return await response.Content.ReadAsAsync<IList<T>>();
-            }
-        }
-
-        public async Task<IList<T>> ReadList<T>(UriPathBuilder pathBuilder)
-        {
-            return await ReadList<T>(pathBuilder.Build());
-        }
-
-        public async Task<T> Read<T>(string uri)
-        {
-            using (var scope = CreateScope())
-            {
-                return await Read<T>(await scope.Instance.GetAsync(uri));
-            }
-        }
-
-        public async Task<T> Read<T>(UriPathBuilder pathBuilder)
-        {
-            return await Read<T>(pathBuilder.Build());
-        }
-
-        public async Task<string> ReadString(UriPathBuilder pathBuilder)
-        {
-            return await ReadString(pathBuilder.Build());
-        }
-
-        public async Task<string> ReadString(string uri)
-        {
-            using (var scope = CreateScope())
-            {
-                var response = await scope.Instance.GetAsync(uri);
-                response.EnsureSuccessStatusCode();
-                return await response.Content.ReadAsStringAsync();
-            }
-        }
-
-        protected async Task<T> Read<T>(HttpResponseMessage response)
-        {
-            if (response.StatusCode == HttpStatusCode.NotFound)
-            {
-                return default(T);
-            }
-
+            var response = await scope.Instance.GetAsync(uri);
             response.EnsureSuccessStatusCode();
-            return await response.Content.ReadAsAsync<T>();
+            return await response.Content.ReadAsAsync<IList<T>>();
         }
+    }
 
-        #endregion
+    public async Task<IList<T>> ReadList<T>(UriPathBuilder pathBuilder)
+    {
+        return await ReadList<T>(pathBuilder.Build());
+    }
 
-        public UriPathBuilder CreatePathBuilder()
+    public async Task<T> Read<T>(string uri)
+    {
+        using (var scope = CreateScope())
         {
-            return new UriPathBuilder().AddPath(BaseApi);
+            return await Read<T>(await scope.Instance.GetAsync(uri));
         }
+    }
+
+    public async Task<T> Read<T>(UriPathBuilder pathBuilder)
+    {
+        return await Read<T>(pathBuilder.Build());
+    }
+
+    public async Task<string> ReadString(UriPathBuilder pathBuilder)
+    {
+        return await ReadString(pathBuilder.Build());
+    }
+
+    public async Task<string> ReadString(string uri)
+    {
+        using (var scope = CreateScope())
+        {
+            var response = await scope.Instance.GetAsync(uri);
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadAsStringAsync();
+        }
+    }
+
+    protected async Task<T> Read<T>(HttpResponseMessage response)
+    {
+        if (response.StatusCode == HttpStatusCode.NotFound)
+        {
+            return default(T);
+        }
+
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadAsAsync<T>();
+    }
+
+    #endregion
+
+    public UriPathBuilder CreatePathBuilder()
+    {
+        return new UriPathBuilder().AddPath(BaseApi);
     }
 }

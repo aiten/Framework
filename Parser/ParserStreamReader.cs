@@ -14,54 +14,53 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.Parser
+namespace Framework.Parser;
+
+public class ParserStreamReader
 {
-    public class ParserStreamReader
+    #region privat properties/members
+
+    string _line;
+    int    _idx;
+
+    #endregion
+
+    public string Line
     {
-        #region privat properties/members
-
-        string _line;
-        int    _idx;
-
-        #endregion
-
-        public string Line
+        set
         {
-            set
-            {
-                _line = value;
-                _idx  = 0;
-            }
-            get => _line.Substring(_idx);
+            _line = value;
+            _idx  = 0;
+        }
+        get => _line.Substring(_idx);
+    }
+
+    public char NextChar        => IsEOF() ? ((char)0) : _line[_idx];
+    public char NextCharToUpper => char.ToUpper(NextChar);
+    public char NextButOneChar  => _idx + 1 >= _line.Length ? ((char)0) : _line[_idx + 1];
+
+    public int PushPosition()
+    {
+        return _idx;
+    }
+
+    public void PopPosition(int idx)
+    {
+        _idx = idx;
+    }
+
+    public char Next()
+    {
+        if (!IsEOF())
+        {
+            _idx++;
         }
 
-        public char NextChar        => IsEOF() ? ((char)0) : _line[_idx];
-        public char NextCharToUpper => char.ToUpper(NextChar);
-        public char NextButOneChar  => _idx + 1 >= _line.Length ? ((char)0) : _line[_idx + 1];
+        return NextChar;
+    }
 
-        public int PushPosition()
-        {
-            return _idx;
-        }
-
-        public void PopPosition(int idx)
-        {
-            _idx = idx;
-        }
-
-        public char Next()
-        {
-            if (!IsEOF())
-            {
-                _idx++;
-            }
-
-            return NextChar;
-        }
-
-        public bool IsEOF()
-        {
-            return _line.Length <= _idx;
-        }
+    public bool IsEOF()
+    {
+        return _line.Length <= _idx;
     }
 }

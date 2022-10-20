@@ -14,79 +14,78 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.MyUnitTest.Drawing
+namespace Framework.MyUnitTest.Drawing;
+
+using FluentAssertions;
+
+using Framework.Drawing;
+
+using Xunit;
+
+public class Polygon2DTest
 {
-    using FluentAssertions;
-
-    using Framework.Drawing;
-
-    using Xunit;
-
-    public class Polygon2DTest
+    private static Polygon2D CreateClosedPolygon()
     {
-        private static Polygon2D CreateClosedPolygon()
+        return new Polygon2D
         {
-            return new Polygon2D
+            Points = new[]
             {
-                Points = new[]
-                {
-                    new Point2D { X = 0, Y = 0 }, new Point2D { X = 100, Y = 0 }, new Point2D { X = 100, Y = 100 }, new Point2D { X = 0, Y = 100 }, new Point2D { X = 0, Y = 0 }
-                }
-            };
-        }
+                new Point2D { X = 0, Y = 0 }, new Point2D { X = 100, Y = 0 }, new Point2D { X = 100, Y = 100 }, new Point2D { X = 0, Y = 100 }, new Point2D { X = 0, Y = 0 }
+            }
+        };
+    }
 
-        private static Polygon2D CreateOpenPolygon()
+    private static Polygon2D CreateOpenPolygon()
+    {
+        return new Polygon2D
         {
-            return new Polygon2D
+            Points = new[]
             {
-                Points = new[]
-                {
-                    new Point2D { X = 0, Y = 0 }, new Point2D { X = 100, Y = 0 }, new Point2D { X = 100, Y = 100 }, new Point2D { X = 0, Y = 100 }
-                }
-            };
-        }
+                new Point2D { X = 0, Y = 0 }, new Point2D { X = 100, Y = 0 }, new Point2D { X = 100, Y = 100 }, new Point2D { X = 0, Y = 100 }
+            }
+        };
+    }
 
-        [Fact]
-        public void PointInPolygon()
-        {
-            Polygon2D polygon = CreateClosedPolygon();
-            polygon.IsPointInPolygon(new Point2D { X = 50, Y = 50 }).Should().Be(true);
-        }
+    [Fact]
+    public void PointInPolygon()
+    {
+        Polygon2D polygon = CreateClosedPolygon();
+        polygon.IsPointInPolygon(new Point2D { X = 50, Y = 50 }).Should().Be(true);
+    }
 
-        [Fact]
-        public void PointInPolygonOnLine()
-        {
-            Polygon2D polygon = CreateClosedPolygon();
-            polygon.IsPointInPolygon(new Point2D { X = 100, Y = 2 }).Should().Be(true, "point on line is in polygon");
-        }
+    [Fact]
+    public void PointInPolygonOnLine()
+    {
+        Polygon2D polygon = CreateClosedPolygon();
+        polygon.IsPointInPolygon(new Point2D { X = 100, Y = 2 }).Should().Be(true, "point on line is in polygon");
+    }
 
-        [Fact]
-        public void PointNotInPolygon()
-        {
-            Polygon2D polygon = CreateClosedPolygon();
-            polygon.IsPointInPolygon(new Point2D { X = 1, Y     = 100.5 }).Should().Be(false);
-            polygon.IsPointInPolygon(new Point2D { X = 100.5, Y = 1 }).Should().Be(false);
-            polygon.IsPointInPolygon(new Point2D { X = -0.5, Y  = 1 }).Should().Be(false);
-            polygon.IsPointInPolygon(new Point2D { X = 1, Y     = -0.5 }).Should().Be(false);
-        }
+    [Fact]
+    public void PointNotInPolygon()
+    {
+        Polygon2D polygon = CreateClosedPolygon();
+        polygon.IsPointInPolygon(new Point2D { X = 1, Y     = 100.5 }).Should().Be(false);
+        polygon.IsPointInPolygon(new Point2D { X = 100.5, Y = 1 }).Should().Be(false);
+        polygon.IsPointInPolygon(new Point2D { X = -0.5, Y  = 1 }).Should().Be(false);
+        polygon.IsPointInPolygon(new Point2D { X = 1, Y     = -0.5 }).Should().Be(false);
+    }
 
-        [Fact]
-        public void MinMax()
-        {
-            Polygon2D polygon = CreateClosedPolygon();
-            polygon.MaxX.Should().BeApproximately(100.0, double.Epsilon);
-            polygon.MaxY.Should().BeApproximately(100.0, double.Epsilon);
-            polygon.MinX.Should().BeApproximately(0.0, double.Epsilon);
-            polygon.MinY.Should().BeApproximately(0.0, double.Epsilon);
-        }
+    [Fact]
+    public void MinMax()
+    {
+        Polygon2D polygon = CreateClosedPolygon();
+        polygon.MaxX.Should().BeApproximately(100.0, double.Epsilon);
+        polygon.MaxY.Should().BeApproximately(100.0, double.Epsilon);
+        polygon.MinX.Should().BeApproximately(0.0, double.Epsilon);
+        polygon.MinY.Should().BeApproximately(0.0, double.Epsilon);
+    }
 
-        [Fact]
-        public void OpenClosedPolygon()
-        {
-            Polygon2D polygonClosed = CreateClosedPolygon();
-            Polygon2D polygonOpen   = CreateOpenPolygon();
-            polygonClosed.IsClosed.Should().Be(true);
-            polygonOpen.IsClosed.Should().Be(false);
-        }
+    [Fact]
+    public void OpenClosedPolygon()
+    {
+        Polygon2D polygonClosed = CreateClosedPolygon();
+        Polygon2D polygonOpen   = CreateOpenPolygon();
+        polygonClosed.IsClosed.Should().Be(true);
+        polygonOpen.IsClosed.Should().Be(false);
     }
 }

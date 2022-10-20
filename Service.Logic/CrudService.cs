@@ -14,60 +14,59 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.Service.Logic
+namespace Framework.Service.Logic;
+
+using System.Collections.Generic;
+using System.Threading.Tasks;
+
+using Framework.Logic.Abstraction;
+
+public abstract class CrudService<T, TKey> : GetService<T, TKey> where T : class
 {
-    using System.Collections.Generic;
-    using System.Threading.Tasks;
+    private readonly ICrudManager<T, TKey> _manager;
 
-    using Framework.Logic.Abstraction;
-
-    public abstract class CrudService<T, TKey> : GetService<T, TKey> where T : class
+    protected CrudService(ICrudManager<T, TKey> manager) : base(manager)
     {
-        private readonly ICrudManager<T, TKey> _manager;
+        _manager = manager;
+    }
 
-        protected CrudService(ICrudManager<T, TKey> manager) : base(manager)
-        {
-            _manager = manager;
-        }
+    public async Task<TKey> AddAsync(T value)
+    {
+        return await _manager.AddAsync(value);
+    }
 
-        public async Task<TKey> Add(T value)
-        {
-            return await _manager.Add(value);
-        }
+    public async Task<IEnumerable<TKey>> AddAsync(IEnumerable<T> values)
+    {
+        return await _manager.AddAsync(values);
+    }
 
-        public async Task<IEnumerable<TKey>> Add(IEnumerable<T> values)
-        {
-            return await _manager.Add(values);
-        }
+    public async Task DeleteAsync(T value)
+    {
+        await _manager.DeleteAsync(value);
+    }
 
-        public async Task Delete(T value)
-        {
-            await _manager.Delete(value);
-        }
+    public async Task DeleteAsync(IEnumerable<T> values)
+    {
+        await _manager.DeleteAsync(values);
+    }
 
-        public async Task Delete(IEnumerable<T> values)
-        {
-            await _manager.Delete(values);
-        }
+    public async Task DeleteAsync(TKey key)
+    {
+        await _manager.DeleteAsync(key);
+    }
 
-        public async Task Delete(TKey key)
-        {
-            await _manager.Delete(key);
-        }
+    public async Task DeleteAsync(IEnumerable<TKey> keys)
+    {
+        await _manager.DeleteAsync(keys);
+    }
 
-        public async Task Delete(IEnumerable<TKey> keys)
-        {
-            await _manager.Delete(keys);
-        }
+    public async Task UpdateAsync(T value)
+    {
+        await _manager.UpdateAsync(value);
+    }
 
-        public async Task Update(T value)
-        {
-            await _manager.Update(value);
-        }
-
-        public async Task Update(IEnumerable<T> values)
-        {
-            await _manager.Update(values);
-        }
+    public async Task UpdateAsync(IEnumerable<T> values)
+    {
+        await _manager.UpdateAsync(values);
     }
 }

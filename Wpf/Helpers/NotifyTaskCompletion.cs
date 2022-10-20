@@ -16,28 +16,28 @@
 
 // see https://msdn.microsoft.com/magazine/dn605875
 
-namespace Framework.Wpf.Helpers
+namespace Framework.Wpf.Helpers;
+
+using System;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
+
+public sealed class NotifyTaskCompletion<TResult> : INotifyPropertyChanged
 {
-    using System;
-    using System.ComponentModel;
-    using System.Runtime.CompilerServices;
-    using System.Threading.Tasks;
-
-    public sealed class NotifyTaskCompletion<TResult> : INotifyPropertyChanged
+    public NotifyTaskCompletion(Task<TResult> task)
     {
-        public NotifyTaskCompletion(Task<TResult> task)
+        Task = task;
+        if (!task.IsCompleted)
         {
-            Task = task;
-            if (!task.IsCompleted)
-            {
-                Task _ = WatchTaskAsync(task);
-            }
+            Task _ = WatchTaskAsync(task);
         }
+    }
 
-        private void RaisePropertyChanged([CallerMemberName] string propertyName = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
+    private void RaisePropertyChanged([CallerMemberName] string propertyName = null)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
 
 /*
 		private void RaisePropertyChanged<TProperty>(Expression<Func<TProperty>> projection)
@@ -47,52 +47,51 @@ namespace Framework.Wpf.Helpers
 		}
 */
 
-        private async Task WatchTaskAsync(Task task)
+    private async Task WatchTaskAsync(Task task)
+    {
+        try
         {
-            try
-            {
-                await task;
-            }
-            catch
-            {
-                // ignored
-            }
-
-            RaisePropertyChanged(nameof(Status));
-            RaisePropertyChanged(nameof(IsCompleted));
-            RaisePropertyChanged(nameof(IsNotCompleted));
-            if (task.IsCanceled)
-            {
-                RaisePropertyChanged(nameof(IsCanceled));
-            }
-            else if (task.IsFaulted)
-            {
-                RaisePropertyChanged(nameof(IsFaulted));
-                RaisePropertyChanged(nameof(Exception));
-                RaisePropertyChanged(nameof(InnerException));
-                RaisePropertyChanged(nameof(ErrorMessage));
-            }
-            else
-            {
-                RaisePropertyChanged(nameof(IsSuccessfullyCompleted));
-                RaisePropertyChanged(nameof(Result));
-            }
+            await task;
+        }
+        catch
+        {
+            // ignored
         }
 
-        public Task<TResult> Task { get; }
-
-        public TResult Result => Task.Status == TaskStatus.RanToCompletion ? Task.Result : default(TResult);
-
-        public TaskStatus Status         => Task.Status;
-        public bool       IsCompleted    => Task.IsCompleted;
-        public bool       IsNotCompleted => !Task.IsCompleted;
-
-        public bool                              IsSuccessfullyCompleted => Task.Status == TaskStatus.RanToCompletion;
-        public bool                              IsCanceled              => Task.IsCanceled;
-        public bool                              IsFaulted               => Task.IsFaulted;
-        public AggregateException                Exception               => Task.Exception;
-        public Exception                         InnerException          => Exception?.InnerException;
-        public string                            ErrorMessage            => InnerException?.Message;
-        public event PropertyChangedEventHandler PropertyChanged;
+        RaisePropertyChanged(nameof(Status));
+        RaisePropertyChanged(nameof(IsCompleted));
+        RaisePropertyChanged(nameof(IsNotCompleted));
+        if (task.IsCanceled)
+        {
+            RaisePropertyChanged(nameof(IsCanceled));
+        }
+        else if (task.IsFaulted)
+        {
+            RaisePropertyChanged(nameof(IsFaulted));
+            RaisePropertyChanged(nameof(Exception));
+            RaisePropertyChanged(nameof(InnerException));
+            RaisePropertyChanged(nameof(ErrorMessage));
+        }
+        else
+        {
+            RaisePropertyChanged(nameof(IsSuccessfullyCompleted));
+            RaisePropertyChanged(nameof(Result));
+        }
     }
+
+    public Task<TResult> Task { get; }
+
+    public TResult Result => Task.Status == TaskStatus.RanToCompletion ? Task.Result : default(TResult);
+
+    public TaskStatus Status         => Task.Status;
+    public bool       IsCompleted    => Task.IsCompleted;
+    public bool       IsNotCompleted => !Task.IsCompleted;
+
+    public bool                              IsSuccessfullyCompleted => Task.Status == TaskStatus.RanToCompletion;
+    public bool                              IsCanceled              => Task.IsCanceled;
+    public bool                              IsFaulted               => Task.IsFaulted;
+    public AggregateException                Exception               => Task.Exception;
+    public Exception                         InnerException          => Exception?.InnerException;
+    public string                            ErrorMessage            => InnerException?.Message;
+    public event PropertyChangedEventHandler PropertyChanged;
 }

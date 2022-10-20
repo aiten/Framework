@@ -14,34 +14,33 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.WebAPI.Filter
+namespace Framework.WebAPI.Filter;
+
+using System.Diagnostics;
+
+using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.Extensions.Logging;
+
+public sealed class MethodCallLogFilter : IActionFilter
 {
-    using System.Diagnostics;
+    private readonly ILogger<MethodCallLogFilter> _logger;
 
-    using Microsoft.AspNetCore.Mvc.Filters;
-    using Microsoft.Extensions.Logging;
+    private Stopwatch _stopWatch;
 
-    public sealed class MethodCallLogFilter : IActionFilter
+    public MethodCallLogFilter(ILogger<MethodCallLogFilter> logger)
     {
-        private readonly ILogger<MethodCallLogFilter> _logger;
+        _logger = logger;
+    }
 
-        private Stopwatch _stopWatch;
+    public void OnActionExecuting(ActionExecutingContext context)
+    {
+        Debug.Assert(_stopWatch == null, @"OnActionExecuted must be called");
+        _stopWatch = Stopwatch.StartNew();
+    }
 
-        public MethodCallLogFilter(ILogger<MethodCallLogFilter> logger)
-        {
-            _logger = logger;
-        }
-
-        public void OnActionExecuting(ActionExecutingContext context)
-        {
-            Debug.Assert(_stopWatch == null, @"OnActionExecuted must be called");
-            _stopWatch = Stopwatch.StartNew();
-        }
-
-        public void OnActionExecuted(ActionExecutedContext context)
-        {
-            _stopWatch.Stop();
-            _logger.LogDebug($"{context.ActionDescriptor.DisplayName} - {_stopWatch.ElapsedMilliseconds}ms");
-        }
+    public void OnActionExecuted(ActionExecutedContext context)
+    {
+        _stopWatch.Stop();
+        _logger.LogDebug($"{context.ActionDescriptor.DisplayName} - {_stopWatch.ElapsedMilliseconds}ms");
     }
 }

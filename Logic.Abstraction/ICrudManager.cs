@@ -14,26 +14,25 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.Logic.Abstraction
+namespace Framework.Logic.Abstraction;
+
+using System.Collections.Generic;
+using System.Threading.Tasks;
+
+using Microsoft.AspNetCore.JsonPatch;
+
+public interface ICrudManager<T, TId> : IGetManager<T, TId> where T : class
 {
-    using System.Collections.Generic;
-    using System.Threading.Tasks;
+    Task<TId> AddAsync(T value);
 
-    using Microsoft.AspNetCore.JsonPatch;
+    Task UpdateAsync(T   value);
+    Task DeleteAsync(T   value);
+    Task DeleteAsync(TId key);
+    Task PatchAsync(TId  key, JsonPatchDocument<T> patch);
 
-    public interface ICrudManager<T, TId> : IGetManager<T, TId> where T : class
-    {
-        Task<TId> Add(T value);
+    Task<IEnumerable<TId>> AddAsync(IEnumerable<T> values);
 
-        Task Update(T   value);
-        Task Delete(T   value);
-        Task Delete(TId key);
-        Task Patch(TId  key, JsonPatchDocument<T> patch);
-
-        Task<IEnumerable<TId>> Add(IEnumerable<T> values);
-
-        Task Update(IEnumerable<T>   values);
-        Task Delete(IEnumerable<T>   values);
-        Task Delete(IEnumerable<TId> keys);
-    }
+    Task UpdateAsync(IEnumerable<T>   values);
+    Task DeleteAsync(IEnumerable<T>   values);
+    Task DeleteAsync(IEnumerable<TId> keys);
 }

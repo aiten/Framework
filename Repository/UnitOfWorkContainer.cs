@@ -14,24 +14,23 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.Repository
+namespace Framework.Repository;
+
+using Framework.Repository.Abstraction;
+
+public class UnitOfWorkContainer
 {
-    using Framework.Repository.Abstraction;
+    public IUnitOfWork UnitOfWork { get; set; }
 
-    public class UnitOfWorkContainer
+    protected UnitOfWorkContainer(IUnitOfWork unitOfWork)
     {
-        public IUnitOfWork UnitOfWork { get; set; }
-
-        protected UnitOfWorkContainer(IUnitOfWork unitOfWork)
-        {
-            UnitOfWork = unitOfWork;
-        }
+        UnitOfWork = unitOfWork;
     }
+}
 
-    public class UnitOfWorkContainer<TUnitOfWork> : UnitOfWorkContainer where TUnitOfWork : IUnitOfWork
+public class UnitOfWorkContainer<TUnitOfWork> : UnitOfWorkContainer where TUnitOfWork : IUnitOfWork
+{
+    public UnitOfWorkContainer(TUnitOfWork unitOfWork) : base(unitOfWork)
     {
-        public UnitOfWorkContainer(TUnitOfWork unitOfWork) : base(unitOfWork)
-        {
-        }
     }
 }

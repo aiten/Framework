@@ -14,50 +14,49 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.Wpf.Converters
+namespace Framework.Wpf.Converters;
+
+using System;
+using System.Globalization;
+using System.Windows;
+using System.Windows.Data;
+
+public class EnumBooleanConverter : IValueConverter
 {
-    using System;
-    using System.Globalization;
-    using System.Windows;
-    using System.Windows.Data;
-
-    public class EnumBooleanConverter : IValueConverter
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        var parameterString = parameter as string;
+        if (parameterString == null || value == null)
         {
-            var parameterString = parameter as string;
-            if (parameterString == null || value == null)
+            return DependencyProperty.UnsetValue;
+        }
+
+        if (Enum.IsDefined(value.GetType(), value) == false)
+        {
+            return DependencyProperty.UnsetValue;
+        }
+
+        object paramValue = Enum.Parse(value.GetType(), parameterString);
+        return paramValue.Equals(value);
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        string parameterString = parameter as string;
+        bool   valueAsBool     = value != null && (bool)value;
+
+        if (parameterString == null || !valueAsBool)
+        {
+            try
+            {
+                return Enum.Parse(targetType, "0");
+            }
+            catch (Exception)
             {
                 return DependencyProperty.UnsetValue;
             }
-
-            if (Enum.IsDefined(value.GetType(), value) == false)
-            {
-                return DependencyProperty.UnsetValue;
-            }
-
-            object paramValue = Enum.Parse(value.GetType(), parameterString);
-            return paramValue.Equals(value);
         }
 
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            string parameterString = parameter as string;
-            bool   valueAsBool     = value != null && (bool)value;
-
-            if (parameterString == null || !valueAsBool)
-            {
-                try
-                {
-                    return Enum.Parse(targetType, "0");
-                }
-                catch (Exception)
-                {
-                    return DependencyProperty.UnsetValue;
-                }
-            }
-
-            return Enum.Parse(targetType, parameterString);
-        }
+        return Enum.Parse(targetType, parameterString);
     }
 }

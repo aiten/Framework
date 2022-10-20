@@ -14,68 +14,67 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.MyUnitTest.Tools
+namespace Framework.MyUnitTest.Tools;
+
+using FluentAssertions;
+
+using Framework.Tools.Password;
+
+using Xunit;
+
+public class PasswordTest
 {
-    using FluentAssertions;
-
-    using Framework.Tools.Password;
-
-    using Xunit;
-
-    public class PasswordTest
+    [Fact]
+    public void Pbkdf2PasswordTest()
     {
-        [Fact]
-        public void Pbkdf2PasswordTest()
-        {
-            var password1 = "MySecretPassword1";
-            var password2 = "MySecretPassword2";
+        var password1 = "MySecretPassword1";
+        var password2 = "MySecretPassword2";
 
-            var hashProvider = new Pbkdf2PasswordProvider();
+        var hashProvider = new Pbkdf2PasswordProvider();
 
-            var hash1 = hashProvider.GetPasswordHash(password1);
-            var hash2 = hashProvider.GetPasswordHash(password2);
+        var hash1 = hashProvider.GetPasswordHash(password1);
+        var hash2 = hashProvider.GetPasswordHash(password2);
 
-            hash1.Should().NotContain(password1);
-            hash1.Length.Should().BeGreaterThan(1);
+        hash1.Should().NotContain(password1);
+        hash1.Length.Should().BeGreaterThan(1);
 
-            hashProvider.ValidatePassword(password1, hash1).Should().BeTrue();
-            hashProvider.ValidatePassword(password2, hash2).Should().BeTrue();
-            hashProvider.ValidatePassword(password2, hash1).Should().BeFalse();
-            hashProvider.ValidatePassword(password1, hash2).Should().BeFalse();
-        }
+        hashProvider.ValidatePassword(password1, hash1).Should().BeTrue();
+        hashProvider.ValidatePassword(password2, hash2).Should().BeTrue();
+        hashProvider.ValidatePassword(password2, hash1).Should().BeFalse();
+        hashProvider.ValidatePassword(password1, hash2).Should().BeFalse();
+    }
 
-        [Fact]
-        public void AesPasswordTest()
-        {
-            var password1 = "MySecretPassword1";
-            var password2 = "MySecretPassword2";
+    [Fact]
+    public void AesPasswordTest()
+    {
+        var password1 = "MySecretPassword1";
+        var password2 = "MySecretPassword2";
 
-            var key1 = "MySecretPasswordKey1";
-            var key2 = "MySecretPasswordKey2";
+        var key1 = "MySecretPasswordKey1";
+        var key2 = "MySecretPasswordKey2";
 
-            var aesProvider1 = new AesPasswordProvider(key1);
-            var aesProvider2 = new AesPasswordProvider(key2);
+        var aesProvider1 = new AesPasswordProvider(key1);
+        var aesProvider2 = new AesPasswordProvider(key2);
 
-            var hash11 = aesProvider1.GetPasswordHash(password1);
-            var hash21 = aesProvider2.GetPasswordHash(password1);
+        var hash11 = aesProvider1.GetPasswordHash(password1);
+        var hash21 = aesProvider2.GetPasswordHash(password1);
 
-            var hash12 = aesProvider1.GetPasswordHash(password2);
-            var hash22 = aesProvider2.GetPasswordHash(password2);
+        var hash12 = aesProvider1.GetPasswordHash(password2);
+        var hash22 = aesProvider2.GetPasswordHash(password2);
 
-            hash11.Should().NotBeEquivalentTo(hash21);
-            hash12.Should().NotBeEquivalentTo(hash22);
+        hash11.Should().NotBeEquivalentTo(hash21);
+        hash12.Should().NotBeEquivalentTo(hash22);
 
-            aesProvider1.ValidatePassword(password1, hash11).Should().BeTrue();
-            aesProvider1.ValidatePassword(password2, hash12).Should().BeTrue();
+        aesProvider1.ValidatePassword(password1, hash11).Should().BeTrue();
+        aesProvider1.ValidatePassword(password2, hash12).Should().BeTrue();
 
-            aesProvider2.ValidatePassword(password1, hash21).Should().BeTrue();
-            aesProvider2.ValidatePassword(password2, hash22).Should().BeTrue();
+        aesProvider2.ValidatePassword(password1, hash21).Should().BeTrue();
+        aesProvider2.ValidatePassword(password2, hash22).Should().BeTrue();
 
-            aesProvider1.ValidatePassword(password2, hash11).Should().BeFalse();
-            aesProvider1.ValidatePassword(password1, hash12).Should().BeFalse();
+        aesProvider1.ValidatePassword(password2, hash11).Should().BeFalse();
+        aesProvider1.ValidatePassword(password1, hash12).Should().BeFalse();
 
-            aesProvider2.ValidatePassword(password2, hash21).Should().BeFalse();
-            aesProvider2.ValidatePassword(password1, hash22).Should().BeFalse();
-        }
+        aesProvider2.ValidatePassword(password2, hash21).Should().BeFalse();
+        aesProvider2.ValidatePassword(password1, hash22).Should().BeFalse();
     }
 }

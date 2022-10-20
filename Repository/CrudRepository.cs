@@ -14,103 +14,102 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.Repository
+namespace Framework.Repository;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+
+using Framework.Repository.Abstraction;
+
+using Microsoft.EntityFrameworkCore;
+
+public abstract class CrudRepository<TDbContext, TEntity, TKey> : GetRepository<TDbContext, TEntity, TKey>
+    where TDbContext : DbContext where TEntity : class
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Threading.Tasks;
-
-    using Framework.Repository.Abstraction;
-
-    using Microsoft.EntityFrameworkCore;
-
-    public abstract class CrudRepository<TDbContext, TEntity, TKey> : GetRepository<TDbContext, TEntity, TKey>
-        where TDbContext : DbContext where TEntity : class
+    protected CrudRepository(TDbContext dbContext)
+        : base(dbContext)
     {
-        protected CrudRepository(TDbContext dbContext)
-            : base(dbContext)
-        {
-        }
+    }
 
-        protected IQueryable<TEntity> TrackingQueryWithInclude => AddInclude(TrackingQuery);
+    protected IQueryable<TEntity> TrackingQueryWithInclude => AddInclude(TrackingQuery);
 
-        protected IQueryable<TEntity> TrackingQueryWithOptional => AddOptionalWhere(TrackingQuery);
+    protected IQueryable<TEntity> TrackingQueryWithOptional => AddOptionalWhere(TrackingQuery);
 
-        #region Get Tracking
+    #region GetAsync Tracking
 
-        public async Task<IList<TEntity>> GetTrackingAll()
-        {
-            return await GetAll(AddInclude(TrackingQueryWithOptional));
-        }
+    public async Task<IList<TEntity>> GetTrackingAllAsync()
+    {
+        return await GetAllAsync(AddInclude(TrackingQueryWithOptional));
+    }
 
-        public async Task<TEntity> GetTracking(TKey key)
-        {
-            return await Get(TrackingQueryWithInclude, key);
-        }
+    public async Task<TEntity> GetTrackingAsync(TKey key)
+    {
+        return await GetAsync(TrackingQueryWithInclude, key);
+    }
 
-        public async Task<IList<TEntity>> GetTracking(IEnumerable<TKey> keys)
-        {
-            return await Get(TrackingQueryWithInclude, keys);
-        }
+    public async Task<IList<TEntity>> GetTrackingAsync(IEnumerable<TKey> keys)
+    {
+        return await GetAsync(TrackingQueryWithInclude, keys);
+    }
 
-        #endregion
+    #endregion
 
-        #region CRUD
+    #region CRUD
 
-        public void Add(TEntity entity)
-        {
-            AddEntity(entity);
-        }
+    public void Add(TEntity entity)
+    {
+        AddEntity(entity);
+    }
 
-        public void AddRange(IEnumerable<TEntity> entities)
-        {
-            AddEntities(entities);
-        }
+    public void AddRange(IEnumerable<TEntity> entities)
+    {
+        AddEntities(entities);
+    }
 
-        public void Delete(TEntity entity)
-        {
-            DeleteEntity(entity);
-        }
+    public void Delete(TEntity entity)
+    {
+        DeleteEntity(entity);
+    }
 
-        public void DeleteRange(IEnumerable<TEntity> entities)
-        {
-            DeleteEntities(entities);
-        }
+    public void DeleteRange(IEnumerable<TEntity> entities)
+    {
+        DeleteEntities(entities);
+    }
 
-        public void SetState(TEntity entity, MyEntityState state)
-        {
-            SetEntityState(entity, (Microsoft.EntityFrameworkCore.EntityState)state);
-        }
+    public void SetState(TEntity entity, MyEntityState state)
+    {
+        SetEntityState(entity, (Microsoft.EntityFrameworkCore.EntityState)state);
+    }
 
-        public void SetValue(TEntity entity, TEntity values)
-        {
-            AssignValues(entity, values);
-            base.SetValue(entity, values);
-        }
+    public void SetValue(TEntity entity, TEntity values)
+    {
+        AssignValues(entity, values);
+        base.SetValue(entity, values);
+    }
 
-        public void SetValueGraph(TEntity trackingEntity, TEntity values)
-        {
-            AssignValuesGraph(trackingEntity, values);
-        }
+    public void SetValueGraph(TEntity trackingEntity, TEntity values)
+    {
+        AssignValuesGraph(trackingEntity, values);
+    }
 
-        protected virtual void AssignValues(TEntity trackingEntity, TEntity values)
-        {
-        }
+    protected virtual void AssignValues(TEntity trackingEntity, TEntity values)
+    {
+    }
 
-        protected virtual void AssignValuesGraph(TEntity trackingEntity, TEntity values)
-        {
-            SetValue(trackingEntity, values);
-        }
+    protected virtual void AssignValuesGraph(TEntity trackingEntity, TEntity values)
+    {
+        SetValue(trackingEntity, values);
+    }
 
-        #endregion
+    #endregion
 
-        public void Sync(ICollection<TEntity> inDb,
-            ICollection<TEntity>              toDb,
-            Func<TEntity, TEntity, bool>      compareEntity,
-            Action<TEntity>                   prepareForAdd)
-        {
-            Sync<TEntity>(inDb, toDb, compareEntity, prepareForAdd);
-        }
+    public void Sync(ICollection<TEntity> inDb,
+        ICollection<TEntity>              toDb,
+        Func<TEntity, TEntity, bool>      compareEntity,
+        Action<TEntity>                   prepareForAdd)
+    {
+        Sync<TEntity>(inDb, toDb, compareEntity, prepareForAdd);
     }
 }

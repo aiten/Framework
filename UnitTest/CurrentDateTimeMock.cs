@@ -14,28 +14,27 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.UnitTest
+namespace Framework.UnitTest;
+
+using System;
+
+using Framework.Tools.Abstraction;
+
+public class CurrentDateTimeMock : ICurrentDateTime
 {
-    using System;
-
-    using Framework.Tools.Abstraction;
-
-    public class CurrentDateTimeMock : ICurrentDateTime
+    public CurrentDateTimeMock(DateTime now)
     {
-        public CurrentDateTimeMock(DateTime now)
-        {
-            Now   = now;
-            Today = now.Date;
-        }
-
-        public CurrentDateTimeMock()
-        {
-            Now   = DateTime.Now;
-            Today = Now.Date;
-        }
-
-        public DateTime Now { get; private set; }
-
-        public DateTime Today { get; private set; }
+        Now   = now;
+        Today = now.Date;
     }
+
+    public CurrentDateTimeMock()
+    {
+        Now   = DateTime.Now;
+        Today = Now.Date;
+    }
+
+    public DateTime Now { get; private set; }
+
+    public DateTime Today { get; private set; }
 }

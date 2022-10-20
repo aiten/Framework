@@ -14,56 +14,55 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.Localization
+namespace Framework.Localization;
+
+using System;
+using System.Globalization;
+using System.Resources;
+using System.Runtime.CompilerServices;
+
+public class Localizable
 {
-    using System;
-    using System.Globalization;
-    using System.Resources;
-    using System.Runtime.CompilerServices;
+    private ResourceManager _resourceManager;
+    private string          _resourceKey;
+    private object[]        _placeholders;
 
-    public class Localizable
+    public CultureInfo CultureInfo { get; set; } = CultureInfo.CurrentCulture;
+
+    public Localizable(ResourceManager resourceManager, string resourceKey, object[] placeholders = null)
     {
-        private ResourceManager _resourceManager;
-        private string          _resourceKey;
-        private object[]        _placeholders;
+        _resourceManager = resourceManager;
+        _resourceKey     = resourceKey;
+        _placeholders    = placeholders;
+    }
 
-        public CultureInfo CultureInfo { get; set; } = CultureInfo.CurrentCulture;
+    public string ConvertMessageKey()
+    {
+        return _resourceKey.Replace('_', '.');
+    }
 
-        public Localizable(ResourceManager resourceManager, string resourceKey, object[] placeholders = null)
+    public string GetResourceString()
+    {
+        return _resourceManager.GetString(_resourceKey, CultureInfo) ?? _resourceManager.GetString(ConvertMessageKey(), CultureInfo);
+    }
+
+    public string Message()
+    {
+        var text = GetResourceString();
+
+        if (_placeholders != null)
         {
-            _resourceManager = resourceManager;
-            _resourceKey     = resourceKey;
-            _placeholders    = placeholders;
-        }
-
-        public string ConvertMessageKey()
-        {
-            return _resourceKey.Replace('_', '.');
-        }
-
-        public string GetResourceString()
-        {
-            return _resourceManager.GetString(_resourceKey, CultureInfo) ?? _resourceManager.GetString(ConvertMessageKey(), CultureInfo);
-        }
-
-        public string Message()
-        {
-            var text = GetResourceString();
-
-            if (_placeholders != null)
+            try
             {
-                try
-                {
-                    text = FormattableStringFactory.Create(text, _placeholders).ToString(CultureInfo);
-                }
-                catch (Exception e)
-                {
-                    // cannot convert string => set to null
-                    text += e.Message;
-                }
+                text = FormattableStringFactory.Create(text, _placeholders).ToString(CultureInfo);
             }
-
-            return text;
+            catch (Exception e)
+            {
+                // cannot convert string => set to null
+                text += e.Message;
+            }
         }
+
+        return text;
     }
 }

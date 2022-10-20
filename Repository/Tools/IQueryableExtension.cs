@@ -16,34 +16,33 @@
 
 // see: https://stackoverflow.com/questions/37527783/get-sql-code-from-an-entity-framework-core-iqueryablet
 
-namespace Framework.Repository.Tools
+namespace Framework.Repository.Tools;
+
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+
+using Microsoft.EntityFrameworkCore.Query;
+using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
+
+public static class IQueryableExtensions
 {
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Reflection;
-
-    using Microsoft.EntityFrameworkCore.Query;
-    using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
-
-    public static class IQueryableExtensions
+    public static string ToSql<TEntity>(this IQueryable<TEntity> query) where TEntity : class
     {
-        public static string ToSql<TEntity>(this IQueryable<TEntity> query) where TEntity : class
+        using (var enumerator = query.Provider.Execute<IEnumerable<TEntity>>(query.Expression).GetEnumerator())
         {
-            using (var enumerator = query.Provider.Execute<IEnumerable<TEntity>>(query.Expression).GetEnumerator())
-            {
-                var relationalCommandCache = enumerator.Private("_relationalCommandCache");
-                var selectExpression       = relationalCommandCache.Private<SelectExpression>("_selectExpression");
-                var factory                = relationalCommandCache.Private<IQuerySqlGeneratorFactory>("_querySqlGeneratorFactory");
+            var relationalCommandCache = enumerator.Private("_relationalCommandCache");
+            var selectExpression       = relationalCommandCache.Private<SelectExpression>("_selectExpression");
+            var factory                = relationalCommandCache.Private<IQuerySqlGeneratorFactory>("_querySqlGeneratorFactory");
 
-                var sqlGenerator = factory.Create();
-                var command      = sqlGenerator.GetCommand(selectExpression);
+            var sqlGenerator = factory.Create();
+            var command      = sqlGenerator.GetCommand(selectExpression);
 
-                string sql = command.CommandText;
-                return sql;
-            }
+            string sql = command.CommandText;
+            return sql;
         }
-
-        private static object Private(this    object obj, string privateField) => obj?.GetType().GetField(privateField, BindingFlags.Instance | BindingFlags.NonPublic)?.GetValue(obj);
-        private static T      Private<T>(this object obj, string privateField) => (T)obj?.GetType().GetField(privateField, BindingFlags.Instance | BindingFlags.NonPublic)?.GetValue(obj);
     }
+
+    private static object Private(this    object obj, string privateField) => obj?.GetType().GetField(privateField, BindingFlags.Instance | BindingFlags.NonPublic)?.GetValue(obj);
+    private static T      Private<T>(this object obj, string privateField) => (T)obj?.GetType().GetField(privateField, BindingFlags.Instance | BindingFlags.NonPublic)?.GetValue(obj);
 }

@@ -14,15 +14,14 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.Repository
-{
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
+namespace Framework.Repository;
 
-    public class FilterBuilder<TEntity, TKey> where TEntity : class
-    {
-        public Func<IQueryable<TEntity>, TKey, IQueryable<TEntity>>              PrimaryWhere   { get; set; }
-        public Func<IQueryable<TEntity>, IEnumerable<TKey>, IQueryable<TEntity>> PrimaryWhereIn { get; set; }
-    }
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+public class FilterBuilder<TEntity, TKey> where TEntity : class
+{
+    public Func<IQueryable<TEntity>, TKey, IQueryable<TEntity>>              PrimaryWhere   { get; set; }
+    public Func<IQueryable<TEntity>, IEnumerable<TKey>, IQueryable<TEntity>> PrimaryWhereIn { get; set; }
 }

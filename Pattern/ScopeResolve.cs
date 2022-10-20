@@ -14,49 +14,48 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.Pattern
+namespace Framework.Pattern;
+
+using System;
+
+using Microsoft.Extensions.DependencyInjection;
+
+// Factory/Scope using Resolve of dependencyInjection
+
+public sealed class ScopeResolve<T> : IScope<T>, IDisposable where T : class
 {
-    using System;
+    private readonly IServiceScope _scope;
+    private readonly T             _instance;
 
-    using Microsoft.Extensions.DependencyInjection;
+    private bool _isDisposed;
 
-    // Factory/Scope using Resolve of dependencyInjection
-
-    public sealed class ScopeResolve<T> : IScope<T>, IDisposable where T : class
+    public ScopeResolve(IServiceScope scope, T instance)
     {
-        private readonly IServiceScope _scope;
-        private readonly T             _instance;
+        _scope    = scope;
+        _instance = instance;
+    }
 
-        private bool _isDisposed;
-
-        public ScopeResolve(IServiceScope scope, T instance)
-        {
-            _scope    = scope;
-            _instance = instance;
-        }
-
-        public T Instance
-        {
-            get
-            {
-                if (_isDisposed)
-                {
-                    throw new ObjectDisposedException("this", "Dispose must not be called twice.");
-                }
-
-                return _instance;
-            }
-        }
-
-        public void Dispose()
+    public T Instance
+    {
+        get
         {
             if (_isDisposed)
             {
-                return;
+                throw new ObjectDisposedException("this", "Dispose must not be called twice.");
             }
 
-            _isDisposed = true;
-            _scope.Dispose();
+            return _instance;
         }
+    }
+
+    public void Dispose()
+    {
+        if (_isDisposed)
+        {
+            return;
+        }
+
+        _isDisposed = true;
+        _scope.Dispose();
     }
 }

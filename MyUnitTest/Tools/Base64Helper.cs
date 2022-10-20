@@ -14,24 +14,23 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.MyUnitTest.Tools
+namespace Framework.MyUnitTest.Tools;
+
+using FluentAssertions;
+
+using Framework.Tools;
+
+using Xunit;
+
+public class Base64HelperTest
 {
-    using FluentAssertions;
-
-    using Framework.Tools;
-
-    using Xunit;
-
-    public class Base64HelperTest
+    [Fact]
+    public void Base64AsStringTest()
     {
-        [Fact]
-        public void Base64AsStringTest()
-        {
-            string fromBase64  = "Test base 64";
-            string toBase64    = Base64Helper.StringToBase64(fromBase64);
-            string base64Again = Base64Helper.StringFromBase64(toBase64);
+        string fromBase64  = "Test base 64";
+        string toBase64    = Base64Helper.StringToBase64(fromBase64);
+        string base64Again = Base64Helper.StringFromBase64(toBase64);
 
-            base64Again.Should().Be(fromBase64);
-        }
+        base64Again.Should().Be(fromBase64);
     }
 }

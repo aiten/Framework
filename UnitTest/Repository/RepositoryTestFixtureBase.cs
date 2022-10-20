@@ -14,54 +14,53 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.UnitTest.Repository
+namespace Framework.UnitTest.Repository;
+
+using System;
+using System.IO;
+using System.Reflection;
+using System.Threading.Tasks;
+
+using Microsoft.EntityFrameworkCore;
+
+public abstract class RepositoryTestFixtureBase<TDbContext> : IDisposable where TDbContext : DbContext
 {
-    using System;
-    using System.IO;
-    using System.Reflection;
-    using System.Threading.Tasks;
-
-    using Microsoft.EntityFrameworkCore;
-
-    public abstract class RepositoryTestFixtureBase<TDbContext> : IDisposable where TDbContext : DbContext
+    protected RepositoryTestFixtureBase()
     {
-        protected RepositoryTestFixtureBase()
+        ScriptDir = $"{Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)}\\Repository\\SQL\\";
+    }
+
+    public string ScriptDir { get; set; }
+
+    private TDbContext Context { get; set; }
+
+    public void Dispose()
+    {
+        Context?.Dispose();
+        Context = null;
+    }
+
+    public abstract TDbContext CreateDbContext();
+
+    private async Task ExecSqlScriptAsync(string filePath, string replace = null)
+    {
+        var sql = await File.ReadAllTextAsync(filePath);
+
+        if (!string.IsNullOrEmpty(replace))
         {
-            ScriptDir = $"{Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)}\\Repository\\SQL\\";
+            sql = sql.Replace(@"[REPLACE]", replace);
         }
 
-        public string ScriptDir { get; set; }
+        await ExecSqlAsync(sql);
+    }
 
-        private TDbContext Context { get; set; }
-
-        public void Dispose()
+    private async Task ExecSqlAsync(string sql)
+    {
+        if (Context == null)
         {
-            Context?.Dispose();
-            Context = null;
+            throw new NullReferenceException(@"DB context is null!");
         }
 
-        public abstract TDbContext CreateDbContext();
-
-        private async Task ExecSqlScriptAsync(string filePath, string replace = null)
-        {
-            var sql = await File.ReadAllTextAsync(filePath);
-
-            if (!string.IsNullOrEmpty(replace))
-            {
-                sql = sql.Replace(@"[REPLACE]", replace);
-            }
-
-            await ExecSqlAsync(sql);
-        }
-
-        private async Task ExecSqlAsync(string sql)
-        {
-            if (Context == null)
-            {
-                throw new NullReferenceException(@"DB context is null!");
-            }
-
-            await Context.Database.ExecuteSqlRawAsync(sql);
-        }
+        await Context.Database.ExecuteSqlRawAsync(sql);
     }
 }

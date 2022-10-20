@@ -14,20 +14,19 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.Pattern
+namespace Framework.Pattern;
+
+public class FactoryInstance<T> : IFactory<T> where T : class
 {
-    public class FactoryInstance<T> : IFactory<T> where T : class
+    public FactoryInstance(T obj)
     {
-        public FactoryInstance(T obj)
-        {
-            _obj = obj;
-        }
+        _obj = obj;
+    }
 
-        private readonly T _obj;
+    private readonly T _obj;
 
-        IScope<T> IFactory<T>.Create()
-        {
-            return new ScopeInstance<T>(_obj);
-        }
+    IScope<T> IFactory<T>.Create()
+    {
+        return new ScopeInstance<T>(_obj);
     }
 }

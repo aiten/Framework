@@ -14,35 +14,34 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.Repository.Abstraction
+namespace Framework.Repository.Abstraction;
+
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+
+public interface ICrudRepository<TEntity, TKey> : IGetRepository<TEntity, TKey>
+    where TEntity : class
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Threading.Tasks;
+    Task<IList<TEntity>> GetTrackingAllAsync();
 
-    public interface ICrudRepository<TEntity, TKey> : IGetRepository<TEntity, TKey>
-        where TEntity : class
-    {
-        Task<IList<TEntity>> GetTrackingAll();
+    Task<TEntity> GetTrackingAsync(TKey key);
 
-        Task<TEntity> GetTracking(TKey key);
+    Task<IList<TEntity>> GetTrackingAsync(IEnumerable<TKey> keys);
 
-        Task<IList<TEntity>> GetTracking(IEnumerable<TKey> keys);
+    void Add(TEntity entity);
 
-        void Add(TEntity entity);
+    void AddRange(IEnumerable<TEntity> entities);
 
-        void AddRange(IEnumerable<TEntity> entities);
+    void Delete(TEntity entity);
 
-        void Delete(TEntity entity);
+    void DeleteRange(IEnumerable<TEntity> entities);
 
-        void DeleteRange(IEnumerable<TEntity> entities);
+    void SetValue(TEntity trackingEntity, TEntity values);
 
-        void SetValue(TEntity trackingEntity, TEntity values);
+    void SetValueGraph(TEntity trackingEntity, TEntity values);
 
-        void SetValueGraph(TEntity trackingEntity, TEntity values);
+    void SetState(TEntity entity, MyEntityState state);
 
-        void SetState(TEntity entity, MyEntityState state);
-
-        void Sync(ICollection<TEntity> inDb, ICollection<TEntity> toDb, Func<TEntity, TEntity, bool> compareEntities, Action<TEntity> prepareForAdd);
-    }
+    void Sync(ICollection<TEntity> inDb, ICollection<TEntity> toDb, Func<TEntity, TEntity, bool> compareEntities, Action<TEntity> prepareForAdd);
 }

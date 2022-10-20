@@ -14,35 +14,34 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.Service.Logic
+namespace Framework.Service.Logic;
+
+using System.Collections.Generic;
+using System.Threading.Tasks;
+
+using Framework.Logic.Abstraction;
+
+public abstract class GetService<T, TKey> : ServiceBase where T : class
 {
-    using System.Collections.Generic;
-    using System.Threading.Tasks;
+    private readonly ICrudManager<T, TKey> _manager;
 
-    using Framework.Logic.Abstraction;
-
-    public abstract class GetService<T, TKey> : ServiceBase where T : class
+    protected GetService(ICrudManager<T, TKey> manager)
     {
-        private readonly ICrudManager<T, TKey> _manager;
+        _manager = manager;
+    }
 
-        protected GetService(ICrudManager<T, TKey> manager)
-        {
-            _manager = manager;
-        }
+    public async Task<T> GetAsync(TKey id)
+    {
+        return await _manager.GetAsync(id);
+    }
 
-        public async Task<T> Get(TKey id)
-        {
-            return await _manager.Get(id);
-        }
+    public async Task<IEnumerable<T>> GetAsync(IEnumerable<TKey> ids)
+    {
+        return await _manager.GetAsync(ids);
+    }
 
-        public async Task<IEnumerable<T>> Get(IEnumerable<TKey> ids)
-        {
-            return await _manager.Get(ids);
-        }
-
-        public async Task<IEnumerable<T>> GetAll()
-        {
-            return await _manager.GetAll();
-        }
+    public async Task<IEnumerable<T>> GetAllAsync()
+    {
+        return await _manager.GetAllAsync();
     }
 }

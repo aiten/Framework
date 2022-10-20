@@ -14,31 +14,30 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.UnitTest.Repository
+namespace Framework.UnitTest.Repository;
+
+using System;
+
+using Framework.Repository.Abstraction;
+
+using Microsoft.EntityFrameworkCore;
+
+public class TestDbContext<TDbContext, TIRepository> : IDisposable where TIRepository : IRepository where TDbContext : DbContext
 {
-    using System;
+    public TDbContext   DbContext  { get; private set; }
+    public IUnitOfWork  UnitOfWork { get; private set; }
+    public TIRepository Repository { get; private set; }
 
-    using Framework.Repository.Abstraction;
-
-    using Microsoft.EntityFrameworkCore;
-
-    public class TestDbContext<TDbContext, TIRepository> : IDisposable where TIRepository : IRepository where TDbContext : DbContext
+    public TestDbContext(TDbContext dbContext, IUnitOfWork uow, TIRepository repository)
     {
-        public TDbContext   DbContext  { get; private set; }
-        public IUnitOfWork  UnitOfWork { get; private set; }
-        public TIRepository Repository { get; private set; }
+        DbContext  = dbContext;
+        UnitOfWork = uow;
+        Repository = repository;
+    }
 
-        public TestDbContext(TDbContext dbContext, IUnitOfWork uow, TIRepository repository)
-        {
-            DbContext  = dbContext;
-            UnitOfWork = uow;
-            Repository = repository;
-        }
-
-        public void Dispose()
-        {
-            DbContext.Dispose();
-            DbContext = null;
-        }
+    public void Dispose()
+    {
+        DbContext.Dispose();
+        DbContext = null;
     }
 }

@@ -14,127 +14,126 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.Tools
+namespace Framework.Tools;
+
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using System.Threading.Tasks;
+
+public static class ListExtensions
 {
-    using System;
-    using System.Collections;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Reflection;
-    using System.Threading.Tasks;
+    #region Async
 
-    public static class ListExtensions
+    public static async Task<IEnumerable<TResult>> SelectAsync<TSource, TResult>(this IEnumerable<TSource> source, Func<TSource, Task<TResult>> method)
     {
-        #region Async
+        return await Task.WhenAll(source.Select(async s => await method(s)));
+    }
 
-        public static async Task<IEnumerable<TResult>> SelectAsync<TSource, TResult>(this IEnumerable<TSource> source, Func<TSource, Task<TResult>> method)
+    public static async Task<IEnumerable<TResult>> SelectManyAsync<TSource, TResult>(this IEnumerable<TSource> source, Func<TSource, Task<IEnumerable<TResult>>> method)
+    {
+        return (await Task.WhenAll(source.Select(async s => await method(s)))).SelectMany(s => s);
+    }
+
+    public static async Task<IList<TResult>> SelectManyAsync<TSource, TResult>(this IList<TSource> source, Func<TSource, Task<IList<TResult>>> method)
+    {
+        return (await Task.WhenAll(source.Select(async s => await method(s)))).SelectMany(s => s).ToList();
+    }
+
+    #endregion
+
+    public static ICollection<T> ToICollection<T>(this IEnumerable<T> list)
+    {
+        var collection = list as ICollection<T>;
+        return collection ?? list.ToList();
+    }
+
+    public static IEnumerable<IEnumerable<T>> Split<T>(this IEnumerable<T> list, int size)
+    {
+        if (size < 1)
         {
-            return await Task.WhenAll(source.Select(async s => await method(s)));
+            throw new ArgumentOutOfRangeException(nameof(size), size, @"Must not be < 1");
         }
 
-        public static async Task<IEnumerable<TResult>> SelectManyAsync<TSource, TResult>(this IEnumerable<TSource> source, Func<TSource, Task<IEnumerable<TResult>>> method)
-        {
-            return (await Task.WhenAll(source.Select(async s => await method(s)))).SelectMany(s => s);
-        }
+        var listList = new List<IEnumerable<T>>();
+        var count    = 0;
+        var lastList = new List<T>();
 
-        public static async Task<IList<TResult>> SelectManyAsync<TSource, TResult>(this IList<TSource> source, Func<TSource, Task<IList<TResult>>> method)
+        foreach (var element in list)
         {
-            return (await Task.WhenAll(source.Select(async s => await method(s)))).SelectMany(s => s).ToList();
-        }
-
-        #endregion
-
-        public static ICollection<T> ToICollection<T>(this IEnumerable<T> list)
-        {
-            var collection = list as ICollection<T>;
-            return collection ?? list.ToList();
-        }
-
-        public static IEnumerable<IEnumerable<T>> Split<T>(this IEnumerable<T> list, int size)
-        {
-            if (size < 1)
+            if ((count % size) == 0)
             {
-                throw new ArgumentOutOfRangeException(nameof(size), size, @"Must not be < 1");
+                lastList = new List<T>();
+                listList.Add(lastList);
             }
 
-            var listList = new List<IEnumerable<T>>();
-            var count    = 0;
-            var lastList = new List<T>();
+            lastList.Add(element);
+            count++;
+        }
 
-            foreach (var element in list)
+        return listList;
+    }
+
+    public static IEnumerable<IEnumerable<T>> SplitBefore<T>(this IEnumerable<T> list, Func<T, bool> askSplitBefore)
+    {
+        var      listList = new List<IEnumerable<T>>();
+        IList<T> lastList = null;
+
+        foreach (var element in list)
+        {
+            if (askSplitBefore(element) || lastList == null)
             {
-                if ((count % size) == 0)
-                {
-                    lastList = new List<T>();
-                    listList.Add(lastList);
-                }
-
-                lastList.Add(element);
-                count++;
+                lastList = new List<T>();
+                listList.Add(lastList);
             }
 
-            return listList;
+            lastList.Add(element);
         }
 
-        public static IEnumerable<IEnumerable<T>> SplitBefore<T>(this IEnumerable<T> list, Func<T, bool> askSplitBefore)
+        return listList;
+    }
+
+    public static IEnumerable<IEnumerable<T>> SplitAfter<T>(this IEnumerable<T> list, Func<T, bool> askSplitAfter)
+    {
+        var      listList = new List<IEnumerable<T>>();
+        IList<T> lastList = null;
+
+        foreach (var element in list)
         {
-            var      listList = new List<IEnumerable<T>>();
-            IList<T> lastList = null;
-
-            foreach (var element in list)
+            if (lastList == null)
             {
-                if (askSplitBefore(element) || lastList == null)
-                {
-                    lastList = new List<T>();
-                    listList.Add(lastList);
-                }
-
-                lastList.Add(element);
+                lastList = new List<T>();
+                listList.Add(lastList);
             }
 
-            return listList;
-        }
+            lastList.Add(element);
 
-        public static IEnumerable<IEnumerable<T>> SplitAfter<T>(this IEnumerable<T> list, Func<T, bool> askSplitAfter)
-        {
-            var      listList = new List<IEnumerable<T>>();
-            IList<T> lastList = null;
-
-            foreach (var element in list)
+            if (askSplitAfter(element))
             {
-                if (lastList == null)
-                {
-                    lastList = new List<T>();
-                    listList.Add(lastList);
-                }
-
-                lastList.Add(element);
-
-                if (askSplitAfter(element))
-                {
-                    lastList = null;
-                }
+                lastList = null;
             }
-
-            return listList;
         }
 
-        public static IEnumerable<T> Select<T>(this IEnumerable list, PropertyInfo pi)
+        return listList;
+    }
+
+    public static IEnumerable<T> Select<T>(this IEnumerable list, PropertyInfo pi)
+    {
+        IList<T> returnList = new List<T>();
+
+        foreach (var element in list)
         {
-            IList<T> returnList = new List<T>();
-
-            foreach (var element in list)
-            {
-                var val = (T)pi.GetValue(element);
-                returnList.Add(val);
-            }
-
-            return returnList;
+            var val = (T)pi.GetValue(element);
+            returnList.Add(val);
         }
 
-        public static IEnumerable<T> DistinctBy<T, TKey>(this IEnumerable<T> items, Func<T, TKey> property)
-        {
-            return items.GroupBy(property).Select(x => x.First());
-        }
+        return returnList;
+    }
+
+    public static IEnumerable<T> DistinctBy<T, TKey>(this IEnumerable<T> items, Func<T, TKey> property)
+    {
+        return items.GroupBy(property).Select(x => x.First());
     }
 }

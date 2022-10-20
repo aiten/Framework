@@ -14,24 +14,23 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.WebAPI.Controller
+namespace Framework.WebAPI.Controller;
+
+using System.Collections.Generic;
+using System.Linq;
+
+public class UriAndValue<TDto> where TDto : class
 {
-    using System.Collections.Generic;
-    using System.Linq;
+    public string Uri { get; set; }
 
-    public class UriAndValue<TDto> where TDto : class
+    public TDto Value { get; set; }
+}
+
+public static class UriAndValueExtension
+{
+    public static UrisAndValues<T> ToUrisAndValues<T>(this IEnumerable<UriAndValue<T>> from) where T : class
     {
-        public string Uri { get; set; }
-
-        public TDto Value { get; set; }
-    }
-
-    public static class UriAndValueExtension
-    {
-        public static UrisAndValues<T> ToUrisAndValues<T>(this IEnumerable<UriAndValue<T>> from) where T : class
-        {
-            var fromArray = from.ToArray();
-            return new UrisAndValues<T>() { Value = fromArray.Select(v => v.Value), Uri = fromArray.Select(u => u.Uri) };
-        }
+        var fromArray = from.ToArray();
+        return new UrisAndValues<T>() { Value = fromArray.Select(v => v.Value), Uri = fromArray.Select(u => u.Uri) };
     }
 }

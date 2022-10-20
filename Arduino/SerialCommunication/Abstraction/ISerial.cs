@@ -14,91 +14,90 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.Arduino.SerialCommunication.Abstraction
+namespace Framework.Arduino.SerialCommunication.Abstraction;
+
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+
+public interface ISerial : IDisposable
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Threading.Tasks;
+    #region Setup/Init
 
-    public interface ISerial : IDisposable
-    {
-        #region Setup/Init
+    Task ConnectAsync(string portName, string serverName, string userName, string password);
+    Task DisconnectAsync();
+    void AbortCommands();
+    void ResumeAfterAbort();
 
-        Task ConnectAsync(string portName, string serverName, string userName, string password);
-        Task DisconnectAsync();
-        void AbortCommands();
-        void ResumeAfterAbort();
+    #endregion
 
-        #endregion
+    #region Pubic
 
-        #region Pubic
+    Task<IEnumerable<SerialCommand>> QueueCommandsAsync(IEnumerable<string> commands);
+    Task<IEnumerable<SerialCommand>> SendCommandsAsync(IEnumerable<string>  commands, int maxMilliseconds);
 
-        Task<IEnumerable<SerialCommand>> QueueCommandsAsync(IEnumerable<string> commands);
-        Task<IEnumerable<SerialCommand>> SendCommandsAsync(IEnumerable<string>  commands, int maxMilliseconds);
+    Task<string> WaitUntilResponseAsync(int   maxMilliseconds);
+    Task<bool>   WaitUntilQueueEmptyAsync(int maxMilliseconds);
 
-        Task<string> WaitUntilResponseAsync(int   maxMilliseconds);
-        Task<bool>   WaitUntilQueueEmptyAsync(int maxMilliseconds);
+    #endregion;
 
-        #endregion;
+    #region Events
 
-        #region Events
+    // The event we publish
+    event CommandEventHandler WaitForSend;
+    event CommandEventHandler CommandSending;
+    event CommandEventHandler CommandSent;
+    event CommandEventHandler WaitCommandSent;
+    event CommandEventHandler ReplyReceived;
+    event CommandEventHandler ReplyOk;
+    event CommandEventHandler ReplyError;
+    event CommandEventHandler ReplyInfo;
+    event CommandEventHandler ReplyUnknown;
+    event CommandEventHandler CommandQueueChanged;
+    event CommandEventHandler CommandQueueEmpty;
 
-        // The event we publish
-        event CommandEventHandler WaitForSend;
-        event CommandEventHandler CommandSending;
-        event CommandEventHandler CommandSent;
-        event CommandEventHandler WaitCommandSent;
-        event CommandEventHandler ReplyReceived;
-        event CommandEventHandler ReplyOk;
-        event CommandEventHandler ReplyError;
-        event CommandEventHandler ReplyInfo;
-        event CommandEventHandler ReplyUnknown;
-        event CommandEventHandler CommandQueueChanged;
-        event CommandEventHandler CommandQueueEmpty;
+    #endregion
 
-        #endregion
+    #region Properties
 
-        #region Properties
+    bool IsConnected { get; }
 
-        bool IsConnected { get; }
+    int CommandsInQueue { get; }
 
-        int CommandsInQueue { get; }
+    IEnumerable<SerialCommand> PendingCommands { get; }
 
-        IEnumerable<SerialCommand> PendingCommands { get; }
+    bool Pause    { get; set; }
+    bool SendNext { get; set; }
 
-        bool Pause    { get; set; }
-        bool SendNext { get; set; }
+    int BaudRate { get; set; }
 
-        int BaudRate { get; set; }
+    /// <summary>
+    /// Dtr is used as reset, e.g Arduino Uno, Mega, ..., not reset for Arduino Zero
+    /// </summary>
+    bool DtrIsReset { get; set; }
 
-        /// <summary>
-        /// Dtr is used as reset, e.g Arduino Uno, Mega, ..., not reset for Arduino Zero
-        /// </summary>
-        bool DtrIsReset { get; set; }
+    /// <summary>
+    /// Reset on Connect (only possible if DtrIsReset is true)
+    /// </summary>
+    bool ResetOnConnect { get; set; }
 
-        /// <summary>
-        /// Reset on Connect (only possible if DtrIsReset is true)
-        /// </summary>
-        bool ResetOnConnect { get; set; }
+    string OkTag                  { get; set; }
+    string ErrorTag               { get; set; }
+    string InfoTag                { get; set; }
+    bool   CommandToUpper         { get; set; }
+    bool   ErrorIsReply           { get; set; }
+    int    MaxCommandHistoryCount { get; set; }
+    int    ArduinoBufferSize      { get; set; }
+    int    ArduinoLineSize        { get; set; }
+    bool   Aborted                { get; }
 
-        string OkTag                  { get; set; }
-        string ErrorTag               { get; set; }
-        string InfoTag                { get; set; }
-        bool   CommandToUpper         { get; set; }
-        bool   ErrorIsReply           { get; set; }
-        int    MaxCommandHistoryCount { get; set; }
-        int    ArduinoBufferSize      { get; set; }
-        int    ArduinoLineSize        { get; set; }
-        bool   Aborted                { get; }
+    #endregion
 
-        #endregion
+    #region CommandHistory
 
-        #region CommandHistory
+    SerialCommand       LastCommand        { get; }
+    List<SerialCommand> CommandHistoryCopy { get; }
+    void                ClearCommandHistory();
 
-        SerialCommand       LastCommand        { get; }
-        List<SerialCommand> CommandHistoryCopy { get; }
-        void                ClearCommandHistory();
-
-        #endregion
-    }
+    #endregion
 }

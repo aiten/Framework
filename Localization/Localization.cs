@@ -14,74 +14,73 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.Localization
+namespace Framework.Localization;
+
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using System.Resources;
+
+using Framework.Localization.Abstraction;
+
+public class LocalizationCollector : ILocalizationCollector
 {
-    using System;
-    using System.Collections;
-    using System.Collections.Generic;
-    using System.Globalization;
-    using System.Linq;
-    using System.Resources;
-
-    using Framework.Localization.Abstraction;
-
-    public class LocalizationCollector : ILocalizationCollector
+    public LocalizationCollector()
     {
-        public LocalizationCollector()
-        {
-            Resources.Add(ErrorMessages.ResourceManager);
-        }
+        Resources.Add(ErrorMessages.ResourceManager);
+    }
 
-        public IList<ResourceManager> Resources { get; set; } = new List<ResourceManager>();
+    public IList<ResourceManager> Resources { get; set; } = new List<ResourceManager>();
 
-        public Dictionary<string, object> Generate(CultureInfo cultureInfo)
+    public Dictionary<string, object> Generate(CultureInfo cultureInfo)
+    {
+        var result = new Dictionary<string, object>();
+        foreach (var mgr in Resources)
         {
-            var result = new Dictionary<string, object>();
-            foreach (var mgr in Resources)
+            var allInResource = mgr.GetResourceSet(cultureInfo, true, true);
+
+            if (allInResource != null)
             {
-                var allInResource = mgr.GetResourceSet(cultureInfo, true, true);
-
-                if (allInResource != null)
+                foreach (DictionaryEntry x in allInResource)
                 {
-                    foreach (DictionaryEntry x in allInResource)
+                    var keys  = ((string)x.Key).Split('.');
+                    var value = (string)x.Value;
+
+                    var current = result;
+
+                    foreach (var key in keys.Take(keys.Length - 1))
                     {
-                        var keys  = ((string)x.Key).Split('.');
-                        var value = (string)x.Value;
-
-                        var current = result;
-
-                        foreach (var key in keys.Take(keys.Length - 1))
+                        if (current.ContainsKey(key))
                         {
-                            if (current.ContainsKey(key))
+                            var val = current[key];
+                            if (val is string)
                             {
-                                var val = current[key];
-                                if (val is string)
-                                {
-                                    throw new Exception(ErrorMessages.ResourceManager.ToLocalizable(nameof(ErrorMessages.Localization_Configuration_KeyIsUsed), new object[] { (string)x.Key }).Message());
-                                }
+                                throw new Exception(ErrorMessages.ResourceManager.ToLocalizable(nameof(ErrorMessages.Localization_Configuration_KeyIsUsed), new object[] { (string)x.Key }).Message());
+                            }
 
-                                current = (Dictionary<string, object>)val;
-                            }
-                            else
-                            {
-                                var newCurrent = new Dictionary<string, object>();
-                                current[key] = newCurrent;
-                                current      = newCurrent;
-                            }
+                            current = (Dictionary<string, object>)val;
                         }
-
-                        var lastKey = keys.Last();
-                        if (current.ContainsKey(lastKey))
+                        else
                         {
-                            throw new Exception(ErrorMessages.ResourceManager.ToLocalizable(nameof(ErrorMessages.Localization_Configuration_DuplicatedKey), new object[] { (string)x.Key }).Message());
+                            var newCurrent = new Dictionary<string, object>();
+                            current[key] = newCurrent;
+                            current      = newCurrent;
                         }
-
-                        current[lastKey] = value;
                     }
+
+                    var lastKey = keys.Last();
+                    if (current.ContainsKey(lastKey))
+                    {
+                        throw new Exception(ErrorMessages.ResourceManager.ToLocalizable(nameof(ErrorMessages.Localization_Configuration_DuplicatedKey), new object[] { (string)x.Key }).Message());
+                    }
+
+                    current[lastKey] = value;
                 }
             }
-
-            return result;
         }
+
+        return result;
     }
 }

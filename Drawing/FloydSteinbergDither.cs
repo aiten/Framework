@@ -14,63 +14,62 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.Drawing
+namespace Framework.Drawing;
+
+public class FloydSteinbergDither : DitherBase
 {
-    public class FloydSteinbergDither : DitherBase
+    #region private members
+
+    #endregion
+
+    #region properties
+
+    #endregion
+
+    #region public
+
+    #endregion
+
+    #region private helper
+
+    protected override void ConvertImage()
     {
-        #region private members
-
-        #endregion
-
-        #region properties
-
-        #endregion
-
-        #region public
-
-        #endregion
-
-        #region private helper
-
-        protected override void ConvertImage()
+        for (int y = 0; y < Height; y++)
         {
-            for (int y = 0; y < Height; y++)
+            for (int x = 0; x < Width; x++)
             {
-                for (int x = 0; x < Width; x++)
+                Color currentPixel = GetPixel(x, y);
+                currentPixel.Saturation();
+
+                // Color bestColorRGB = FindNearestColorBW(currentPixel);
+                Color bestColorRGB = FindNearestColorGrayScale(currentPixel);
+                SetPixel(x, y, bestColorRGB);
+
+                int errorR = (currentPixel.R) - (bestColorRGB.R);
+                int errorG = (currentPixel.G) - (bestColorRGB.G);
+                int errorB = (currentPixel.B) - (bestColorRGB.B);
+
+                if (x + 1 < Width)
                 {
-                    Color currentPixel = GetPixel(x, y);
-                    currentPixel.Saturation();
+                    AddPixelSaturation(x + 1, y + 0, (errorR * 7) / 16, (errorG * 7) / 16, (errorB * 7) / 16, 0);
+                }
 
-                    // Color bestColorRGB = FindNearestColorBW(currentPixel);
-                    Color bestColorRGB = FindNearestColorGrayScale(currentPixel);
-                    SetPixel(x, y, bestColorRGB);
-
-                    int errorR = (currentPixel.R) - (bestColorRGB.R);
-                    int errorG = (currentPixel.G) - (bestColorRGB.G);
-                    int errorB = (currentPixel.B) - (bestColorRGB.B);
-
-                    if (x + 1 < Width)
+                if (y + 1 < Height)
+                {
+                    if (x - 1 >= 0)
                     {
-                        AddPixelSaturation(x + 1, y + 0, (errorR * 7) / 16, (errorG * 7) / 16, (errorB * 7) / 16, 0);
+                        AddPixelSaturation(x - 1, y + 1, (errorR * 3) / 16, (errorG * 3) / 16, (errorB * 3) / 16, 0);
                     }
 
-                    if (y + 1 < Height)
+                    AddPixelSaturation(x + 0, y + 1, (errorR * 5) / 16, (errorG * 5) / 16, (errorB * 5) / 16, 0);
+                    if (x + 1 < Width)
                     {
-                        if (x - 1 >= 0)
-                        {
-                            AddPixelSaturation(x - 1, y + 1, (errorR * 3) / 16, (errorG * 3) / 16, (errorB * 3) / 16, 0);
-                        }
-
-                        AddPixelSaturation(x + 0, y + 1, (errorR * 5) / 16, (errorG * 5) / 16, (errorB * 5) / 16, 0);
-                        if (x + 1 < Width)
-                        {
-                            AddPixelSaturation(x + 1, y + 1, (errorR * 1) / 16, (errorG * 1) / 16, (errorB * 1) / 16, 0);
-                        }
+                        AddPixelSaturation(x + 1, y + 1, (errorR * 1) / 16, (errorG * 1) / 16, (errorB * 1) / 16, 0);
                     }
                 }
             }
         }
     }
-
-    #endregion
 }
+
+#endregion

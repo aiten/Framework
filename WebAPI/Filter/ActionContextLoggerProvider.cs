@@ -14,30 +14,29 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.WebAPI.Filter
+namespace Framework.WebAPI.Filter;
+
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Controllers;
+using Microsoft.Extensions.Logging;
+
+public abstract class ActionContextLoggerProvider
 {
-    using Microsoft.AspNetCore.Mvc;
-    using Microsoft.AspNetCore.Mvc.Controllers;
-    using Microsoft.Extensions.Logging;
+    private readonly ILoggerFactory _loggerFactory;
 
-    public abstract class ActionContextLoggerProvider
+    protected ActionContextLoggerProvider(ILoggerFactory loggerFactory)
     {
-        private readonly ILoggerFactory _loggerFactory;
+        _loggerFactory = loggerFactory;
+    }
 
-        protected ActionContextLoggerProvider(ILoggerFactory loggerFactory)
+    protected ILogger CreateLogger(ActionContext context)
+    {
+        if (context.ActionDescriptor is ControllerActionDescriptor cas)
         {
-            _loggerFactory = loggerFactory;
+            return _loggerFactory.CreateLogger(cas.ControllerTypeInfo.AsType());
         }
 
-        protected ILogger CreateLogger(ActionContext context)
-        {
-            if (context.ActionDescriptor is ControllerActionDescriptor cas)
-            {
-                return _loggerFactory.CreateLogger(cas.ControllerTypeInfo.AsType());
-            }
-
-            // Should not happen, but if it does we use string identifier.
-            return _loggerFactory.CreateLogger("WebApiFilter");
-        }
+        // Should not happen, but if it does we use string identifier.
+        return _loggerFactory.CreateLogger("WebApiFilter");
     }
 }

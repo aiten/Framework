@@ -14,16 +14,15 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.Startup.Abstraction
+namespace Framework.Startup.Abstraction;
+
+using Framework.Localization.Abstraction;
+
+using Microsoft.Extensions.DependencyInjection;
+
+public interface IModuleInitializer
 {
-    using Framework.Localization.Abstraction;
+    void AddServices(IServiceCollection service);
 
-    using Microsoft.Extensions.DependencyInjection;
-
-    public interface IModuleInitializer
-    {
-        void AddServices(IServiceCollection service);
-
-        void AddTranslationResources(ILocalizationCollector localisation);
-    }
+    void AddTranslationResources(ILocalizationCollector localisation);
 }

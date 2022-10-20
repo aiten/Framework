@@ -14,18 +14,17 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.Drawing
+namespace Framework.Drawing;
+
+using System;
+
+public class Point2D
 {
-    using System;
+    public double X { get; set; }
+    public double Y { get; set; }
 
-    public class Point2D
+    public bool Compare(Point2D to)
     {
-        public double X { get; set; }
-        public double Y { get; set; }
-
-        public bool Compare(Point2D to)
-        {
-            return Math.Abs(X - to.X) < double.Epsilon && Math.Abs(Y - to.Y) < double.Epsilon;
-        }
+        return Math.Abs(X - to.X) < double.Epsilon && Math.Abs(Y - to.Y) < double.Epsilon;
     }
 }

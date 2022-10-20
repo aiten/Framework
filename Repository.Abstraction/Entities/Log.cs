@@ -14,26 +14,25 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.Repository.Abstraction.Entities
-{
-    using System;
+namespace Framework.Repository.Abstraction.Entities;
 
-    public class Log
-    {
-        public int      Id            { get; set; }
-        public DateTime LogDate       { get; set; }
-        public string   Application   { get; set; }
-        public string   Level         { get; set; }
-        public string   Message       { get; set; }
-        public string   UserName      { get; set; }
-        public string   ServerName    { get; set; }
-        public string   MachineName   { get; set; }
-        public string   Port          { get; set; }
-        public string   Url           { get; set; }
-        public string   ServerAddress { get; set; }
-        public string   RemoteAddress { get; set; }
-        public string   Logger        { get; set; }
-        public string   Exception     { get; set; }
-        public string   StackTrace    { get; set; }
-    }
+using System;
+
+public class Log
+{
+    public int      Id            { get; set; }
+    public DateTime LogDate       { get; set; }
+    public string   Application   { get; set; }
+    public string   Level         { get; set; }
+    public string   Message       { get; set; }
+    public string   UserName      { get; set; }
+    public string   ServerName    { get; set; }
+    public string   MachineName   { get; set; }
+    public string   Port          { get; set; }
+    public string   Url           { get; set; }
+    public string   ServerAddress { get; set; }
+    public string   RemoteAddress { get; set; }
+    public string   Logger        { get; set; }
+    public string   Exception     { get; set; }
+    public string   StackTrace    { get; set; }
 }

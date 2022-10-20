@@ -14,56 +14,55 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.Schedule
+namespace Framework.Schedule;
+
+using System;
+
+using Framework.Schedule.Abstraction;
+
+public static class JobSchedulerExtension
 {
-    using System;
-
-    using Framework.Schedule.Abstraction;
-
-    public static class JobSchedulerExtension
+    public static IJobExecutor SetOptions(this IJobExecutor executor, Action<IJobExecutor> setOption)
     {
-        public static IJobExecutor SetOptions(this IJobExecutor executor, Action<IJobExecutor> setOption)
-        {
-            setOption?.Invoke(executor);
-            return executor;
-        }
+        setOption?.Invoke(executor);
+        return executor;
+    }
 
-        public static IJobExecutor Periodic(this IJobScheduler scheduler, TimeSpan period, Type job)
-        {
-            var schedule = new PeriodicSchedule(period);
-            return scheduler.ScheduleJob(schedule, job);
-        }
+    public static IJobExecutor Periodic(this IJobScheduler scheduler, TimeSpan period, Type job)
+    {
+        var schedule = new PeriodicSchedule(period);
+        return scheduler.ScheduleJob(schedule, job);
+    }
 
-        public static IJobExecutor Periodic<T>(this IJobScheduler scheduler, TimeSpan period, Action<IJobExecutor> setOption = null) where T : IJob
-        {
-            return scheduler.Periodic(period, typeof(T)).SetOptions(setOption);
-        }
+    public static IJobExecutor Periodic<T>(this IJobScheduler scheduler, TimeSpan period, Action<IJobExecutor> setOption = null) where T : IJob
+    {
+        return scheduler.Periodic(period, typeof(T)).SetOptions(setOption);
+    }
 
-        public static IJobExecutor Daily(this IJobScheduler scheduler, TimeSpan timeOfDay, Type job, Action<IJobExecutor> setOption = null)
-        {
-            var schedule = new DailySchedule(timeOfDay);
-            return scheduler.ScheduleJob(schedule, job).SetOptions(setOption);
-        }
+    public static IJobExecutor Daily(this IJobScheduler scheduler, TimeSpan timeOfDay, Type job, Action<IJobExecutor> setOption = null)
+    {
+        var schedule = new DailySchedule(timeOfDay);
+        return scheduler.ScheduleJob(schedule, job).SetOptions(setOption);
+    }
 
-        public static IJobExecutor Daily<T>(this IJobScheduler scheduler, TimeSpan timeOfDay, Action<IJobExecutor> setOption = null) where T : IJob
-        {
-            return scheduler.Daily(timeOfDay, typeof(T)).SetOptions(setOption);
-        }
+    public static IJobExecutor Daily<T>(this IJobScheduler scheduler, TimeSpan timeOfDay, Action<IJobExecutor> setOption = null) where T : IJob
+    {
+        return scheduler.Daily(timeOfDay, typeof(T)).SetOptions(setOption);
+    }
 
-        public static IJobExecutor Timed(this IJobScheduler scheduler, Type job, Action<IJobExecutor> setOption = null)
-        {
-            var schedule = new SelfScheduledSchedule();
-            return scheduler.ScheduleJob(schedule, job).SetOptions(setOption);
-        }
+    public static IJobExecutor Timed(this IJobScheduler scheduler, Type job, Action<IJobExecutor> setOption = null)
+    {
+        var schedule = new SelfScheduledSchedule();
+        return scheduler.ScheduleJob(schedule, job).SetOptions(setOption);
+    }
 
-        public static IJobExecutor Timed<T>(this IJobScheduler scheduler, Action<IJobExecutor> setOption = null) where T : ISelfScheduledJob
-        {
-            return scheduler.Timed(typeof(T)).SetOptions(setOption);
-        }
+    public static IJobExecutor Timed<T>(this IJobScheduler scheduler, Action<IJobExecutor> setOption = null) where T : ISelfScheduledJob
+    {
+        return scheduler.Timed(typeof(T)).SetOptions(setOption);
+    }
 
-        public static IJobExecutor Then<T>(this IJobExecutor jobExecutor, Action<IJobExecutor> setOption = null) where T : IJob
-        {
-            return jobExecutor.Then(typeof(T)).SetOptions(setOption);
-        }
+    public static IJobExecutor Then<T>(this IJobExecutor jobExecutor, Action<IJobExecutor> setOption = null) where T : IJob
+    {
+        return jobExecutor.Then(typeof(T)).SetOptions(setOption);
     }
 }

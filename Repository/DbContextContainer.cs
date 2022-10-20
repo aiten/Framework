@@ -14,24 +14,23 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.Repository
+namespace Framework.Repository;
+
+using Microsoft.EntityFrameworkCore;
+
+public class DbContextContainer
 {
-    using Microsoft.EntityFrameworkCore;
+    public DbContext DbContext { get; set; }
 
-    public class DbContextContainer
+    protected DbContextContainer(DbContext dbContext)
     {
-        public DbContext DbContext { get; set; }
-
-        protected DbContextContainer(DbContext dbContext)
-        {
-            this.DbContext = dbContext;
-        }
+        this.DbContext = dbContext;
     }
+}
 
-    public class DbContextContainer<TDbContext> : DbContextContainer where TDbContext : DbContext
+public class DbContextContainer<TDbContext> : DbContextContainer where TDbContext : DbContext
+{
+    public DbContextContainer(TDbContext dbContext) : base(dbContext)
     {
-        public DbContextContainer(TDbContext dbContext) : base(dbContext)
-        {
-        }
     }
 }

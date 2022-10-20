@@ -14,61 +14,60 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.Tools
+namespace Framework.Tools;
+
+using System;
+using System.Threading;
+
+public class DelayedExecution
 {
-    using System;
-    using System.Threading;
+    Timer _timer;
+    bool  _pendingTimer = false;
+    bool  _needExecute  = false;
 
-    public class DelayedExecution
+    public void Execute(int delayedMs, Action set, Action execute)
     {
-        Timer _timer;
-        bool  _pendingTimer = false;
-        bool  _needExecute  = false;
-
-        public void Execute(int delayedMs, Action set, Action execute)
+        if (_timer == null)
         {
-            if (_timer == null)
-            {
-                // first call, start timer
-                _pendingTimer = true;
-                _needExecute  = false;
-                set();
-                execute();
+            // first call, start timer
+            _pendingTimer = true;
+            _needExecute  = false;
+            set();
+            execute();
 
-                _timer = new Timer(
-                    (_) =>
+            _timer = new Timer(
+                (_) =>
+                {
+                    if (_needExecute)
                     {
-                        if (_needExecute)
-                        {
-                            // "Execute" and start timer again
-                            _needExecute = false;
-                            execute();
-                            _timer.Change(delayedMs, Timeout.Infinite);
-                        }
-                        else
-                        {
-                            _pendingTimer = false;
-                        }
-                    },
-                    this,
-                    delayedMs,
-                    Timeout.Infinite);
-            }
-            else if (_pendingTimer)
-            {
-                // last "execute" within delayedMS => do not call execute but "set" new values
-                _needExecute = true;
-                set();
-            }
-            else
-            {
-                // restart again
-                _pendingTimer = true;
-                _needExecute  = false;
-                set();
-                execute();
-                _timer.Change(delayedMs, Timeout.Infinite);
-            }
+                        // "Execute" and start timer again
+                        _needExecute = false;
+                        execute();
+                        _timer.Change(delayedMs, Timeout.Infinite);
+                    }
+                    else
+                    {
+                        _pendingTimer = false;
+                    }
+                },
+                this,
+                delayedMs,
+                Timeout.Infinite);
+        }
+        else if (_pendingTimer)
+        {
+            // last "execute" within delayedMS => do not call execute but "set" new values
+            _needExecute = true;
+            set();
+        }
+        else
+        {
+            // restart again
+            _pendingTimer = true;
+            _needExecute  = false;
+            set();
+            execute();
+            _timer.Change(delayedMs, Timeout.Infinite);
         }
     }
 }

@@ -14,18 +14,56 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.Wpf.Helpers
-{
-    using System;
-    using System.Threading;
-    using System.Threading.Tasks;
-    using System.Windows.Input;
+namespace Framework.Wpf.Helpers;
 
-    public class DelegateCommandAsync<T> : ICommand
+using System;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Windows.Input;
+
+public class DelegateCommandAsync<T> : ICommand
+{
+    private readonly Func<CancellationToken, Task<T>> _command;
+    private readonly Func<bool>                       _canExecute;
+    private readonly CancelAsyncCommand               _cancelCommand = new CancelAsyncCommand();
+
+    public event EventHandler CanExecuteChanged
     {
-        private readonly Func<CancellationToken, Task<T>> _command;
-        private readonly Func<bool>                       _canExecute;
-        private readonly CancelAsyncCommand               _cancelCommand = new CancelAsyncCommand();
+        add => CommandManager.RequerySuggested += value;
+        remove => CommandManager.RequerySuggested -= value;
+    }
+
+    protected void RaiseCanExecuteChanged()
+    {
+        CommandManager.InvalidateRequerySuggested();
+    }
+
+    public DelegateCommandAsync(Func<CancellationToken, Task<T>> command, Func<bool> canExecute = null)
+    {
+        _command    = command;
+        _canExecute = canExecute;
+    }
+
+    public async void Execute(object parameter)
+    {
+        _cancelCommand.NotifyCommandStarting();
+        RaiseCanExecuteChanged();
+        await _command(_cancelCommand.Token);
+        _cancelCommand.NotifyCommandFinished();
+        RaiseCanExecuteChanged();
+    }
+
+    public ICommand CancelCommand => _cancelCommand;
+
+    public bool CanExecute(object parameter)
+    {
+        return _canExecute == null || _canExecute();
+    }
+
+    private sealed class CancelAsyncCommand : ICommand
+    {
+        private CancellationTokenSource _cts = new CancellationTokenSource();
+        private bool                    _commandExecuting;
 
         public event EventHandler CanExecuteChanged
         {
@@ -33,79 +71,40 @@ namespace Framework.Wpf.Helpers
             remove => CommandManager.RequerySuggested -= value;
         }
 
-        protected void RaiseCanExecuteChanged()
+        private void RaiseCanExecuteChanged()
         {
             CommandManager.InvalidateRequerySuggested();
         }
 
-        public DelegateCommandAsync(Func<CancellationToken, Task<T>> command, Func<bool> canExecute = null)
+        public CancellationToken Token => _cts.Token;
+
+        public void NotifyCommandStarting()
         {
-            _command    = command;
-            _canExecute = canExecute;
+            _commandExecuting = true;
+            if (!_cts.IsCancellationRequested)
+            {
+                return;
+            }
+
+            _cts = new CancellationTokenSource();
+            RaiseCanExecuteChanged();
         }
 
-        public async void Execute(object parameter)
+        public void NotifyCommandFinished()
         {
-            _cancelCommand.NotifyCommandStarting();
-            RaiseCanExecuteChanged();
-            await _command(_cancelCommand.Token);
-            _cancelCommand.NotifyCommandFinished();
+            _commandExecuting = false;
             RaiseCanExecuteChanged();
         }
-
-        public ICommand CancelCommand => _cancelCommand;
 
         public bool CanExecute(object parameter)
         {
-            return _canExecute == null || _canExecute();
+            return _commandExecuting && !_cts.IsCancellationRequested;
         }
 
-        private sealed class CancelAsyncCommand : ICommand
+        public void Execute(object parameter)
         {
-            private CancellationTokenSource _cts = new CancellationTokenSource();
-            private bool                    _commandExecuting;
-
-            public event EventHandler CanExecuteChanged
-            {
-                add => CommandManager.RequerySuggested += value;
-                remove => CommandManager.RequerySuggested -= value;
-            }
-
-            private void RaiseCanExecuteChanged()
-            {
-                CommandManager.InvalidateRequerySuggested();
-            }
-
-            public CancellationToken Token => _cts.Token;
-
-            public void NotifyCommandStarting()
-            {
-                _commandExecuting = true;
-                if (!_cts.IsCancellationRequested)
-                {
-                    return;
-                }
-
-                _cts = new CancellationTokenSource();
-                RaiseCanExecuteChanged();
-            }
-
-            public void NotifyCommandFinished()
-            {
-                _commandExecuting = false;
-                RaiseCanExecuteChanged();
-            }
-
-            public bool CanExecute(object parameter)
-            {
-                return _commandExecuting && !_cts.IsCancellationRequested;
-            }
-
-            public void Execute(object parameter)
-            {
-                _cts.Cancel();
-                RaiseCanExecuteChanged();
-            }
+            _cts.Cancel();
+            RaiseCanExecuteChanged();
         }
     }
 }

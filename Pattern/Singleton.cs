@@ -14,44 +14,43 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.Pattern
+namespace Framework.Pattern;
+
+using System.Linq;
+using System.Reflection;
+
+public class Singleton<T> where T : new()
 {
-    using System.Linq;
-    using System.Reflection;
+    private static T _instance;
 
-    public class Singleton<T> where T : new()
+    public static T Instance
     {
-        private static T _instance;
-
-        public static T Instance
+        get
         {
-            get
+            if (_instance == null)
             {
-                if (_instance == null)
-                {
-                    _instance = new T();
-                }
-
-                return _instance;
+                _instance = new T();
             }
+
+            return _instance;
         }
+    }
 
-        public static bool Allocated => _instance != null;
+    public static bool Allocated => _instance != null;
 
-        public static void Free()
+    public static void Free()
+    {
+        if (_instance != null)
         {
-            if (_instance != null)
+            foreach (MethodInfo mi in typeof(T).GetMethods())
             {
-                foreach (MethodInfo mi in typeof(T).GetMethods())
+                if (mi.Name == "Dispose" && !mi.GetParameters().Any())
                 {
-                    if (mi.Name == "Dispose" && !mi.GetParameters().Any())
-                    {
-                        mi.Invoke(_instance, new object[0]);
-                    }
+                    mi.Invoke(_instance, new object[0]);
                 }
-
-                _instance = default(T);
             }
+
+            _instance = default(T);
         }
     }
 }

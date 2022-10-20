@@ -14,22 +14,21 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.Pattern
+namespace Framework.Pattern;
+
+using System;
+
+public class FactoryCreate<T> : IFactory<T> where T : class, IDisposable
 {
-    using System;
-
-    public class FactoryCreate<T> : IFactory<T> where T : class, IDisposable
+    public FactoryCreate(Func<T> createObjectFunc)
     {
-        public FactoryCreate(Func<T> createObjectFunc)
-        {
-            _createObjectFunc = createObjectFunc;
-        }
+        _createObjectFunc = createObjectFunc;
+    }
 
-        private readonly Func<T> _createObjectFunc;
+    private readonly Func<T> _createObjectFunc;
 
-        IScope<T> IFactory<T>.Create()
-        {
-            return new ScopeDispose<T>(_createObjectFunc());
-        }
+    IScope<T> IFactory<T>.Create()
+    {
+        return new ScopeDispose<T>(_createObjectFunc());
     }
 }

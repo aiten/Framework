@@ -14,90 +14,89 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.MyUnitTest.Tools
+namespace Framework.MyUnitTest.Tools;
+
+using FluentAssertions;
+
+using Framework.Tools;
+
+using Xunit;
+
+public class CopyPropertiesExtensionsTest
 {
-    using FluentAssertions;
-
-    using Framework.Tools;
-
-    using Xunit;
-
-    public class CopyPropertiesExtensionsTest
+    public class MyObject
     {
-        public class MyObject
+        public int Ignore { get; set; }
+
+        public int PropInt { get; set; }
+
+        public int? PropIntNull { get; set; }
+
+        public string PropString { get; set; }
+    }
+
+    [Fact]
+    public void CopyPropertiesExtensions()
+    {
+        var objSrc = new MyObject()
         {
-            public int Ignore { get; set; }
+            Ignore      = 1234,
+            PropInt     = 1,
+            PropIntNull = 2,
+            PropString  = "3"
+        };
+        var objDest = new MyObject();
 
-            public int PropInt { get; set; }
+        objDest.CopyProperties(objSrc, nameof(MyObject.Ignore));
 
-            public int? PropIntNull { get; set; }
+        objDest.Ignore.Should().Be(0);
+        objDest.Ignore = objSrc.Ignore;
 
-            public string PropString { get; set; }
-        }
+        objDest.Should().BeEquivalentTo(objSrc);
+    }
 
-        [Fact]
-        public void CopyPropertiesExtensions()
+    [Fact]
+    public void CopyChangedPropertiesExtensions()
+    {
+        var objSrc = new MyObject()
         {
-            var objSrc = new MyObject()
-            {
-                Ignore      = 1234,
-                PropInt     = 1,
-                PropIntNull = 2,
-                PropString  = "3"
-            };
-            var objDest = new MyObject();
+            Ignore      = 1234,
+            PropInt     = 1,
+            PropIntNull = 2,
+            PropString  = "3"
+        };
+        var objSrc2 = new MyObject();
 
-            objDest.CopyProperties(objSrc, nameof(MyObject.Ignore));
+        var objDest = new MyObject();
 
-            objDest.Ignore.Should().Be(0);
-            objDest.Ignore = objSrc.Ignore;
+        // null + null  => null
+        var changedFields = objDest.CopyChangedProperties(objDest, nameof(MyObject.Ignore));
+        changedFields.Should().HaveCount(0);
 
-            objDest.Should().BeEquivalentTo(objSrc);
-        }
+        // null + not null => not null
+        changedFields = objDest.CopyChangedProperties(objSrc, nameof(MyObject.Ignore));
 
-        [Fact]
-        public void CopyChangedPropertiesExtensions()
-        {
-            var objSrc = new MyObject()
-            {
-                Ignore      = 1234,
-                PropInt     = 1,
-                PropIntNull = 2,
-                PropString  = "3"
-            };
-            var objSrc2 = new MyObject();
+        objDest.Ignore.Should().Be(0);
+        objDest.Ignore = objSrc.Ignore;
 
-            var objDest = new MyObject();
+        objDest.Should().BeEquivalentTo(objSrc);
+        changedFields.Should().HaveCount(3);
 
-            // null + null  => null
-            var changedFields = objDest.CopyChangedProperties(objDest, nameof(MyObject.Ignore));
-            changedFields.Should().HaveCount(0);
+        // not null + not null => not null
+        objSrc.PropIntNull = 22;
+        objSrc.PropString  = "33";
+        changedFields      = objDest.CopyChangedProperties(objSrc, nameof(MyObject.Ignore));
 
-            // null + not null => not null
-            changedFields = objDest.CopyChangedProperties(objSrc, nameof(MyObject.Ignore));
+        objDest.Should().BeEquivalentTo(objSrc);
+        changedFields.Should().HaveCount(2);
 
-            objDest.Ignore.Should().Be(0);
-            objDest.Ignore = objSrc.Ignore;
+        // not null + null => null
+        changedFields = objDest.CopyChangedProperties(objSrc2, nameof(MyObject.Ignore));
 
-            objDest.Should().BeEquivalentTo(objSrc);
-            changedFields.Should().HaveCount(3);
+        objDest.Ignore.Should().Be(objSrc.Ignore);
+        objDest.Ignore = objSrc2.Ignore;
 
-            // not null + not null => not null
-            objSrc.PropIntNull = 22;
-            objSrc.PropString  = "33";
-            changedFields      = objDest.CopyChangedProperties(objSrc, nameof(MyObject.Ignore));
-
-            objDest.Should().BeEquivalentTo(objSrc);
-            changedFields.Should().HaveCount(2);
-
-            // not null + null => null
-            changedFields = objDest.CopyChangedProperties(objSrc2, nameof(MyObject.Ignore));
-
-            objDest.Ignore.Should().Be(objSrc.Ignore);
-            objDest.Ignore = objSrc2.Ignore;
-
-            objDest.Should().BeEquivalentTo(objSrc2);
-            changedFields.Should().HaveCount(3);
-        }
+        objDest.Should().BeEquivalentTo(objSrc2);
+        changedFields.Should().HaveCount(3);
     }
 }

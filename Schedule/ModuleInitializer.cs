@@ -14,25 +14,24 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.Schedule
+namespace Framework.Schedule;
+
+using Framework.Localization.Abstraction;
+using Framework.Schedule.Abstraction;
+using Framework.Startup.Abstraction;
+
+using Microsoft.Extensions.DependencyInjection;
+
+public class ModuleInitializer : IModuleInitializer
 {
-    using Framework.Localization.Abstraction;
-    using Framework.Schedule.Abstraction;
-    using Framework.Startup.Abstraction;
-
-    using Microsoft.Extensions.DependencyInjection;
-
-    public class ModuleInitializer : IModuleInitializer
+    public void AddServices(IServiceCollection services)
     {
-        public void AddServices(IServiceCollection services)
-        {
-            services
-                .AddSingleton<IJobScheduler, JobScheduler>()
-                .AddTransient<JobParamContainer>();
-        }
+        services
+            .AddSingleton<IJobScheduler, JobScheduler>()
+            .AddTransient<JobParamContainer>();
+    }
 
-        public void AddTranslationResources(ILocalizationCollector localisation)
-        {
-        }
+    public void AddTranslationResources(ILocalizationCollector localisation)
+    {
     }
 }

@@ -14,44 +14,43 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.Schedule
+namespace Framework.Schedule;
+
+using System;
+using System.Threading;
+
+using Framework.Schedule.Abstraction;
+using Framework.Tools.Abstraction;
+
+using Microsoft.Extensions.Logging;
+
+public sealed class PeriodicSchedule : ISchedule
 {
-    using System;
-    using System.Threading;
+    private readonly TimeSpan _period;
 
-    using Framework.Schedule.Abstraction;
-    using Framework.Tools.Abstraction;
+    public PeriodicSchedule(TimeSpan period)
+    {
+        _period = period;
+    }
 
-    using Microsoft.Extensions.Logging;
+    public IJobExecutor Schedule(IServiceProvider serviceProvider, ILoggerFactory loggerFactory, ICurrentDateTime currentDateTime, Type job)
+    {
+        return new PeriodicJobExecutor(_period, serviceProvider, loggerFactory, currentDateTime, job);
+    }
 
-    public sealed class PeriodicSchedule : ISchedule
+    private sealed class PeriodicJobExecutor : JobExecutor
     {
         private readonly TimeSpan _period;
 
-        public PeriodicSchedule(TimeSpan period)
+        public PeriodicJobExecutor(TimeSpan period, IServiceProvider serviceProvider, ILoggerFactory loggerFactory, ICurrentDateTime currentDateTime, Type job) :
+            base(serviceProvider, loggerFactory, currentDateTime, job)
         {
             _period = period;
         }
 
-        public IJobExecutor Schedule(IServiceProvider serviceProvider, ILoggerFactory loggerFactory, ICurrentDateTime currentDateTime, Type job)
+        public override void Start()
         {
-            return new PeriodicJobExecutor(_period, serviceProvider, loggerFactory, currentDateTime, job);
-        }
-
-        private sealed class PeriodicJobExecutor : JobExecutor
-        {
-            private readonly TimeSpan _period;
-
-            public PeriodicJobExecutor(TimeSpan period, IServiceProvider serviceProvider, ILoggerFactory loggerFactory, ICurrentDateTime currentDateTime, Type job) :
-                base(serviceProvider, loggerFactory, currentDateTime, job)
-            {
-                _period = period;
-            }
-
-            public override void Start()
-            {
-                Timer = new Timer(async (state) => await CastAndRunJob(state), this, TimeSpan.Zero, _period);
-            }
+            Timer = new Timer(async (state) => await CastAndRunJob(state), this, TimeSpan.Zero, _period);
         }
     }
 }

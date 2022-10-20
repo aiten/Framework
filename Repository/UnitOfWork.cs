@@ -14,64 +14,63 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.Repository
+namespace Framework.Repository;
+
+using System;
+using System.Threading.Tasks;
+
+using Abstraction;
+
+using Framework.Localization;
+
+using Microsoft.EntityFrameworkCore;
+
+public class UnitOfWork<T> : IUnitOfWork
+    where T : DbContext
 {
-    using System;
-    using System.Threading.Tasks;
+    public T Context { get; private set; }
 
-    using Abstraction;
-
-    using Framework.Localization;
-
-    using Microsoft.EntityFrameworkCore;
-
-    public class UnitOfWork<T> : IUnitOfWork
-        where T : DbContext
+    public UnitOfWork(T context)
     {
-        public T Context { get; private set; }
-
-        public UnitOfWork(T context)
-        {
-            Context = context;
-        }
-
-        public int SaveChanges()
-        {
-            return Context.SaveChanges();
-        }
-
-        public async Task<int> SaveChangesAsync()
-        {
-            return await Context.SaveChangesAsync();
-        }
-
-        public async Task<int> ExecuteSqlCommand(string sql)
-        {
-            return await Context.Database.ExecuteSqlRawAsync(sql);
-        }
-
-        public async Task<int> ExecuteSqlCommand(string sql, params object[] parameters)
-        {
-            return await Context.Database.ExecuteSqlRawAsync(sql, parameters);
-        }
-
-        #region Transaction
-
-        public bool IsInTransaction()
-        {
-            return Context.Database.CurrentTransaction != null;
-        }
-
-        public ITransaction BeginTransaction()
-        {
-            if (IsInTransaction())
-            {
-                throw new ArgumentException(ErrorMessages.ResourceManager.ToLocalizable(nameof(ErrorMessages.Framework_Repository_NestedTransaction)).Message());
-            }
-
-            return new Transaction(this, Context.Database.BeginTransaction());
-        }
-
-        #endregion
+        Context = context;
     }
+
+    public int SaveChanges()
+    {
+        return Context.SaveChanges();
+    }
+
+    public async Task<int> SaveChangesAsync()
+    {
+        return await Context.SaveChangesAsync();
+    }
+
+    public async Task<int> ExecuteSqlCommandAsync(string sql)
+    {
+        return await Context.Database.ExecuteSqlRawAsync(sql);
+    }
+
+    public async Task<int> ExecuteSqlCommandAsync(string sql, params object[] parameters)
+    {
+        return await Context.Database.ExecuteSqlRawAsync(sql, parameters);
+    }
+
+    #region Transaction
+
+    public bool IsInTransaction()
+    {
+        return Context.Database.CurrentTransaction != null;
+    }
+
+    public ITransaction BeginTransaction()
+    {
+        if (IsInTransaction())
+        {
+            throw new ArgumentException(ErrorMessages.ResourceManager.ToLocalizable(nameof(ErrorMessages.Framework_Repository_NestedTransaction)).Message());
+        }
+
+        return new Transaction(this, Context.Database.BeginTransaction());
+    }
+
+    #endregion
 }

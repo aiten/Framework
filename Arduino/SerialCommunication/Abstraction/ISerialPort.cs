@@ -14,72 +14,71 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.Arduino.SerialCommunication.Abstraction
+namespace Framework.Arduino.SerialCommunication.Abstraction;
+
+using System;
+using System.IO;
+using System.Text;
+
+public enum Parity
 {
-    using System;
-    using System.IO;
-    using System.Text;
+    None  = 0,
+    Odd   = 1,
+    Even  = 2,
+    Mark  = 3,
+    Space = 4
+}
 
-    public enum Parity
-    {
-        None  = 0,
-        Odd   = 1,
-        Even  = 2,
-        Mark  = 3,
-        Space = 4
-    }
+public enum StopBits
+{
+    None         = 0,
+    One          = 1,
+    Two          = 2,
+    OnePointFive = 3
+}
 
-    public enum StopBits
-    {
-        None         = 0,
-        One          = 1,
-        Two          = 2,
-        OnePointFive = 3
-    }
+public enum Handshake
+{
+    None                 = 0,
+    XOnXOff              = 1,
+    RequestToSend        = 2,
+    RequestToSendXOnXOff = 3
+}
 
-    public enum Handshake
-    {
-        None                 = 0,
-        XOnXOff              = 1,
-        RequestToSend        = 2,
-        RequestToSendXOnXOff = 3
-    }
+/// <summary>
+/// Interface to mock SerialPort
+/// </summary>
+public interface ISerialPort : IDisposable
+{
+    string[] GetPortNames();
 
-    /// <summary>
-    /// Interface to mock SerialPort
-    /// </summary>
-    public interface ISerialPort : IDisposable
-    {
-        string[] GetPortNames();
+    void Open();
+    void Close();
 
-        void Open();
-        void Close();
+    void DiscardOutBuffer();
+    void WriteLine(string msg);
 
-        void DiscardOutBuffer();
-        void WriteLine(string msg);
+    string    PortName  { get; set; }
+    int       BaudRate  { get; set; }
+    Parity    Parity    { get; set; }
+    int       DataBits  { get; set; }
+    StopBits  StopBits  { get; set; }
+    Handshake Handshake { get; set; }
+    string    NewLine   { get; set; }
 
-        string    PortName  { get; set; }
-        int       BaudRate  { get; set; }
-        Parity    Parity    { get; set; }
-        int       DataBits  { get; set; }
-        StopBits  StopBits  { get; set; }
-        Handshake Handshake { get; set; }
-        string    NewLine   { get; set; }
+    bool DtrEnable { get; set; }
+    bool RtsEnable { get; set; }
 
-        bool DtrEnable { get; set; }
-        bool RtsEnable { get; set; }
+    bool IsOpen { get; }
 
-        bool IsOpen { get; }
+    // Set the read/write timeouts
+    int ReadTimeout  { get; set; }
+    int WriteTimeout { get; set; }
 
-        // Set the read/write timeouts
-        int ReadTimeout  { get; set; }
-        int WriteTimeout { get; set; }
+    public int BytesToWrite { get; }
+    public int BytesToRead  { get; }
 
-        public int BytesToWrite { get; }
-        public int BytesToRead  { get; }
+    Stream BaseStream { get; }
 
-        Stream BaseStream { get; }
-
-        Encoding Encoding { get; }
-    }
+    Encoding Encoding { get; }
 }

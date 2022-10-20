@@ -14,16 +14,15 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.Service.Abstraction
+namespace Framework.Service.Abstraction;
+
+using System.Collections.Generic;
+using System.Threading.Tasks;
+
+public interface IGetService<T, in TKey> where T : class
 {
-    using System.Collections.Generic;
-    using System.Threading.Tasks;
+    Task<T> GetAsync(TKey id);
 
-    public interface IGetService<T, in TKey> where T : class
-    {
-        Task<T> Get(TKey id);
-
-        Task<IEnumerable<T>> Get(IEnumerable<TKey> keys);
-        Task<IEnumerable<T>> GetAll();
-    }
+    Task<IEnumerable<T>> GetAsync(IEnumerable<TKey> keys);
+    Task<IEnumerable<T>> GetAllAsync();
 }

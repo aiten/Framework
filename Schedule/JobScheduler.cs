@@ -14,52 +14,51 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.Schedule
+namespace Framework.Schedule;
+
+using System;
+using System.Collections.Generic;
+
+using Framework.Schedule.Abstraction;
+using Framework.Tools.Abstraction;
+
+using Microsoft.Extensions.Logging;
+
+public sealed class JobScheduler : IJobScheduler
 {
-    using System;
-    using System.Collections.Generic;
+    private readonly ILoggerFactory      _loggerFactory;
+    private readonly IList<IJobExecutor> _jobExecutorList = new List<IJobExecutor>();
+    private readonly ICurrentDateTime    _currentDateTime;
+    private readonly IServiceProvider    _serviceProvider;
 
-    using Framework.Schedule.Abstraction;
-    using Framework.Tools.Abstraction;
-
-    using Microsoft.Extensions.Logging;
-
-    public sealed class JobScheduler : IJobScheduler
+    public JobScheduler(IServiceProvider serviceProvider, ILoggerFactory loggerFactory, ICurrentDateTime currentDateTime)
     {
-        private readonly ILoggerFactory      _loggerFactory;
-        private readonly IList<IJobExecutor> _jobExecutorList = new List<IJobExecutor>();
-        private readonly ICurrentDateTime    _currentDateTime;
-        private readonly IServiceProvider    _serviceProvider;
+        _serviceProvider = serviceProvider;
+        _loggerFactory   = loggerFactory;
+        _currentDateTime = currentDateTime;
+    }
 
-        public JobScheduler(IServiceProvider serviceProvider, ILoggerFactory loggerFactory, ICurrentDateTime currentDateTime)
+    public IJobExecutor ScheduleJob(ISchedule schedule, Type job)
+    {
+        var jobExecutor = schedule.Schedule(_serviceProvider, _loggerFactory, _currentDateTime, job);
+        _jobExecutorList.Add(jobExecutor);
+        return jobExecutor;
+    }
+
+    public void Start()
+    {
+        foreach (var jobExecutor in _jobExecutorList)
         {
-            _serviceProvider = serviceProvider;
-            _loggerFactory   = loggerFactory;
-            _currentDateTime = currentDateTime;
+            jobExecutor.Start();
         }
+    }
 
-        public IJobExecutor ScheduleJob(ISchedule schedule, Type job)
+    public void Dispose()
+    {
+        foreach (var executor in _jobExecutorList)
         {
-            var jobExecutor = schedule.Schedule(_serviceProvider, _loggerFactory, _currentDateTime, job);
-            _jobExecutorList.Add(jobExecutor);
-            return jobExecutor;
-        }
-
-        public void Start()
-        {
-            foreach (var jobExecutor in _jobExecutorList)
-            {
-                jobExecutor.Start();
-            }
-        }
-
-        public void Dispose()
-        {
-            foreach (var executor in _jobExecutorList)
-            {
-                executor.CtSource.Cancel();
-                executor.Dispose();
-            }
+            executor.CtSource.Cancel();
+            executor.Dispose();
         }
     }
 }

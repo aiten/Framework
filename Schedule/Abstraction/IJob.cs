@@ -14,21 +14,20 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.Schedule.Abstraction
+namespace Framework.Schedule.Abstraction;
+
+using System.Threading;
+using System.Threading.Tasks;
+
+public interface IJob
 {
-    using System.Threading;
-    using System.Threading.Tasks;
+    string JobName { get; set; }
 
-    public interface IJob
-    {
-        string JobName { get; set; }
+    object Param { get; set; }
 
-        object Param { get; set; }
+    CancellationToken CToken { get; set; }
 
-        CancellationToken CToken { get; set; }
+    Task SetContextAsync();
 
-        Task SetContext();
-
-        Task Execute();
-    }
+    Task ExecuteAsync();
 }

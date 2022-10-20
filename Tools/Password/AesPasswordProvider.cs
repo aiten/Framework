@@ -14,85 +14,84 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.Tools.Password
+namespace Framework.Tools.Password;
+
+using System;
+using System.IO;
+using System.Security.Cryptography;
+using System.Text;
+
+public class AesPasswordProvider : ITwoWayPasswordProvider
 {
-    using System;
-    using System.IO;
-    using System.Security.Cryptography;
-    using System.Text;
+    private readonly string _key;
 
-    public class AesPasswordProvider : ITwoWayPasswordProvider
+    public AesPasswordProvider(string key)
     {
-        private readonly string _key;
+        _key = key;
+    }
 
-        public AesPasswordProvider(string key)
-        {
-            _key = key;
-        }
+    public string GetPassword(string passwordHash)
+    {
+        return Decrypt(passwordHash);
+    }
 
-        public string GetPassword(string passwordHash)
-        {
-            return Decrypt(passwordHash);
-        }
+    public string GetPasswordHash(string password)
+    {
+        return Encrypt(password);
+    }
 
-        public string GetPasswordHash(string password)
-        {
-            return Encrypt(password);
-        }
+    public bool ValidatePassword(string password, string correctHash)
+    {
+        return string.CompareOrdinal(correctHash, Encrypt(password)) == 0;
+    }
 
-        public bool ValidatePassword(string password, string correctHash)
+    private string Encrypt(string clearText)
+    {
+        var clearBytes = Encoding.Unicode.GetBytes(clearText);
+        using (var encryptor = Aes.Create())
         {
-            return string.CompareOrdinal(correctHash, Encrypt(password)) == 0;
-        }
+            _ = encryptor ?? throw new ArgumentNullException(nameof(encryptor));
 
-        private string Encrypt(string clearText)
-        {
-            var clearBytes = Encoding.Unicode.GetBytes(clearText);
-            using (var encryptor = Aes.Create())
+            var pdb = new Rfc2898DeriveBytes(_key, new byte[] { 0x49, 0x76, 0x61, 0x6e, 0x20, 0x4d, 0x65, 0x64, 0x76, 0x65, 0x64, 0x65, 0x76 });
+            encryptor.Key = pdb.GetBytes(32);
+            encryptor.IV  = pdb.GetBytes(16);
+            using (var ms = new MemoryStream())
             {
-                _ = encryptor ?? throw new ArgumentNullException(nameof(encryptor));
-
-                var pdb = new Rfc2898DeriveBytes(_key, new byte[] { 0x49, 0x76, 0x61, 0x6e, 0x20, 0x4d, 0x65, 0x64, 0x76, 0x65, 0x64, 0x65, 0x76 });
-                encryptor.Key = pdb.GetBytes(32);
-                encryptor.IV  = pdb.GetBytes(16);
-                using (var ms = new MemoryStream())
+                using (var cs = new CryptoStream(ms, encryptor.CreateEncryptor(), CryptoStreamMode.Write))
                 {
-                    using (var cs = new CryptoStream(ms, encryptor.CreateEncryptor(), CryptoStreamMode.Write))
-                    {
-                        cs.Write(clearBytes, 0, clearBytes.Length);
-                        cs.Close();
-                    }
-
-                    clearText = Convert.ToBase64String(ms.ToArray());
+                    cs.Write(clearBytes, 0, clearBytes.Length);
+                    cs.Close();
                 }
-            }
 
-            return clearText;
+                clearText = Convert.ToBase64String(ms.ToArray());
+            }
         }
 
-        private string Decrypt(string cipherText)
+        return clearText;
+    }
+
+    private string Decrypt(string cipherText)
+    {
+        var cipherBytes = Convert.FromBase64String(cipherText);
+        using (var encryptor = Aes.Create())
         {
-            var cipherBytes = Convert.FromBase64String(cipherText);
-            using (var encryptor = Aes.Create())
+            _ = encryptor ?? throw new ArgumentNullException(nameof(encryptor));
+
+            var pdb = new Rfc2898DeriveBytes(_key, new byte[] { 0x49, 0x76, 0x61, 0x6e, 0x20, 0x4d, 0x65, 0x64, 0x76, 0x65, 0x64, 0x65, 0x76 });
+            encryptor.Key = pdb.GetBytes(32);
+            encryptor.IV  = pdb.GetBytes(16);
+            using (var ms = new MemoryStream())
             {
-                _ = encryptor ?? throw new ArgumentNullException(nameof(encryptor));
-
-                var pdb = new Rfc2898DeriveBytes(_key, new byte[] { 0x49, 0x76, 0x61, 0x6e, 0x20, 0x4d, 0x65, 0x64, 0x76, 0x65, 0x64, 0x65, 0x76 });
-                encryptor.Key = pdb.GetBytes(32);
-                encryptor.IV  = pdb.GetBytes(16);
-                using (var ms = new MemoryStream())
+                using (var cs = new CryptoStream(ms, encryptor.CreateDecryptor(), CryptoStreamMode.Write))
                 {
-                    using (var cs = new CryptoStream(ms, encryptor.CreateDecryptor(), CryptoStreamMode.Write))
-                    {
-                        cs.Write(cipherBytes, 0, cipherBytes.Length);
-                        cs.Close();
-                    }
-
-                    cipherText = Encoding.Unicode.GetString(ms.ToArray());
+                    cs.Write(cipherBytes, 0, cipherBytes.Length);
+                    cs.Close();
                 }
-            }
 
-            return cipherText;
+                cipherText = Encoding.Unicode.GetString(ms.ToArray());
+            }
         }
+
+        return cipherText;
     }
 }

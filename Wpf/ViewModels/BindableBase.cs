@@ -14,33 +14,32 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.Wpf.ViewModels
+namespace Framework.Wpf.ViewModels;
+
+using System;
+using System.Runtime.CompilerServices;
+
+public class BindableBase : Prism.Mvvm.BindableBase
 {
-    using System;
-    using System.Runtime.CompilerServices;
+    #region properties
 
-    public class BindableBase : Prism.Mvvm.BindableBase
+    protected bool SetProperty(Func<bool> equal, Action action, [CallerMemberName] string propertyName = null)
     {
-        #region properties
-
-        protected bool SetProperty(Func<bool> equal, Action action, [CallerMemberName] string propertyName = null)
+        if (equal())
         {
-            if (equal())
-            {
-                return false;
-            }
-
-            RaisePropertyChanged(action, propertyName);
-
-            return true;
+            return false;
         }
 
-        protected void RaisePropertyChanged(Action action, [CallerMemberName] string propertyName = null)
-        {
-            action();
-            RaisePropertyChanged(propertyName);
-        }
+        RaisePropertyChanged(action, propertyName);
 
-        #endregion
+        return true;
     }
+
+    protected void RaisePropertyChanged(Action action, [CallerMemberName] string propertyName = null)
+    {
+        action();
+        RaisePropertyChanged(propertyName);
+    }
+
+    #endregion
 }

@@ -14,63 +14,62 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.Wpf.Helpers
+namespace Framework.Wpf.Helpers;
+
+using System;
+using System.ComponentModel;
+using System.Linq.Expressions;
+using System.Runtime.CompilerServices;
+
+public class NotificationObject : INotifyPropertyChanged
 {
-    using System;
-    using System.ComponentModel;
-    using System.Linq.Expressions;
-    using System.Runtime.CompilerServices;
+    public event PropertyChangedEventHandler PropertyChanged;
 
-    public class NotificationObject : INotifyPropertyChanged
+    // Set Property if value is different
+    protected bool SetProperty<T>(ref T storage, T value, [CallerMemberName] string propertyName = null) where T : IComparable
     {
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        // Set Property if value is different
-        protected bool SetProperty<T>(ref T storage, T value, [CallerMemberName] string propertyName = null) where T : IComparable
+        if (Equals(storage, value))
         {
-            if (Equals(storage, value))
-            {
-                return false; // ref equal
-            }
-
-            if (storage != null && storage.CompareTo(value) == 0)
-            {
-                return false; // logical equal
-            }
-
-            storage = value;
-            RaisePropertyChanged(propertyName);
-            return true;
+            return false; // ref equal
         }
 
-        protected bool SetProperty(Func<bool> equal, Action action, [CallerMemberName] string propertyName = null)
+        if (storage != null && storage.CompareTo(value) == 0)
         {
-            if (equal())
-            {
-                return false;
-            }
-
-            action();
-            RaisePropertyChanged(propertyName);
-
-            return true;
+            return false; // logical equal
         }
 
-        protected void OnProperty(Action action, [CallerMemberName] string propertyName = null)
+        storage = value;
+        RaisePropertyChanged(propertyName);
+        return true;
+    }
+
+    protected bool SetProperty(Func<bool> equal, Action action, [CallerMemberName] string propertyName = null)
+    {
+        if (equal())
         {
-            action();
-            RaisePropertyChanged(propertyName);
+            return false;
         }
 
-        protected void RaisePropertyChanged([CallerMemberName] string propertyName = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
+        action();
+        RaisePropertyChanged(propertyName);
 
-        protected void OnPropertyChanged<TProperty>(Expression<Func<TProperty>> projection)
-        {
-            var memberExpression = (MemberExpression)projection.Body;
-            RaisePropertyChanged(memberExpression.Member.Name);
-        }
+        return true;
+    }
+
+    protected void OnProperty(Action action, [CallerMemberName] string propertyName = null)
+    {
+        action();
+        RaisePropertyChanged(propertyName);
+    }
+
+    protected void RaisePropertyChanged([CallerMemberName] string propertyName = null)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
+
+    protected void OnPropertyChanged<TProperty>(Expression<Func<TProperty>> projection)
+    {
+        var memberExpression = (MemberExpression)projection.Body;
+        RaisePropertyChanged(memberExpression.Member.Name);
     }
 }

@@ -14,59 +14,58 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.Pattern
+namespace Framework.Pattern;
+
+using System;
+
+public class DisposeWrapper : IDisposable
 {
-    using System;
+    #region IDisposable Support
 
-    public class DisposeWrapper : IDisposable
+    private bool _disposedValue = false; // To detect redundant calls
+
+    protected virtual void DisposeManaged()
     {
-        #region IDisposable Support
+    }
 
-        private bool _disposedValue = false; // To detect redundant calls
-
-        protected virtual void DisposeManaged()
-        {
-        }
-
-        protected virtual void DisposeUnManaged()
-        {
-            // TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.
-            // TODO: set large fields to null.
-
-            // TODO: override a finalizer only if Dispose(bool disposing) above has code to free unmanaged resources.
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!_disposedValue)
-            {
-                if (disposing)
-                {
-                    DisposeManaged();
-                }
-
-                DisposeUnManaged();
-
-                _disposedValue = true;
-            }
-        }
+    protected virtual void DisposeUnManaged()
+    {
+        // TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.
+        // TODO: set large fields to null.
 
         // TODO: override a finalizer only if Dispose(bool disposing) above has code to free unmanaged resources.
-        // ~MachineController() {
-        //   // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
-        //   Dispose(false);
-        // }
-
-        // This code added to correctly implement the disposable pattern.
-        void IDisposable.Dispose()
-        {
-            // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
-            Dispose(true);
-
-            // TODO: uncomment the following line if the finalizer is overridden above.
-            // GC.SuppressFinalize(this);
-        }
-
-        #endregion
     }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (!_disposedValue)
+        {
+            if (disposing)
+            {
+                DisposeManaged();
+            }
+
+            DisposeUnManaged();
+
+            _disposedValue = true;
+        }
+    }
+
+    // TODO: override a finalizer only if Dispose(bool disposing) above has code to free unmanaged resources.
+    // ~MachineController() {
+    //   // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
+    //   Dispose(false);
+    // }
+
+    // This code added to correctly implement the disposable pattern.
+    void IDisposable.Dispose()
+    {
+        // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
+        Dispose(true);
+
+        // TODO: uncomment the following line if the finalizer is overridden above.
+        // GC.SuppressFinalize(this);
+    }
+
+    #endregion
 }

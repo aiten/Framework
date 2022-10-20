@@ -14,12 +14,11 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.Tools.Abstraction
-{
-    using System.Security.Claims;
+namespace Framework.Tools.Abstraction;
 
-    public interface IUserContext
-    {
-        ClaimsPrincipal User { get; }
-    }
+using System.Security.Claims;
+
+public interface IUserContext
+{
+    ClaimsPrincipal User { get; }
 }

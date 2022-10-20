@@ -14,71 +14,70 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.Repository.Tools
+namespace Framework.Repository.Tools;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+using Framework.CsvImport;
+
+using Microsoft.EntityFrameworkCore;
+
+public class DbImporter
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
+    private readonly DbContext _context;
 
-    using Framework.CsvImport;
+    public string CsvDir { get; set; }
 
-    using Microsoft.EntityFrameworkCore;
-
-    public class DbImporter
+    protected DbImporter(DbContext context)
     {
-        private readonly DbContext _context;
-
-        public string CsvDir { get; set; }
-
-        protected DbImporter(DbContext context)
-        {
-            _context = context;
-        }
-
-        #region Csv Import
-
-        public IList<T> Read<T>(string fileName) where T : new()
-        {
-            return ReadFromCsv<T>($@"{CsvDir}\{fileName}");
-        }
-
-        protected Dictionary<TKey, TEntity> ImportCsv<TKey, TEntity>(string fileName, Func<TEntity, TKey> getKey, Action<TEntity, TKey> setKey) where TEntity : class, new()
-        {
-            var entities = Read<TEntity>(fileName);
-            return PrepareAndAdd<TKey, TEntity>(entities, getKey, setKey);
-        }
-
-        private Dictionary<TKey, TEntity> PrepareAndAdd<TKey, TEntity>(IList<TEntity> items, Func<TEntity, TKey> getKey, Action<TEntity, TKey> setKey) where TEntity : class
-        {
-            var keyMap = items.ToDictionary(getKey, x => x);
-            foreach (var entity in items)
-            {
-                setKey(entity, default);
-            }
-
-            _context.Set<TEntity>().AddRange(items);
-            return keyMap;
-        }
-
-        private static IList<T> ReadFromCsv<T>(string path) where T : new()
-        {
-            var csvImport = new CsvImport<T>();
-            var items     = csvImport.Read(path).ToList();
-            return items;
-        }
-
-        #endregion
-
-        #region fill from Db
-
-        protected Dictionary<TKey, TEntity> ReadFromDb<TKey, TEntity>(Func<TEntity, TKey> getKey) where TEntity : class
-        {
-            var allEntities = _context.Set<TEntity>().ToList();
-            var keyMap      = allEntities.ToDictionary(getKey, x => x);
-
-            return keyMap;
-        }
-
-        #endregion
+        _context = context;
     }
+
+    #region Csv Import
+
+    public IList<T> Read<T>(string fileName) where T : new()
+    {
+        return ReadFromCsv<T>($@"{CsvDir}\{fileName}");
+    }
+
+    protected Dictionary<TKey, TEntity> ImportCsv<TKey, TEntity>(string fileName, Func<TEntity, TKey> getKey, Action<TEntity, TKey> setKey) where TEntity : class, new()
+    {
+        var entities = Read<TEntity>(fileName);
+        return PrepareAndAdd<TKey, TEntity>(entities, getKey, setKey);
+    }
+
+    private Dictionary<TKey, TEntity> PrepareAndAdd<TKey, TEntity>(IList<TEntity> items, Func<TEntity, TKey> getKey, Action<TEntity, TKey> setKey) where TEntity : class
+    {
+        var keyMap = items.ToDictionary(getKey, x => x);
+        foreach (var entity in items)
+        {
+            setKey(entity, default);
+        }
+
+        _context.Set<TEntity>().AddRange(items);
+        return keyMap;
+    }
+
+    private static IList<T> ReadFromCsv<T>(string path) where T : new()
+    {
+        var csvImport = new CsvImport<T>();
+        var items     = csvImport.Read(path).ToList();
+        return items;
+    }
+
+    #endregion
+
+    #region fill from Db
+
+    protected Dictionary<TKey, TEntity> ReadFromDb<TKey, TEntity>(Func<TEntity, TKey> getKey) where TEntity : class
+    {
+        var allEntities = _context.Set<TEntity>().ToList();
+        var keyMap      = allEntities.ToDictionary(getKey, x => x);
+
+        return keyMap;
+    }
+
+    #endregion
 }

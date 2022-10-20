@@ -14,89 +14,88 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.Service.WebAPI.Uri
+namespace Framework.Service.WebAPI.Uri;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+
+public class UriQueryBuilder
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
+    private readonly List<Tuple<string, object>> _list = new List<Tuple<string, object>>();
+    private readonly string                      _old  = string.Empty;
 
-    public class UriQueryBuilder
+    public UriQueryBuilder()
     {
-        private readonly List<Tuple<string, object>> _list = new List<Tuple<string, object>>();
-        private readonly string                      _old  = string.Empty;
+    }
 
-        public UriQueryBuilder()
+    public UriQueryBuilder(string old)
+    {
+        _old = old;
+    }
+
+    public UriQueryBuilder(UriQueryBuilder old)
+    {
+        _list.AddRange(old._list);
+    }
+
+    public UriQueryBuilder AddRange<T>(string filterName, IEnumerable<T> valueList)
+    {
+        if (valueList != null)
         {
+            _list.AddRange(valueList.Select(val => new Tuple<string, object>(filterName, val)));
         }
 
-        public UriQueryBuilder(string old)
+        return this;
+    }
+
+    public UriQueryBuilder Add<T>(string filterName, T val)
+    {
+        _list.Add(new Tuple<string, object>(filterName, val));
+        return this;
+    }
+
+    public UriQueryBuilder AddIfNotNull<T>(string filterName, T? val) where T : struct
+    {
+        if (val.HasValue)
         {
-            _old = old;
+            _list.Add(new Tuple<string, object>(filterName, val.Value));
         }
 
-        public UriQueryBuilder(UriQueryBuilder old)
-        {
-            _list.AddRange(old._list);
-        }
+        return this;
+    }
 
-        public UriQueryBuilder AddRange<T>(string filterName, IEnumerable<T> valueList)
-        {
-            if (valueList != null)
-            {
-                _list.AddRange(valueList.Select(val => new Tuple<string, object>(filterName, val)));
-            }
-
-            return this;
-        }
-
-        public UriQueryBuilder Add<T>(string filterName, T val)
+    public UriQueryBuilder AddIfNotNullOrEmpty(string filterName, string val)
+    {
+        if (string.IsNullOrEmpty(val) == false)
         {
             _list.Add(new Tuple<string, object>(filterName, val));
-            return this;
         }
 
-        public UriQueryBuilder AddIfNotNull<T>(string filterName, T? val) where T : struct
+        return this;
+    }
+
+    public override string ToString()
+    {
+        var sb = new StringBuilder();
+        sb.Append(_old);
+
+        foreach (var filter in _list)
         {
-            if (val.HasValue)
+            if (sb.Length != 0)
             {
-                _list.Add(new Tuple<string, object>(filterName, val.Value));
+                sb.Append(@"&");
             }
 
-            return this;
-        }
-
-        public UriQueryBuilder AddIfNotNullOrEmpty(string filterName, string val)
-        {
-            if (string.IsNullOrEmpty(val) == false)
+            sb.Append(filter.Item1);
+            sb.Append(@"=");
+            if (filter.Item2 != null)
             {
-                _list.Add(new Tuple<string, object>(filterName, val));
+                sb.Append(filter.Item2.ToUriAsQuery());
             }
-
-            return this;
         }
 
-        public override string ToString()
-        {
-            var sb = new StringBuilder();
-            sb.Append(_old);
-
-            foreach (var filter in _list)
-            {
-                if (sb.Length != 0)
-                {
-                    sb.Append(@"&");
-                }
-
-                sb.Append(filter.Item1);
-                sb.Append(@"=");
-                if (filter.Item2 != null)
-                {
-                    sb.Append(filter.Item2.ToUriAsQuery());
-                }
-            }
-
-            return sb.ToString();
-        }
+        return sb.ToString();
     }
 }

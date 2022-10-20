@@ -14,64 +14,63 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.WinAPI
+namespace Framework.WinAPI;
+
+using System;
+using System.Runtime.InteropServices;
+
+public class WinAPIWrapper
 {
-    using System;
-    using System.Runtime.InteropServices;
+    #region Thread
 
-    public class WinAPIWrapper
+    [Flags]
+    public enum EXECUTION_STATE : uint
     {
-        #region Thread
-
-        [Flags]
-        public enum EXECUTION_STATE : uint
-        {
-            ES_NONE             = 0,
-            ES_CONTINUOUS       = 0x80000000,
-            ES_SYSTEM_REQUIRED  = 0x00000001,
-            ES_DISPLAY_REQUIRED = 0x00000002
-        }
-
-        [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        static extern uint SetThreadExecutionState(EXECUTION_STATE esFlags);
-
-        static uint OsSetThreadExecutionState(EXECUTION_STATE esFlags)
-        {
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            {
-                return SetThreadExecutionState(esFlags);
-            }
-
-            return uint.MaxValue;
-        }
-
-        public static void KeepAlive()
-        {
-            OsSetThreadExecutionState(EXECUTION_STATE.ES_DISPLAY_REQUIRED | EXECUTION_STATE.ES_SYSTEM_REQUIRED | EXECUTION_STATE.ES_CONTINUOUS);
-        }
-
-        public static void AllowIdle()
-        {
-            OsSetThreadExecutionState(EXECUTION_STATE.ES_CONTINUOUS);
-        }
-
-        public static void ResetTimer()
-        {
-            OsSetThreadExecutionState(EXECUTION_STATE.ES_NONE);
-        }
-
-        #endregion
-
-        #region Console Window
-
-        [DllImport("kernel32.dll")]
-        private static extern IntPtr GetConsoleWindow();
-
-        public static bool CheckForConsoleWindow()
-        {
-            return GetConsoleWindow() == IntPtr.Zero;
-        }
-
-        #endregion
+        ES_NONE             = 0,
+        ES_CONTINUOUS       = 0x80000000,
+        ES_SYSTEM_REQUIRED  = 0x00000001,
+        ES_DISPLAY_REQUIRED = 0x00000002
     }
+
+    [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+    static extern uint SetThreadExecutionState(EXECUTION_STATE esFlags);
+
+    static uint OsSetThreadExecutionState(EXECUTION_STATE esFlags)
+    {
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            return SetThreadExecutionState(esFlags);
+        }
+
+        return uint.MaxValue;
+    }
+
+    public static void KeepAlive()
+    {
+        OsSetThreadExecutionState(EXECUTION_STATE.ES_DISPLAY_REQUIRED | EXECUTION_STATE.ES_SYSTEM_REQUIRED | EXECUTION_STATE.ES_CONTINUOUS);
+    }
+
+    public static void AllowIdle()
+    {
+        OsSetThreadExecutionState(EXECUTION_STATE.ES_CONTINUOUS);
+    }
+
+    public static void ResetTimer()
+    {
+        OsSetThreadExecutionState(EXECUTION_STATE.ES_NONE);
+    }
+
+    #endregion
+
+    #region Console Window
+
+    [DllImport("kernel32.dll")]
+    private static extern IntPtr GetConsoleWindow();
+
+    public static bool CheckForConsoleWindow()
+    {
+        return GetConsoleWindow() == IntPtr.Zero;
+    }
+
+    #endregion
 }

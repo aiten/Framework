@@ -14,79 +14,78 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.WebAPI.Tool
+namespace Framework.WebAPI.Tool;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+public class MethodCallHistory
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-
-    public class MethodCallHistory
+    private class MethodCall
     {
-        private class MethodCall
-        {
-            public DateTime CallTime { get; init; }
-            public string   UserName { get; init; }
-            public string   Uri      { get; init; }
+        public DateTime CallTime { get; init; }
+        public string   UserName { get; init; }
+        public string   Uri      { get; init; }
 
-            public override string ToString()
-            {
-                return $"{CallTime:s}:{UserName}:{Uri}";
-            }
+        public override string ToString()
+        {
+            return $"{CallTime:s}:{UserName}:{Uri}";
         }
+    }
 
-        private const int KEEPCALLHISTORYMINUTES = 10;
+    private const int KEEPCALLHISTORYMINUTES = 10;
 
-        private object _lock = new object();
+    private object _lock = new object();
 
-        private List<MethodCall> _calls = new List<MethodCall>();
+    private List<MethodCall> _calls = new List<MethodCall>();
 
-        public int MaxMinuteAge { get; set; } = KEEPCALLHISTORYMINUTES;
+    public int MaxMinuteAge { get; set; } = KEEPCALLHISTORYMINUTES;
 
-        public void Add(string uri, string userName)
+    public void Add(string uri, string userName)
+    {
+        CleanUp();
+
+        lock (_lock)
         {
-            CleanUp();
-
-            lock (_lock)
-            {
-                _calls.Add(new MethodCall() { CallTime = DateTime.Now, Uri = uri, UserName = userName });
-            }
+            _calls.Add(new MethodCall() { CallTime = DateTime.Now, Uri = uri, UserName = userName });
         }
+    }
 
-        public IEnumerable<string> GetCallList(string userName)
+    public IEnumerable<string> GetCallList(string userName)
+    {
+        CleanUp();
+
+        lock (_lock)
         {
-            CleanUp();
+            var calls = (IEnumerable<MethodCall>)_calls;
 
-            lock (_lock)
+            if (string.IsNullOrEmpty(userName) == false)
             {
-                var calls = (IEnumerable<MethodCall>)_calls;
-
-                if (string.IsNullOrEmpty(userName) == false)
-                {
-                    calls = calls.Where(c => c.UserName.Contains(userName, StringComparison.OrdinalIgnoreCase));
-                }
-
-                return calls.Select(c => c.ToString());
+                calls = calls.Where(c => c.UserName.Contains(userName, StringComparison.OrdinalIgnoreCase));
             }
+
+            return calls.Select(c => c.ToString());
         }
+    }
 
-        public void Clear()
+    public void Clear()
+    {
+        lock (_lock)
         {
-            lock (_lock)
-            {
-                _calls.Clear();
-            }
+            _calls.Clear();
         }
+    }
 
-        private void CleanUp()
+    private void CleanUp()
+    {
+        var cleanupUntil = DateTime.Now - TimeSpan.FromMinutes(MaxMinuteAge);
+
+        lock (_lock)
         {
-            var cleanupUntil = DateTime.Now - TimeSpan.FromMinutes(MaxMinuteAge);
-
-            lock (_lock)
+            while (_calls.Any() && _calls.First().CallTime < cleanupUntil)
             {
-                while (_calls.Any() && _calls.First().CallTime < cleanupUntil)
-                {
-                    _calls.RemoveAt(0);
-                }
+                _calls.RemoveAt(0);
             }
         }
     }

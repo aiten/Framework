@@ -14,73 +14,72 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.Wpf.ViewModels
+namespace Framework.Wpf.ViewModels;
+
+using System;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Input;
+
+using Helpers;
+
+public class BaseViewModel : BindableBase
 {
-    using System;
-    using System.Threading.Tasks;
-    using System.Windows;
-    using System.Windows.Input;
+    #region ModalDialogs
 
-    using Helpers;
+    /// <summary>
+    /// Close this window and set DialogResult to true
+    /// </summary>
+    public Action DialogOKAction { get; set; }
 
-    public class BaseViewModel : BindableBase
+    public Action DialogCancelAction { get; set; }
+
+    protected virtual bool CanDialogOK()
     {
-        #region ModalDialogs
+        return true;
+    }
 
-        /// <summary>
-        /// Close this window and set DialogResult to true
-        /// </summary>
-        public Action DialogOKAction { get; set; }
+    protected virtual bool CanDialogCancel()
+    {
+        return true;
+    }
 
-        public Action DialogCancelAction { get; set; }
+    protected virtual void DialogOK()
+    {
+        DialogOKAction?.Invoke();
+    }
 
-        protected virtual bool CanDialogOK()
-        {
-            return true;
-        }
+    protected virtual void DialogCancel()
+    {
+        DialogCancelAction?.Invoke();
+    }
 
-        protected virtual bool CanDialogCancel()
-        {
-            return true;
-        }
+    public ICommand DialogOKCommand     => new DelegateCommand(DialogOK,     CanDialogOK);
+    public ICommand DialogCancelCommand => new DelegateCommand(DialogCancel, CanDialogCancel);
 
-        protected virtual void DialogOK()
-        {
-            DialogOKAction?.Invoke();
-        }
+    #endregion
 
-        protected virtual void DialogCancel()
-        {
-            DialogCancelAction?.Invoke();
-        }
+    public bool IsDesignTime => System.ComponentModel.DesignerProperties.GetIsInDesignMode(new DependencyObject());
 
-        public ICommand DialogOKCommand     => new DelegateCommand(DialogOK,     CanDialogOK);
-        public ICommand DialogCancelCommand => new DelegateCommand(DialogCancel, CanDialogCancel);
+    #region GUI Forwards
 
-        #endregion
+    public Func<string, string, MessageBoxButton, MessageBoxImage, MessageBoxResult> MessageBox { get; set; }
 
-        public bool IsDesignTime => System.ComponentModel.DesignerProperties.GetIsInDesignMode(new DependencyObject());
+    public Func<string, bool, string> BrowseFileNameFunc { get; set; }
 
-        #region GUI Forwards
+    /// <summary>
+    /// Close this window
+    /// </summary>
+    public Action CloseAction { get; set; }
 
-        public Func<string, string, MessageBoxButton, MessageBoxImage, MessageBoxResult> MessageBox { get; set; }
+    #endregion
 
-        public Func<string, bool, string> BrowseFileNameFunc { get; set; }
+    public virtual void Cleanup()
+    {
+    }
 
-        /// <summary>
-        /// Close this window
-        /// </summary>
-        public Action CloseAction { get; set; }
-
-        #endregion
-
-        public virtual void Cleanup()
-        {
-        }
-
-        public virtual async Task Loaded()
-        {
-            await Task.FromResult(0);
-        }
+    public virtual async Task Loaded()
+    {
+        await Task.FromResult(0);
     }
 }

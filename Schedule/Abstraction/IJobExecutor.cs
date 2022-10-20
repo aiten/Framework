@@ -14,26 +14,25 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.Schedule.Abstraction
+namespace Framework.Schedule.Abstraction;
+
+using System;
+using System.Threading;
+using System.Threading.Tasks;
+
+public interface IJobExecutor : IDisposable
 {
-    using System;
-    using System.Threading;
-    using System.Threading.Tasks;
+    void Start();
 
-    public interface IJobExecutor : IDisposable
-    {
-        void Start();
+    Task Execute();
 
-        Task Execute();
+    string JobName { get; set; }
 
-        string JobName { get; set; }
+    Type ParamContainer { get; set; }
 
-        Type ParamContainer { get; set; }
+    object Param { get; set; }
 
-        object Param { get; set; }
+    CancellationTokenSource CtSource { get; set; }
 
-        CancellationTokenSource CtSource { get; set; }
-
-        IJobExecutor Then(Type job);
-    }
+    IJobExecutor Then(Type job);
 }

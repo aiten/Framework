@@ -14,15 +14,14 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.WebAPI.Tool
-{
-    using Microsoft.AspNetCore.Http;
+namespace Framework.WebAPI.Tool;
 
-    public static class HttpRequestExtensions
+using Microsoft.AspNetCore.Http;
+
+public static class HttpRequestExtensions
+{
+    public static string GetCurrentUri(this HttpRequest request)
     {
-        public static string GetCurrentUri(this HttpRequest request)
-        {
-            return $"{request.Scheme}://{request.Host}{request.Path}{request.QueryString}";
-        }
+        return $"{request.Scheme}://{request.Host}{request.Path}{request.QueryString}";
     }
 }

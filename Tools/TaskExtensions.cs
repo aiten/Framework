@@ -14,18 +14,17 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.Tools
+namespace Framework.Tools;
+
+using System.Threading.Tasks;
+
+public static class TaskExtensions
 {
-    using System.Threading.Tasks;
-
-    public static class TaskExtensions
+    public static void Ignore(this Task t)
     {
-        public static void Ignore(this Task t)
-        {
-        }
+    }
 
-        public static void Ignore<TResult>(this Task<TResult> t)
-        {
-        }
+    public static void Ignore<TResult>(this Task<TResult> t)
+    {
     }
 }

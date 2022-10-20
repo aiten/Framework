@@ -14,75 +14,74 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.Repository
+namespace Framework.Repository;
+
+using System;
+using System.Threading.Tasks;
+
+using Abstraction;
+
+using Framework.Localization;
+
+using Microsoft.EntityFrameworkCore.Storage;
+
+public class Transaction : ITransaction
 {
-    using System;
-    using System.Threading.Tasks;
+    public IUnitOfWork UnitOfWork { get; private set; }
 
-    using Abstraction;
-
-    using Framework.Localization;
-
-    using Microsoft.EntityFrameworkCore.Storage;
-
-    public class Transaction : ITransaction
+    public Transaction(IUnitOfWork unitOfWork, IDbContextTransaction dbTran)
     {
-        public IUnitOfWork UnitOfWork { get; private set; }
-
-        public Transaction(IUnitOfWork unitOfWork, IDbContextTransaction dbTran)
-        {
-            UnitOfWork = unitOfWork;
-            _dbTran    = dbTran;
-        }
-
-        #region Transaction
-
-        private IDbContextTransaction _dbTran;
-
-        public bool InTransaction => _dbTran != null;
-
-        private void CheckInTransaction()
-        {
-            if (InTransaction == false)
-            {
-                throw new ArgumentException(ErrorMessages.ResourceManager.ToLocalizable(nameof(ErrorMessages.Framework_Repository_TransactionNotStarted)).Message());
-            }
-        }
-
-        public async Task SaveChangesAsync()
-        {
-            CheckInTransaction();
-            await UnitOfWork.SaveChangesAsync();
-        }
-
-        public async Task CommitTransactionAsync()
-        {
-            await SaveChangesAsync();
-            await _dbTran.CommitAsync();
-            _dbTran = null;
-        }
-
-        public void RollbackTransaction()
-        {
-            CheckInTransaction();
-
-            _dbTran.Rollback();
-            _dbTran = null;
-        }
-
-        #endregion
-
-        #region dispose
-
-        public void Dispose()
-        {
-            if (InTransaction)
-            {
-                // if commit is not called, rollback transaction now
-                RollbackTransaction();
-            }
-        }
-
-        #endregion
+        UnitOfWork = unitOfWork;
+        _dbTran    = dbTran;
     }
+
+    #region Transaction
+
+    private IDbContextTransaction _dbTran;
+
+    public bool InTransaction => _dbTran != null;
+
+    private void CheckInTransaction()
+    {
+        if (InTransaction == false)
+        {
+            throw new ArgumentException(ErrorMessages.ResourceManager.ToLocalizable(nameof(ErrorMessages.Framework_Repository_TransactionNotStarted)).Message());
+        }
+    }
+
+    public async Task SaveChangesAsync()
+    {
+        CheckInTransaction();
+        await UnitOfWork.SaveChangesAsync();
+    }
+
+    public async Task CommitTransactionAsync()
+    {
+        await SaveChangesAsync();
+        await _dbTran.CommitAsync();
+        _dbTran = null;
+    }
+
+    public void RollbackTransaction()
+    {
+        CheckInTransaction();
+
+        _dbTran.Rollback();
+        _dbTran = null;
+    }
+
+    #endregion
+
+    #region dispose
+
+    public void Dispose()
+    {
+        if (InTransaction)
+        {
+            // if commit is not called, rollback transaction now
+            RollbackTransaction();
+        }
+    }
+
+    #endregion
 }

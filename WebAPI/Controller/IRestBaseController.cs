@@ -14,20 +14,19 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.WebAPI.Controller
+namespace Framework.WebAPI.Controller;
+
+using System;
+using System.Threading.Tasks;
+
+using Microsoft.AspNetCore.Mvc;
+
+public interface IRestBaseController<T, TId> : IGetController<T, TId>
+    where TId : IComparable
 {
-    using System;
-    using System.Threading.Tasks;
+    Task<ActionResult<T>> Add([FromBody] T value);
 
-    using Microsoft.AspNetCore.Mvc;
+    Task<ActionResult<T>> Update(TId id, [FromBody] T value);
 
-    public interface IRestBaseController<T, TId> : IGetController<T, TId>
-        where TId : IComparable
-    {
-        Task<ActionResult<T>> Add([FromBody] T value);
-
-        Task<ActionResult<T>> Update(TId id, [FromBody] T value);
-
-        Task<ActionResult<T>> Delete(TId id);
-    }
+    Task<ActionResult<T>> Delete(TId id);
 }

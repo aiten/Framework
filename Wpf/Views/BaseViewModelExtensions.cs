@@ -14,118 +14,117 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.Wpf.Views
+namespace Framework.Wpf.Views;
+
+using System;
+using System.IO;
+using System.Windows;
+using System.Windows.Controls;
+
+using ViewModels;
+
+public static class BaseViewModelExtensions
 {
-    using System;
-    using System.IO;
-    using System.Windows;
-    using System.Windows.Controls;
-
-    using ViewModels;
-
-    public static class BaseViewModelExtensions
+    public static void DefaultInitForBaseViewModel(this BaseViewModel vm)
     {
-        public static void DefaultInitForBaseViewModel(this BaseViewModel vm)
+        vm.MessageBox ??= MessageBox.Show;
+
+        vm.BrowseFileNameFunc ??= (filename, saveFile) =>
         {
-            vm.MessageBox ??= MessageBox.Show;
-
-            vm.BrowseFileNameFunc ??= (filename, saveFile) =>
+            Microsoft.Win32.FileDialog dlg;
+            if (saveFile)
             {
-                Microsoft.Win32.FileDialog dlg;
-                if (saveFile)
-                {
-                    dlg = new Microsoft.Win32.SaveFileDialog();
-                }
-                else
-                {
-                    dlg = new Microsoft.Win32.OpenFileDialog();
-                }
-
-                dlg.FileName = filename;
-                string dir = Path.GetDirectoryName(filename);
-                if (!string.IsNullOrEmpty(dir))
-                {
-                    dlg.InitialDirectory = dir;
-                    dlg.FileName         = Path.GetFileName(filename);
-                }
-
-                if (dlg.ShowDialog() ?? false)
-                {
-                    return dlg.FileName;
-                }
-
-                return null;
-            };
-        }
-
-        public static void DefaultInitForBaseViewModel(this Window view)
-        {
-            var vm = view.DataContext as BaseViewModel;
-
-            if (vm != null)
-            {
-                vm.DefaultInitForBaseViewModel();
-
-                var closeAction = new Action(view.Close);
-                var dialogOkAction = new Action(
-                    () =>
-                    {
-                        view.DialogResult = true;
-                        view.Close();
-                    });
-                var dialogCancelAction = new Action(
-                    () =>
-                    {
-                        view.DialogResult = false;
-                        view.Close();
-                    });
-                var loadedEvent = new RoutedEventHandler(
-                    async (v, e) =>
-                    {
-                        var vmm = view.DataContext as BaseViewModel;
-                        if (vmm != null)
-                        {
-                            await vmm.Loaded();
-                        }
-                    });
-
-                RoutedEventHandler unloadedEvent = null;
-
-                unloadedEvent = (v, _) =>
-                {
-                    vm.CloseAction        =  null;
-                    vm.DialogOKAction     =  null;
-                    vm.DialogCancelAction =  null;
-                    view.Loaded           -= loadedEvent;
-                    view.Unloaded         -= unloadedEvent;
-                };
-
-                vm.CloseAction        = closeAction;
-                vm.DialogOKAction     = dialogOkAction;
-                vm.DialogCancelAction = dialogCancelAction;
-
-                view.Loaded   += loadedEvent;
-                view.Unloaded += unloadedEvent;
+                dlg = new Microsoft.Win32.SaveFileDialog();
             }
-        }
-
-        public static void DefaultInitForBaseViewModel(this Page view)
-        {
-            var vm = view.DataContext as BaseViewModel;
-
-            if (vm != null)
+            else
             {
-                vm.DefaultInitForBaseViewModel();
+                dlg = new Microsoft.Win32.OpenFileDialog();
+            }
 
-                view.Loaded += async (v, _) =>
+            dlg.FileName = filename;
+            string dir = Path.GetDirectoryName(filename);
+            if (!string.IsNullOrEmpty(dir))
+            {
+                dlg.InitialDirectory = dir;
+                dlg.FileName         = Path.GetFileName(filename);
+            }
+
+            if (dlg.ShowDialog() ?? false)
+            {
+                return dlg.FileName;
+            }
+
+            return null;
+        };
+    }
+
+    public static void DefaultInitForBaseViewModel(this Window view)
+    {
+        var vm = view.DataContext as BaseViewModel;
+
+        if (vm != null)
+        {
+            vm.DefaultInitForBaseViewModel();
+
+            var closeAction = new Action(view.Close);
+            var dialogOkAction = new Action(
+                () =>
+                {
+                    view.DialogResult = true;
+                    view.Close();
+                });
+            var dialogCancelAction = new Action(
+                () =>
+                {
+                    view.DialogResult = false;
+                    view.Close();
+                });
+            var loadedEvent = new RoutedEventHandler(
+                async (v, e) =>
                 {
                     var vmm = view.DataContext as BaseViewModel;
                     if (vmm != null)
                     {
                         await vmm.Loaded();
                     }
-                };
-            }
+                });
+
+            RoutedEventHandler unloadedEvent = null;
+
+            unloadedEvent = (v, _) =>
+            {
+                vm.CloseAction        =  null;
+                vm.DialogOKAction     =  null;
+                vm.DialogCancelAction =  null;
+                view.Loaded           -= loadedEvent;
+                view.Unloaded         -= unloadedEvent;
+            };
+
+            vm.CloseAction        = closeAction;
+            vm.DialogOKAction     = dialogOkAction;
+            vm.DialogCancelAction = dialogCancelAction;
+
+            view.Loaded   += loadedEvent;
+            view.Unloaded += unloadedEvent;
+        }
+    }
+
+    public static void DefaultInitForBaseViewModel(this Page view)
+    {
+        var vm = view.DataContext as BaseViewModel;
+
+        if (vm != null)
+        {
+            vm.DefaultInitForBaseViewModel();
+
+            view.Loaded += async (v, _) =>
+            {
+                var vmm = view.DataContext as BaseViewModel;
+                if (vmm != null)
+                {
+                    await vmm.Loaded();
+                }
+            };
         }
     }
 }

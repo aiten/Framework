@@ -14,72 +14,71 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.Schedule
+namespace Framework.Schedule;
+
+using System;
+using System.Threading;
+
+using Framework.Schedule.Abstraction;
+using Framework.Tools.Abstraction;
+
+using Microsoft.Extensions.Logging;
+
+public sealed class SelfScheduledSchedule : ISchedule
 {
-    using System;
-    using System.Threading;
-
-    using Framework.Schedule.Abstraction;
-    using Framework.Tools.Abstraction;
-
-    using Microsoft.Extensions.Logging;
-
-    public sealed class SelfScheduledSchedule : ISchedule
+    public SelfScheduledSchedule()
     {
-        public SelfScheduledSchedule()
+    }
+
+    public IJobExecutor Schedule(IServiceProvider serviceProvider, ILoggerFactory loggerFactory, ICurrentDateTime currentDateTime, Type job)
+    {
+        return new TimedJobExecutor(serviceProvider, loggerFactory, currentDateTime, job);
+    }
+
+    private sealed class TimedJobExecutor : JobExecutor
+    {
+        private readonly ILogger          _logger;
+        private readonly ICurrentDateTime _dateTimeService;
+
+        public TimedJobExecutor(IServiceProvider serviceProvider, ILoggerFactory loggerFactory, ICurrentDateTime currentDateTime, Type job) :
+            base(serviceProvider, loggerFactory, currentDateTime, job)
         {
+            _logger          = loggerFactory.CreateLogger(GetType());
+            _dateTimeService = currentDateTime;
         }
 
-        public IJobExecutor Schedule(IServiceProvider serviceProvider, ILoggerFactory loggerFactory, ICurrentDateTime currentDateTime, Type job)
+        public override void Start()
         {
-            return new TimedJobExecutor(serviceProvider, loggerFactory, currentDateTime, job);
+            Timer = new Timer(async (state) => await CastAndRunJob(state), this, (int)GetRandomDelay(), -1);
         }
 
-        private sealed class TimedJobExecutor : JobExecutor
+        protected override void Executed()
         {
-            private readonly ILogger          _logger;
-            private readonly ICurrentDateTime _dateTimeService;
+            base.Executed();
 
-            public TimedJobExecutor(IServiceProvider serviceProvider, ILoggerFactory loggerFactory, ICurrentDateTime currentDateTime, Type job) :
-                base(serviceProvider, loggerFactory, currentDateTime, job)
+            var nextExecution = NextExecutionRequest;
+
+            if (nextExecution == null ||
+                nextExecution < _dateTimeService.Now)
             {
-                _logger          = loggerFactory.CreateLogger(GetType());
-                _dateTimeService = currentDateTime;
+                _logger.LogError($"NextExcecutionRequest {NextExecutionRequest?.ToString()} < {_dateTimeService.Now}. Restart immediately.");
+                nextExecution = _dateTimeService.Now + TimeSpan.FromMilliseconds(GetRandomDelay());
             }
 
-            public override void Start()
+            try
             {
-                Timer = new Timer(async (state) => await CastAndRunJob(state), this, (int)GetRandomDelay(), -1);
+                if (IsDisposed)
+                {
+                    return;
+                }
+
+                var nextExecutionDateTimeOffset = GetOffsetToNextTick(nextExecution.Value, DateTimeOffset => _dateTimeService.Now + TimeSpan.FromMilliseconds(GetRandomDelay()));
+
+                Timer.Change((int)nextExecutionDateTimeOffset.TotalMilliseconds, -1);
             }
-
-            protected override void Executed()
+            catch (Exception e)
             {
-                base.Executed();
-
-                var nextExecution = NextExecutionRequest;
-
-                if (nextExecution == null ||
-                    nextExecution < _dateTimeService.Now)
-                {
-                    _logger.LogError($"NextExcecutionRequest {NextExecutionRequest?.ToString()} < {_dateTimeService.Now}. Restart immediately.");
-                    nextExecution = _dateTimeService.Now + TimeSpan.FromMilliseconds(GetRandomDelay());
-                }
-
-                try
-                {
-                    if (IsDisposed)
-                    {
-                        return;
-                    }
-
-                    var nextExecutionDateTimeOffset = GetOffsetToNextTick(nextExecution.Value, DateTimeOffset => _dateTimeService.Now + TimeSpan.FromMilliseconds(GetRandomDelay()));
-
-                    Timer.Change((int)nextExecutionDateTimeOffset.TotalMilliseconds, -1);
-                }
-                catch (Exception e)
-                {
-                    _logger.LogError(e, "Timer could not schedule the next runtime successfully.");
-                }
+                _logger.LogError(e, "Timer could not schedule the next runtime successfully.");
             }
         }
     }

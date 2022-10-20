@@ -14,24 +14,23 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.Service.Abstraction
+namespace Framework.Service.Abstraction;
+
+using System.Collections.Generic;
+using System.Threading.Tasks;
+
+public interface ICrudService<T, TKey> : IGetService<T, TKey> where T : class
 {
-    using System.Collections.Generic;
-    using System.Threading.Tasks;
+    Task<TKey> AddAsync(T value);
 
-    public interface ICrudService<T, TKey> : IGetService<T, TKey> where T : class
-    {
-        Task<TKey> Add(T value);
+    Task UpdateAsync(T value);
 
-        Task Update(T value);
+    Task DeleteAsync(T    value);
+    Task DeleteAsync(TKey key);
 
-        Task Delete(T    value);
-        Task Delete(TKey key);
+    Task<IEnumerable<TKey>> AddAsync(IEnumerable<T> values);
 
-        Task<IEnumerable<TKey>> Add(IEnumerable<T> values);
-
-        Task Update(IEnumerable<T>    values);
-        Task Delete(IEnumerable<T>    values);
-        Task Delete(IEnumerable<TKey> keys);
-    }
+    Task UpdateAsync(IEnumerable<T>    values);
+    Task DeleteAsync(IEnumerable<T>    values);
+    Task DeleteAsync(IEnumerable<TKey> keys);
 }

@@ -14,26 +14,25 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.WebAPI.Filter
+namespace Framework.WebAPI.Filter;
+
+using System.Net;
+
+using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.Extensions.Logging;
+
+public sealed class UnhandledExceptionFilter : ExceptionFilterBase
 {
-    using System.Net;
-
-    using Microsoft.AspNetCore.Mvc.Filters;
-    using Microsoft.Extensions.Logging;
-
-    public sealed class UnhandledExceptionFilter : ExceptionFilterBase
+    public UnhandledExceptionFilter(ILoggerFactory loggerFactory) : base(loggerFactory)
     {
-        public UnhandledExceptionFilter(ILoggerFactory loggerFactory) : base(loggerFactory)
-        {
-        }
+    }
 
-        protected override ExceptionResponse? GetResponse(ExceptionContext exceptionContext)
-        {
-            var logger    = CreateLogger(exceptionContext);
-            var exception = exceptionContext.Exception;
-            logger.LogError(exception, exception.Message);
+    protected override ExceptionResponse? GetResponse(ExceptionContext exceptionContext)
+    {
+        var logger    = CreateLogger(exceptionContext);
+        var exception = exceptionContext.Exception;
+        logger.LogError(exception, exception.Message);
 
-            return new ExceptionResponse(HttpStatusCode.InternalServerError, exception);
-        }
+        return new ExceptionResponse(HttpStatusCode.InternalServerError, exception);
     }
 }

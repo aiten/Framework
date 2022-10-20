@@ -14,65 +14,64 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.Arduino.SerialCommunication
+namespace Framework.Arduino.SerialCommunication;
+
+using System;
+using System.Collections.Generic;
+
+using Framework.Arduino.SerialCommunication.Abstraction;
+using Framework.Pattern;
+
+using Microsoft.Extensions.Logging;
+
+public class HpglSerial : Serial
 {
-    using System;
-    using System.Collections.Generic;
+    readonly int maxMessageLength = 128;
 
-    using Framework.Arduino.SerialCommunication.Abstraction;
-    using Framework.Pattern;
-
-    using Microsoft.Extensions.Logging;
-
-    public class HpglSerial : Serial
+    public HpglSerial(IFactory<ISerialPort> serialPortFactory, ILogger<Serial> logger) : base(serialPortFactory, logger)
     {
-        readonly int maxMessageLength = 128;
+    }
 
-        public HpglSerial(IFactory<ISerialPort> serialPortFactory, ILogger<Serial> logger) : base(serialPortFactory, logger)
+    #region Overrrids
+
+    protected override string[] SplitCommand(string line)
+    {
+        return SplitHpgl(line);
+    }
+
+    protected string[] SplitHpgl(string line)
+    {
+        var cmds    = line.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
+        var cmdList = new List<string>();
+
+        foreach (string l in cmds)
         {
-        }
-
-        #region Overrrids
-
-        protected override string[] SplitCommand(string line)
-        {
-            return SplitHpgl(line);
-        }
-
-        protected string[] SplitHpgl(string line)
-        {
-            var cmds    = line.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
-            var cmdList = new List<string>();
-
-            foreach (string l in cmds)
+            var message = l;
+            while (message.Length > maxMessageLength)
             {
-                var message = l;
-                while (message.Length > maxMessageLength)
+                var cmd = message.Substring(0, 2);
+                var idx = 0;
+                while (idx < maxMessageLength && idx != -1)
                 {
-                    var cmd = message.Substring(0, 2);
-                    var idx = 0;
-                    while (idx < maxMessageLength && idx != -1)
-                    {
-                        idx = message.IndexOf(',', idx + 1);
-                        idx = message.IndexOf(',', idx + 1);
-                    }
-
-                    if (idx == -1)
-                    {
-                        break;
-                    }
-
-                    string sendMessage = message.Substring(0, idx);
-                    message = cmd + message.Substring(idx + 1);
-                    cmdList.Add(sendMessage);
+                    idx = message.IndexOf(',', idx + 1);
+                    idx = message.IndexOf(',', idx + 1);
                 }
 
-                cmdList.Add(message);
+                if (idx == -1)
+                {
+                    break;
+                }
+
+                string sendMessage = message.Substring(0, idx);
+                message = cmd + message.Substring(idx + 1);
+                cmdList.Add(sendMessage);
             }
 
-            return cmdList.ToArray();
+            cmdList.Add(message);
         }
 
-        #endregion
+        return cmdList.ToArray();
     }
+
+    #endregion
 }

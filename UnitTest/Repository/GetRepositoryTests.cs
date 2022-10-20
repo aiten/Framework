@@ -14,69 +14,68 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.UnitTest.Repository
+namespace Framework.UnitTest.Repository;
+
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+
+using FluentAssertions;
+
+using Framework.Repository.Abstraction;
+
+using Microsoft.EntityFrameworkCore;
+
+public class GetRepositoryTests<TDbContext, TEntity, TKey, TIRepository> : UnitTestBase
+    where TEntity : class where TIRepository : IGetRepository<TEntity, TKey> where TDbContext : DbContext
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Threading.Tasks;
+    public Func<GetTestDbContext<TDbContext, TEntity, TKey, TIRepository>> CreateTestDbContext;
 
-    using FluentAssertions;
+    public Func<TEntity, TKey>   GetEntityKey;
+    public Action<TEntity, TKey> SetEntityKey;
 
-    using Framework.Repository.Abstraction;
+    public Func<TEntity, object>   GetEntityState = entity => null;
+    public Action<TEntity, object> SetEntityState = (entity, o) => { };
 
-    using Microsoft.EntityFrameworkCore;
+    public Func<TEntity, TEntity, bool> CompareEntity;
 
-    public class GetRepositoryTests<TDbContext, TEntity, TKey, TIRepository> : UnitTestBase
-        where TEntity : class where TIRepository : IGetRepository<TEntity, TKey> where TDbContext : DbContext
+    public async Task<IList<TEntity>> GetAll()
     {
-        public Func<GetTestDbContext<TDbContext, TEntity, TKey, TIRepository>> CreateTestDbContext;
-
-        public Func<TEntity, TKey>   GetEntityKey;
-        public Action<TEntity, TKey> SetEntityKey;
-
-        public Func<TEntity, object>   GetEntityState = entity => null;
-        public Action<TEntity, object> SetEntityState = (entity, o) => { };
-
-        public Func<TEntity, TEntity, bool> CompareEntity;
-
-        public async Task<IList<TEntity>> GetAll()
+        using (var ctx = CreateTestDbContext())
         {
-            using (var ctx = CreateTestDbContext())
-            {
-                var entities = await ctx.Repository.GetAll();
-                entities.Should().NotBeNull();
-                return entities;
-            }
+            var entities = await ctx.Repository.GetAllAsync();
+            entities.Should().NotBeNull();
+            return entities;
         }
+    }
 
-        public async Task<TEntity> GetOK(TKey key)
+    public async Task<TEntity> GetOK(TKey key)
+    {
+        using (var ctx = CreateTestDbContext())
         {
-            using (var ctx = CreateTestDbContext())
-            {
-                var entity = await ctx.Repository.Get(key);
-                entity.Should().BeOfType(typeof(TEntity));
-                entity.Should().NotBeNull();
-                return entity;
-            }
+            var entity = await ctx.Repository.GetAsync(key);
+            entity.Should().BeOfType(typeof(TEntity));
+            entity.Should().NotBeNull();
+            return entity;
         }
+    }
 
-        public async Task<IList<TEntity>> GetOK(IEnumerable<TKey> keys)
+    public async Task<IList<TEntity>> GetOK(IEnumerable<TKey> keys)
+    {
+        using (var ctx = CreateTestDbContext())
         {
-            using (var ctx = CreateTestDbContext())
-            {
-                var entities = await ctx.Repository.Get(keys);
-                entities.Should().NotBeNull();
-                return entities;
-            }
+            var entities = await ctx.Repository.GetAsync(keys);
+            entities.Should().NotBeNull();
+            return entities;
         }
+    }
 
-        public async Task GetNotExist(TKey key)
+    public async Task GetNotExist(TKey key)
+    {
+        using (var ctx = CreateTestDbContext())
         {
-            using (var ctx = CreateTestDbContext())
-            {
-                var entity = await ctx.Repository.Get(key);
-                entity.Should().BeNull();
-            }
+            var entity = await ctx.Repository.GetAsync(key);
+            entity.Should().BeNull();
         }
     }
 }

@@ -14,12 +14,11 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.Tools.Password
-{
-    public interface IOneWayPasswordProvider
-    {
-        string GetPasswordHash(string password);
+namespace Framework.Tools.Password;
 
-        bool ValidatePassword(string password, string passwordHash);
-    }
+public interface IOneWayPasswordProvider
+{
+    string GetPasswordHash(string password);
+
+    bool ValidatePassword(string password, string passwordHash);
 }

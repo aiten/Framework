@@ -14,64 +14,63 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.Arduino.SerialCommunication
+namespace Framework.Arduino.SerialCommunication;
+
+using System;
+
+public class SerialEventArgs : EventArgs
 {
-    using System;
-
-    public class SerialEventArgs : EventArgs
+    public SerialEventArgs(string info, SerialCommand cmd)
     {
-        public SerialEventArgs(string info, SerialCommand cmd)
+        Command = cmd;
+        if (cmd != null && string.IsNullOrEmpty(info))
         {
-            Command = cmd;
-            if (cmd != null && string.IsNullOrEmpty(info))
-            {
-                Info = cmd.CommandText;
-            }
-            else
-            {
-                Info = info;
-            }
-
-            if (cmd != null)
-            {
-                SeqId = cmd.SeqId;
-            }
+            Info = cmd.CommandText;
+        }
+        else
+        {
+            Info = info;
         }
 
-        public SerialEventArgs(SerialCommand cmd)
+        if (cmd != null)
         {
-            Command = cmd;
-            if (cmd != null)
-            {
-                Info  = cmd.CommandText;
-                SeqId = cmd.SeqId;
-            }
+            SeqId = cmd.SeqId;
         }
-
-        public SerialEventArgs(int queueLength, SerialCommand cmd)
-        {
-            QueueLength = queueLength;
-            Command     = cmd;
-            if (cmd != null)
-            {
-                Info  = cmd.CommandText;
-                SeqId = cmd.SeqId;
-            }
-        }
-
-        public SerialEventArgs()
-        {
-        }
-
-        public bool   Continue { get; set; } = false;
-        public bool   Abort    { get; set; } = false;
-        public string Result   { get; set; }
-
-        public string Info        { get; }
-        public int    QueueLength { get; }
-
-        public int SeqId { get; }
-
-        public SerialCommand Command { get; }
     }
+
+    public SerialEventArgs(SerialCommand cmd)
+    {
+        Command = cmd;
+        if (cmd != null)
+        {
+            Info  = cmd.CommandText;
+            SeqId = cmd.SeqId;
+        }
+    }
+
+    public SerialEventArgs(int queueLength, SerialCommand cmd)
+    {
+        QueueLength = queueLength;
+        Command     = cmd;
+        if (cmd != null)
+        {
+            Info  = cmd.CommandText;
+            SeqId = cmd.SeqId;
+        }
+    }
+
+    public SerialEventArgs()
+    {
+    }
+
+    public bool   Continue { get; set; } = false;
+    public bool   Abort    { get; set; } = false;
+    public string Result   { get; set; }
+
+    public string Info        { get; }
+    public int    QueueLength { get; }
+
+    public int SeqId { get; }
+
+    public SerialCommand Command { get; }
 }

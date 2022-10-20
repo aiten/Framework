@@ -14,15 +14,14 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.WebAPI.Controller
+namespace Framework.WebAPI.Controller;
+
+using System.Collections.Generic;
+
+public class UrisAndValues<Tdto>
+    where Tdto : class
 {
-    using System.Collections.Generic;
+    public IEnumerable<string> Uri { get; set; }
 
-    public class UrisAndValues<Tdto>
-        where Tdto : class
-    {
-        public IEnumerable<string> Uri { get; set; }
-
-        public IEnumerable<Tdto> Value { get; set; }
-    }
+    public IEnumerable<Tdto> Value { get; set; }
 }

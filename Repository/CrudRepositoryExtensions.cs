@@ -14,42 +14,41 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.Repository
+namespace Framework.Repository;
+
+using System.Data;
+using System.Threading.Tasks;
+
+using Abstraction;
+
+using Framework.Localization;
+
+public static class CrudRepositoryExtensions
 {
-    using System.Data;
-    using System.Threading.Tasks;
-
-    using Abstraction;
-
-    using Framework.Localization;
-
-    public static class CrudRepositoryExtensions
+    public static async Task StoreAsync<TEntity, TKey>(this ICrudRepository<TEntity, TKey> repository, TEntity entity, TKey key)
+        where TEntity : class
     {
-        public static async Task Store<TEntity, TKey>(this ICrudRepository<TEntity, TKey> repository, TEntity entity, TKey key)
-            where TEntity : class
+        var entityInDb = await repository.GetTrackingAsync(key);
+        if (entityInDb == default(TEntity))
         {
-            var entityInDb = await repository.GetTracking(key);
-            if (entityInDb == default(TEntity))
-            {
-                repository.Add(entity);
-            }
-            else
-            {
-                // syn with existing
-                repository.SetValue(entityInDb, entity);
-            }
+            repository.Add(entity);
+        }
+        else
+        {
+            // syn with existing
+            repository.SetValue(entityInDb, entity);
+        }
+    }
+
+    public static async Task UpdateAsync<TEntity, TKey>(this ICrudRepository<TEntity, TKey> repository, TKey key, TEntity values)
+        where TEntity : class
+    {
+        var entityInDb = await repository.GetTrackingAsync(key);
+        if (entityInDb == default(TEntity))
+        {
+            throw new DBConcurrencyException(ErrorMessages.ResourceManager.ToLocalizable(nameof(ErrorMessages.Framework_Repository_TrackingEntityNotFound)).Message());
         }
 
-        public static async Task Update<TEntity, TKey>(this ICrudRepository<TEntity, TKey> repository, TKey key, TEntity values)
-            where TEntity : class
-        {
-            var entityInDb = await repository.GetTracking(key);
-            if (entityInDb == default(TEntity))
-            {
-                throw new DBConcurrencyException(ErrorMessages.ResourceManager.ToLocalizable(nameof(ErrorMessages.Framework_Repository_TrackingEntityNotFound)).Message());
-            }
-
-            repository.SetValueGraph(entityInDb, values);
-        }
+        repository.SetValueGraph(entityInDb, values);
     }
 }

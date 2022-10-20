@@ -14,12 +14,11 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.Schedule
-{
-    using Framework.Schedule.Abstraction;
+namespace Framework.Schedule;
 
-    public sealed class JobParamContainer : IJobParamContainer
-    {
-        public object Param { get; set; }
-    }
+using Framework.Schedule.Abstraction;
+
+public sealed class JobParamContainer : IJobParamContainer
+{
+    public object Param { get; set; }
 }

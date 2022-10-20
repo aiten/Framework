@@ -14,46 +14,45 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.Service.WebAPI
+namespace Framework.Service.WebAPI;
+
+using System;
+using System.Collections.Generic;
+using System.Net.Http;
+using System.Net.Http.Headers;
+
+public static class HttpClientHelper
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Net.Http;
-    using System.Net.Http.Headers;
-
-    public static class HttpClientHelper
+    public static void PrepareHttpClient(HttpClient httpClient, string baseUri = null, int timeOutSeconds = -1, Dictionary<string, string> defaultHeaders = null)
     {
-        public static void PrepareHttpClient(HttpClient httpClient, string baseUri = null, int timeOutSeconds = -1, Dictionary<string, string> defaultHeaders = null)
+        if (!string.IsNullOrEmpty(baseUri))
         {
-            if (!string.IsNullOrEmpty(baseUri))
-            {
-                httpClient.BaseAddress = new System.Uri(baseUri);
-            }
-
-            httpClient.DefaultRequestHeaders.Accept.Clear();
-            httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
-            if (timeOutSeconds != -1)
-            {
-                httpClient.Timeout = TimeSpan.FromSeconds(timeOutSeconds);
-            }
-
-            if (defaultHeaders != null)
-            {
-                foreach (var defaultHeader in defaultHeaders)
-                {
-                    httpClient.DefaultRequestHeaders.Add(defaultHeader.Key, defaultHeader.Value);
-                }
-            }
+            httpClient.BaseAddress = new System.Uri(baseUri);
         }
 
-        public static HttpClientHandler CreateHttpClientHandlerIgnoreSSLCertificatesError()
+        httpClient.DefaultRequestHeaders.Accept.Clear();
+        httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+        if (timeOutSeconds != -1)
         {
-            return new HttpClientHandler
-            {
-                ClientCertificateOptions                  = ClientCertificateOption.Manual,
-                ServerCertificateCustomValidationCallback = (httpRequestMessage, cert, cetChain, policyErrors) => true
-            };
+            httpClient.Timeout = TimeSpan.FromSeconds(timeOutSeconds);
         }
+
+        if (defaultHeaders != null)
+        {
+            foreach (var defaultHeader in defaultHeaders)
+            {
+                httpClient.DefaultRequestHeaders.Add(defaultHeader.Key, defaultHeader.Value);
+            }
+        }
+    }
+
+    public static HttpClientHandler CreateHttpClientHandlerIgnoreSSLCertificatesError()
+    {
+        return new HttpClientHandler
+        {
+            ClientCertificateOptions                  = ClientCertificateOption.Manual,
+            ServerCertificateCustomValidationCallback = (httpRequestMessage, cert, cetChain, policyErrors) => true
+        };
     }
 }

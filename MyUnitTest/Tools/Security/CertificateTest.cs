@@ -14,32 +14,31 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.MyUnitTest.Tools.Security
+namespace Framework.MyUnitTest.Tools.Security;
+
+using System.Security.Cryptography.X509Certificates;
+
+using FluentAssertions;
+
+using Framework.Tools.Security;
+
+using Xunit;
+
+public class CertificateTest
 {
-    using System.Security.Cryptography.X509Certificates;
+    #region Common Name
 
-    using FluentAssertions;
-
-    using Framework.Tools.Security;
-
-    using Xunit;
-
-    public class CertificateTest
+    [Theory]
+    [InlineData("CN = localhost",                                                                "localhost")]
+    [InlineData("cn=My Development CA  , OU=My Systems Team, O=A123, L=Linz, S=N12, C=AU",       "My Development CA")]
+    [InlineData("OU=My Systems Team, O=A123, L=Linz, S=N12, C=AU",                               null)]
+    [InlineData("cn=\"My, Development, CA\"  , OU=My Systems Team, O=A123, L=Linz, S=N12, C=AU", "My, Development, CA")]
+    public void SplitX500DistinguishedName(string subject, string expect)
     {
-        #region Common Name
-
-        [Theory]
-        [InlineData("CN = localhost",                                                                "localhost")]
-        [InlineData("cn=My Development CA  , OU=My Systems Team, O=A123, L=Linz, S=N12, C=AU",       "My Development CA")]
-        [InlineData("OU=My Systems Team, O=A123, L=Linz, S=N12, C=AU",                               null)]
-        [InlineData("cn=\"My, Development, CA\"  , OU=My Systems Team, O=A123, L=Linz, S=N12, C=AU", "My, Development, CA")]
-        public void SplitX500DistinguishedName(string subject, string expect)
-        {
-            var name = new X500DistinguishedName(subject);
-            var cn   = name.CN();
-            cn.Should().Be(expect);
-        }
-
-        #endregion
+        var name = new X500DistinguishedName(subject);
+        var cn   = name.CN();
+        cn.Should().Be(expect);
     }
+
+    #endregion
 }

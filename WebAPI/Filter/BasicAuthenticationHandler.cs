@@ -14,65 +14,64 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.WebAPI.Filter
+namespace Framework.WebAPI.Filter;
+
+using System;
+using System.Net.Http.Headers;
+using System.Text;
+using System.Text.Encodings.Web;
+using System.Threading.Tasks;
+
+using Framework.Logic.Abstraction;
+
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+
+public class BasicAuthenticationHandler : AuthenticationHandler<AuthenticationSchemeOptions>
 {
-    using System;
-    using System.Net.Http.Headers;
-    using System.Text;
-    using System.Text.Encodings.Web;
-    using System.Threading.Tasks;
+    private readonly IAuthenticationManager _authenticationManager;
 
-    using Framework.Logic.Abstraction;
-
-    using Microsoft.AspNetCore.Authentication;
-    using Microsoft.Extensions.Logging;
-    using Microsoft.Extensions.Options;
-
-    public class BasicAuthenticationHandler : AuthenticationHandler<AuthenticationSchemeOptions>
+    public BasicAuthenticationHandler(
+        IOptionsMonitor<AuthenticationSchemeOptions> options,
+        ILoggerFactory                               logger,
+        UrlEncoder                                   encoder,
+        ISystemClock                                 clock,
+        IAuthenticationManager                       authenticationManager)
+        : base(options, logger, encoder, clock)
     {
-        private readonly IAuthenticationManager _authenticationManager;
+        _authenticationManager = authenticationManager;
+    }
 
-        public BasicAuthenticationHandler(
-            IOptionsMonitor<AuthenticationSchemeOptions> options,
-            ILoggerFactory                               logger,
-            UrlEncoder                                   encoder,
-            ISystemClock                                 clock,
-            IAuthenticationManager                       authenticationManager)
-            : base(options, logger, encoder, clock)
+    protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
+    {
+        if (!Request.Headers.ContainsKey("Authorization"))
         {
-            _authenticationManager = authenticationManager;
+            return AuthenticateResult.Fail("Missing Authorization Header");
         }
 
-        protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
+        try
         {
-            if (!Request.Headers.ContainsKey("Authorization"))
+            var authHeader      = AuthenticationHeaderValue.Parse(Request.Headers["Authorization"]);
+            var credentialBytes = Convert.FromBase64String(authHeader.Parameter ?? "");
+            var credentials     = Encoding.UTF8.GetString(credentialBytes).Split(new[] { ':' }, 2);
+            var password        = credentials[1];
+            var userName        = credentials[0];
+
+            var userPrincipal = await _authenticationManager.AuthenticateAsync(userName, password);
+
+            if (userPrincipal == null)
             {
-                return AuthenticateResult.Fail("Missing Authorization Header");
+                return AuthenticateResult.Fail("Invalid Username or Password");
             }
 
-            try
-            {
-                var authHeader      = AuthenticationHeaderValue.Parse(Request.Headers["Authorization"]);
-                var credentialBytes = Convert.FromBase64String(authHeader.Parameter ?? "");
-                var credentials     = Encoding.UTF8.GetString(credentialBytes).Split(new[] { ':' }, 2);
-                var password        = credentials[1];
-                var userName        = credentials[0];
+            var ticket = new AuthenticationTicket(userPrincipal, Scheme.Name);
 
-                var userPrincipal = await _authenticationManager.Authenticate(userName, password);
-
-                if (userPrincipal == null)
-                {
-                    return AuthenticateResult.Fail("Invalid Username or Password");
-                }
-
-                var ticket = new AuthenticationTicket(userPrincipal, Scheme.Name);
-
-                return AuthenticateResult.Success(ticket);
-            }
-            catch
-            {
-                return AuthenticateResult.Fail("Invalid Authorization Header");
-            }
+            return AuthenticateResult.Success(ticket);
+        }
+        catch
+        {
+            return AuthenticateResult.Fail("Invalid Authorization Header");
         }
     }
 }

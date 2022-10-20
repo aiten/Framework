@@ -14,23 +14,22 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.UnitTest
+namespace Framework.UnitTest;
+
+using Framework.Tools.Abstraction;
+
+/// <summary>
+/// Base class for *all* unit tests. 
+/// </summary>
+public class UnitTestBase
 {
-    using Framework.Tools.Abstraction;
-
-    /// <summary>
-    /// Base class for *all* unit tests. 
-    /// </summary>
-    public class UnitTestBase
+    protected UnitTestBase()
     {
-        protected UnitTestBase()
-        {
-        }
-
-        private CurrentDateTimeMock _currentDateTime;
-
-        protected ICurrentDateTime CurrentDateTime => CurrentDateTimeX;
-
-        protected CurrentDateTimeMock CurrentDateTimeX => _currentDateTime ?? (_currentDateTime = new CurrentDateTimeMock());
     }
+
+    private CurrentDateTimeMock _currentDateTime;
+
+    protected ICurrentDateTime CurrentDateTime => CurrentDateTimeX;
+
+    protected CurrentDateTimeMock CurrentDateTimeX => _currentDateTime ?? (_currentDateTime = new CurrentDateTimeMock());
 }

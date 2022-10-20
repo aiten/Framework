@@ -14,31 +14,30 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.Startup
+namespace Framework.Startup;
+
+using System.Collections.Generic;
+
+using Framework.Localization.Abstraction;
+using Framework.Startup.Abstraction;
+
+using Microsoft.Extensions.DependencyInjection;
+
+public class InitializationManager
 {
-    using System.Collections.Generic;
+    private List<IModuleInitializer> _moduleInitializers = new List<IModuleInitializer>();
 
-    using Framework.Localization.Abstraction;
-    using Framework.Startup.Abstraction;
-
-    using Microsoft.Extensions.DependencyInjection;
-
-    public class InitializationManager
+    public void Add(IModuleInitializer initializer)
     {
-        private List<IModuleInitializer> _moduleInitializers = new List<IModuleInitializer>();
+        _moduleInitializers.Add(initializer);
+    }
 
-        public void Add(IModuleInitializer initializer)
+    public void Initialize(IServiceCollection services, ILocalizationCollector localizationCollector)
+    {
+        foreach (var moduleInitializer in _moduleInitializers)
         {
-            _moduleInitializers.Add(initializer);
-        }
-
-        public void Initialize(IServiceCollection services, ILocalizationCollector localizationCollector)
-        {
-            foreach (var moduleInitializer in _moduleInitializers)
-            {
-                moduleInitializer.AddTranslationResources(localizationCollector);
-                moduleInitializer.AddServices(services);
-            }
+            moduleInitializer.AddTranslationResources(localizationCollector);
+            moduleInitializer.AddServices(services);
         }
     }
 }

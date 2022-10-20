@@ -14,37 +14,36 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.Repository.Abstraction
+namespace Framework.Repository.Abstraction;
+
+public enum MyEntityState
 {
-    public enum MyEntityState
-    {
-        /// <summary>
-        /// see entity framework.
-        /// </summary>
-        Detached,
+    /// <summary>
+    /// see entity framework.
+    /// </summary>
+    Detached,
 
-        /// <summary>
-        /// see entity framework.
-        /// </summary>
-        Unchanged,
+    /// <summary>
+    /// see entity framework.
+    /// </summary>
+    Unchanged,
 
-        /// <summary>
-        /// see entity framework.
-        /// </summary>
-        Deleted,
+    /// <summary>
+    /// see entity framework.
+    /// </summary>
+    Deleted,
 
-        /// <summary>
-        /// see entity framework.
-        /// </summary>
-        Modified,
+    /// <summary>
+    /// see entity framework.
+    /// </summary>
+    Modified,
 
-        /// <summary>
-        /// see entity framework.
-        /// </summary>
-        Added,
-    }
+    /// <summary>
+    /// see entity framework.
+    /// </summary>
+    Added,
+}
 
-    public interface IRepository
-    {
-    }
+public interface IRepository
+{
 }

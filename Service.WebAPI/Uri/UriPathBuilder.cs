@@ -14,77 +14,76 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.Service.WebAPI.Uri
+namespace Framework.Service.WebAPI.Uri;
+
+using System.Linq;
+using System.Web;
+
+public class UriPathBuilder
 {
-    using System.Linq;
-    using System.Web;
+    public string Path  { get; set; }
+    public string Query { get; set; }
 
-    public class UriPathBuilder
+    public string Build()
     {
-        public string Path  { get; set; }
-        public string Query { get; set; }
-
-        public string Build()
+        if (string.IsNullOrEmpty(Query))
         {
-            if (string.IsNullOrEmpty(Query))
-            {
-                return $"{Path}";
-            }
-
-            return $"{Path}?{Query}";
+            return $"{Path}";
         }
 
-        public UriPathBuilder AddPath<T>(T path)
+        return $"{Path}?{Query}";
+    }
+
+    public UriPathBuilder AddPath<T>(T path)
+    {
+        return AddPath(path.ToUriAsPath());
+    }
+
+    public UriPathBuilder AddPath(string path)
+    {
+        if (string.IsNullOrEmpty(Path))
         {
-            return AddPath(path.ToUriAsPath());
+            Path = path;
         }
-
-        public UriPathBuilder AddPath(string path)
+        else
         {
-            if (string.IsNullOrEmpty(Path))
+            if (Path[^1] != '/')
             {
-                Path = path;
-            }
-            else
-            {
-                if (Path[^1] != '/')
-                {
-                    Path += '/';
-                }
-
-                Path += path;
-            }
-
-            return this;
-        }
-
-        public UriPathBuilder AddPath(string[] pathElements)
-        {
-            if (pathElements != null)
-            {
-                return AddPath(string.Join("/", pathElements.Select(HttpUtility.UrlEncode)));
+                Path += '/';
             }
 
-            return this;
+            Path += path;
         }
 
-        public UriPathBuilder AddQuery(string query)
+        return this;
+    }
+
+    public UriPathBuilder AddPath(string[] pathElements)
+    {
+        if (pathElements != null)
         {
-            if (string.IsNullOrEmpty(Query))
-            {
-                Query = query;
-            }
-            else
-            {
-                Query += "&" + query;
-            }
-
-            return this;
+            return AddPath(string.Join("/", pathElements.Select(HttpUtility.UrlEncode)));
         }
 
-        public UriPathBuilder AddQuery(UriQueryBuilder filter)
+        return this;
+    }
+
+    public UriPathBuilder AddQuery(string query)
+    {
+        if (string.IsNullOrEmpty(Query))
         {
-            return AddQuery(filter.ToString());
+            Query = query;
         }
+        else
+        {
+            Query += "&" + query;
+        }
+
+        return this;
+    }
+
+    public UriPathBuilder AddQuery(UriQueryBuilder filter)
+    {
+        return AddQuery(filter.ToString());
     }
 }

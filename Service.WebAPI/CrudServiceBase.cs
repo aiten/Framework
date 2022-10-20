@@ -14,98 +14,97 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.Service.WebAPI
+namespace Framework.Service.WebAPI;
+
+using System;
+using System.Collections.Generic;
+using System.Net.Http;
+using System.Threading.Tasks;
+
+using Framework.Pattern;
+
+public abstract class CrudServiceBase<T, TKey> : ServiceBase where T : class where TKey : IComparable
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Net.Http;
-    using System.Threading.Tasks;
+    protected abstract TKey GetKey(T value);
 
-    using Framework.Pattern;
+    private readonly HttpClient _httpClient;
 
-    public abstract class CrudServiceBase<T, TKey> : ServiceBase where T : class where TKey : IComparable
+    protected CrudServiceBase(HttpClient httpClient)
     {
-        protected abstract TKey GetKey(T value);
+        _httpClient = httpClient;
+    }
 
-        private readonly HttpClient _httpClient;
+    protected override IScope<HttpClient> CreateScope()
+    {
+        return new ScopeInstance<HttpClient>(_httpClient);
+    }
 
-        protected CrudServiceBase(HttpClient httpClient)
+    public async Task<T> GetAsync(TKey id)
+    {
+        return await Read<T>(CreatePathBuilder().AddPath(id));
+    }
+
+    public Task<IEnumerable<T>> GetAsync(IEnumerable<TKey> keys)
+    {
+        throw new NotImplementedException();
+    }
+
+    public async Task<IEnumerable<T>> GetAllAsync()
+    {
+        return await Read<IEnumerable<T>>(CreatePathBuilder());
+    }
+
+    public async Task<TKey> AddAsync(T value)
+    {
+        using (var scope = CreateScope())
         {
-            _httpClient = httpClient;
-        }
+            var response = await scope.Instance.PostAsJsonAsync(CreatePathBuilder().Build(), value);
 
-        protected override IScope<HttpClient> CreateScope()
+            response.EnsureSuccessStatusCode();
+            return GetKey(await response.Content.ReadAsAsync<T>());
+        }
+    }
+
+    public Task<IEnumerable<TKey>> AddAsync(IEnumerable<T> values)
+    {
+        throw new NotImplementedException();
+    }
+
+    public async Task DeleteAsync(T value)
+    {
+        await DeleteAsync(GetKey(value));
+    }
+
+    public Task DeleteAsync(IEnumerable<T> values)
+    {
+        throw new NotImplementedException();
+    }
+
+    public async Task DeleteAsync(TKey key)
+    {
+        using (var scope = CreateScope())
         {
-            return new ScopeInstance<HttpClient>(_httpClient);
+            var response = await scope.Instance.DeleteAsync(CreatePathBuilder().AddPath(key).Build());
+            response.EnsureSuccessStatusCode();
         }
+    }
 
-        public async Task<T> Get(TKey id)
+    public Task DeleteAsync(IEnumerable<TKey> keys)
+    {
+        throw new NotImplementedException();
+    }
+
+    public async Task UpdateAsync(T value)
+    {
+        using (var scope = CreateScope())
         {
-            return await Read<T>(CreatePathBuilder().AddPath(id));
+            var response = await scope.Instance.PutAsJsonAsync(CreatePathBuilder().AddPath(GetKey(value)).Build(), value);
+            response.EnsureSuccessStatusCode();
         }
+    }
 
-        public Task<IEnumerable<T>> Get(IEnumerable<TKey> keys)
-        {
-            throw new NotImplementedException();
-        }
-
-        public async Task<IEnumerable<T>> GetAll()
-        {
-            return await Read<IEnumerable<T>>(CreatePathBuilder());
-        }
-
-        public async Task<TKey> Add(T value)
-        {
-            using (var scope = CreateScope())
-            {
-                var response = await scope.Instance.PostAsJsonAsync(CreatePathBuilder().Build(), value);
-
-                response.EnsureSuccessStatusCode();
-                return GetKey(await response.Content.ReadAsAsync<T>());
-            }
-        }
-
-        public Task<IEnumerable<TKey>> Add(IEnumerable<T> values)
-        {
-            throw new NotImplementedException();
-        }
-
-        public async Task Delete(T value)
-        {
-            await Delete(GetKey(value));
-        }
-
-        public Task Delete(IEnumerable<T> values)
-        {
-            throw new NotImplementedException();
-        }
-
-        public async Task Delete(TKey key)
-        {
-            using (var scope = CreateScope())
-            {
-                var response = await scope.Instance.DeleteAsync(CreatePathBuilder().AddPath(key).Build());
-                response.EnsureSuccessStatusCode();
-            }
-        }
-
-        public Task Delete(IEnumerable<TKey> keys)
-        {
-            throw new NotImplementedException();
-        }
-
-        public async Task Update(T value)
-        {
-            using (var scope = CreateScope())
-            {
-                var response = await scope.Instance.PutAsJsonAsync(CreatePathBuilder().AddPath(GetKey(value)).Build(), value);
-                response.EnsureSuccessStatusCode();
-            }
-        }
-
-        public Task Update(IEnumerable<T> values)
-        {
-            throw new NotImplementedException();
-        }
+    public Task UpdateAsync(IEnumerable<T> values)
+    {
+        throw new NotImplementedException();
     }
 }

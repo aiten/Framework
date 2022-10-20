@@ -14,23 +14,22 @@
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
 
-namespace Framework.Wpf.Converters
+namespace Framework.Wpf.Converters;
+
+using System;
+using System.Windows.Data;
+
+public class IsBiggerThanConverter : IValueConverter
 {
-    using System;
-    using System.Windows.Data;
-
-    public class IsBiggerThanConverter : IValueConverter
+    public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
     {
-        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
-        {
-            double x = System.Convert.ToDouble(parameter);
-            double v = System.Convert.ToDouble(value);
-            return v > x;
-        }
+        double x = System.Convert.ToDouble(parameter);
+        double v = System.Convert.ToDouble(value);
+        return v > x;
+    }
 
-        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
-        {
-            throw new NotImplementedException();
-        }
+    public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+    {
+        throw new NotImplementedException();
     }
 }

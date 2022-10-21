@@ -19,8 +19,10 @@ namespace Framework.NLogTools;
 using System;
 using System.IO;
 using System.Reflection;
+using System.Runtime.InteropServices;
 
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Hosting.WindowsServices;
 using Microsoft.Extensions.Logging;
 
 using NLog;
@@ -42,11 +44,36 @@ public static class ConfigurationExtensions
                 .UseNLog();
     }
 
+    public static string GetLogFolder(string appName)
+    {
+        string logDir;
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+        {
+            logDir = $"/var/log/{appName}";
+        }
+        else
+        {
+            var localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+
+            if (Microsoft.Azure.Web.DataProtection.Util.IsAzureEnvironment())
+            {
+                localAppData = $"{BaseDirectory}/data/logs";
+            }
+            else if (!Directory.Exists(localAppData) || WindowsServiceHelpers.IsWindowsService())
+            {
+                // service user
+                localAppData = Environment.GetEnvironmentVariable("ProgramData");
+            }
+
+            logDir = $"{localAppData}/{appName}/logs";
+        }
+
+        return logDir;
+    }
+
     public static Logger ConfigureNLogLocation(string appName, Assembly assembly)
     {
-        var logDir = Microsoft.Azure.Web.DataProtection.Util.IsAzureEnvironment()
-            ? $"{BaseDirectory}/data/logs"
-            : $"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}/{appName}/logs";
+        var logDir = GetLogFolder(appName);
 
         if (!Directory.Exists(logDir))
         {
@@ -58,12 +85,10 @@ public static class ConfigurationExtensions
         GlobalDiagnosticsContext.Set("application", appName);
         GlobalDiagnosticsContext.Set("username",    Environment.UserName);
 
-        var logger = NLogBuilder.ConfigureNLog("nlog.config").GetCurrentClassLogger();
-
 #if DEBUG
         LogManager.ThrowExceptions = true;
 #endif
 
-        return logger;
+        return NLogBuilder.ConfigureNLog("nlog.config").GetCurrentClassLogger();
     }
 }

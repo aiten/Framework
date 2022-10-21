@@ -156,12 +156,6 @@ public class CsvImportBase
                     columns.Add(sb.ToString());
                     sb.Clear();
                 }
-
-                else if (quoteChar == noQuoteChar && (ch == '|'))
-                {
-                    columns.Add(sb.ToString());
-                    sb.Clear();
-                }
                 else
                 {
                     sb.Append(ch);

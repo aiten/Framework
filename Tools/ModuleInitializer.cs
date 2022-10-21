@@ -16,20 +16,15 @@
 
 namespace Framework.Tools;
 
-using Framework.Localization.Abstraction;
-using Framework.Startup.Abstraction;
 using Framework.Tools.Abstraction;
 
 using Microsoft.Extensions.DependencyInjection;
 
-public class ModuleInitializer : IModuleInitializer
+public static class ModuleInitializer
 {
-    public void AddServices(IServiceCollection services)
+    public static IServiceCollection AddFrwTools(this IServiceCollection services)
     {
-        services.AddTransient<ICurrentDateTime, CurrentDateTime>();
-    }
-
-    public void AddTranslationResources(ILocalizationCollector localisation)
-    {
+        return
+            services.AddTransient<ICurrentDateTime, CurrentDateTime>();
     }
 }

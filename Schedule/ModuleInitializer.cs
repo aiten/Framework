@@ -16,22 +16,17 @@
 
 namespace Framework.Schedule;
 
-using Framework.Localization.Abstraction;
 using Framework.Schedule.Abstraction;
-using Framework.Startup.Abstraction;
 
 using Microsoft.Extensions.DependencyInjection;
 
-public class ModuleInitializer : IModuleInitializer
+public static class ModuleInitializer
 {
-    public void AddServices(IServiceCollection services)
+    public static IServiceCollection AddFrwSchedule(this IServiceCollection services)
     {
-        services
-            .AddSingleton<IJobScheduler, JobScheduler>()
-            .AddTransient<JobParamContainer>();
-    }
-
-    public void AddTranslationResources(ILocalizationCollector localisation)
-    {
+        return
+            services
+                .AddSingleton<IJobScheduler, JobScheduler>()
+                .AddTransient<JobParamContainer>();
     }
 }

@@ -18,22 +18,17 @@ namespace Framework.Arduino.SerialCommunication;
 
 using Framework.Arduino.SerialCommunication.Abstraction;
 using Framework.Dependency;
-using Framework.Localization.Abstraction;
 using Framework.Pattern;
-using Framework.Startup.Abstraction;
 
 using Microsoft.Extensions.DependencyInjection;
 
-public class ModuleInitializer : IModuleInitializer
+public static class ModuleInitializer
 {
-    public void AddServices(IServiceCollection services)
+    public static IServiceCollection AddArduinoSerial(this IServiceCollection services)
     {
-        services
-            .AddAssemblyIncludingInternals(ServiceLifetime.Transient, typeof(Serial).Assembly)
-            .AddTransient<IFactory<ISerialPort>, FactoryResolve<ISerialPort>>();
-    }
-
-    public void AddTranslationResources(ILocalizationCollector localisation)
-    {
+        return
+            services
+                .AddAssemblyIncludingInternals(ServiceLifetime.Transient, typeof(Serial).Assembly)
+                .AddTransient<IFactory<ISerialPort>, FactoryResolve<ISerialPort>>();
     }
 }

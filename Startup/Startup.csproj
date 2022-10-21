@@ -1,9 +1,0 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <TargetFramework>$(TargetFrameworkForProject)</TargetFramework>
-  </PropertyGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Dependency\Dependency.csproj" />
-    <ProjectReference Include="..\Localization\Localization.csproj" />
-  </ItemGroup>
-</Project>

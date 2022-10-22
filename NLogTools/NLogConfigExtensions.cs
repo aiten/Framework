@@ -21,6 +21,7 @@ using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
 
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting.WindowsServices;
 using Microsoft.Extensions.Logging;
@@ -28,9 +29,17 @@ using Microsoft.Extensions.Logging;
 using NLog;
 using NLog.Web;
 
-public static class ConfigurationExtensions
+public static class NLogConfigExtensions
 {
     private static string BaseDirectory => Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+
+    public static WebApplicationBuilder UseNLog(this WebApplicationBuilder builder)
+    {
+        builder.Logging.ClearProviders();
+        builder.Logging.SetMinimumLevel(Microsoft.Extensions.Logging.LogLevel.Trace);
+        builder.Host.UseNLog();
+        return builder;
+    }
 
     public static IWebHostBuilder ConfigureAndUseNLog(this IWebHostBuilder hostBuilder)
     {

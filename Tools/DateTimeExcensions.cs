@@ -32,4 +32,14 @@ public static class DateTimeExtensions
 
         return ret;
     }
+
+    public static bool IsEqualOrAfter(this DateTime time, DateTime? from)
+    {
+        return (!from.HasValue || from.Value <= time);
+    }
+
+    public static bool IsBefore(this DateTime time, DateTime? to)
+    {
+        return (!to.HasValue || time < to.Value);
+    }
 }

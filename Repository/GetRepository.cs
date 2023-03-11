@@ -22,6 +22,8 @@ using System.Threading.Tasks;
 
 using Microsoft.EntityFrameworkCore;
 
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
+
 public abstract class GetRepository<TDbContext, TEntity, TKey> : QueryRepository<TDbContext, TEntity>
     where TDbContext : DbContext where TEntity : class
 {
@@ -32,7 +34,7 @@ public abstract class GetRepository<TDbContext, TEntity, TKey> : QueryRepository
 
     #region QueryProperties
 
-    protected IQueryable<TEntity> QueryWithInclude => AddInclude(Query);
+    protected IQueryable<TEntity> QueryWithInclude(params string[] includeProperties) => AddInclude(Query, includeProperties);
 
     protected IQueryable<TEntity> QueryWithOptional => AddOptionalWhere(Query);
 
@@ -57,19 +59,28 @@ public abstract class GetRepository<TDbContext, TEntity, TKey> : QueryRepository
         return await AddPrimaryWhereIn(query, keys).ToListAsync();
     }
 
-    public async Task<IList<TEntity>> GetAllAsync()
+    public async Task<IList<TEntity>> GetAllAsync(params string[] includeProperties)
     {
-        return await GetAllAsync(AddInclude(QueryWithOptional));
+        return await GetAllAsync(AddInclude(QueryWithOptional,includeProperties));
     }
 
-    public async Task<TEntity> GetAsync(TKey key)
+    public async Task<TEntity> GetAsync(TKey key, params string[] includeProperties)
     {
-        return await GetAsync(QueryWithInclude, key);
+        return await GetAsync(QueryWithInclude(includeProperties), key);
     }
 
-    public async Task<IList<TEntity>> GetAsync(IEnumerable<TKey> keys)
+    public async Task<IList<TEntity>> GetAsync(IEnumerable<TKey> keys, params string[] includeProperties)
     {
-        return await GetAsync(QueryWithInclude, keys);
+        return await GetAsync(QueryWithInclude(includeProperties), keys);
+    }
+
+    #endregion
+
+    #region extensions
+
+    public bool Exist(TKey key)
+    {
+        return AddPrimaryWhere(Query, key).Any();
     }
 
     #endregion
@@ -78,7 +89,15 @@ public abstract class GetRepository<TDbContext, TEntity, TKey> : QueryRepository
 
     protected virtual IQueryable<TEntity> AddOptionalWhere(IQueryable<TEntity> query) => query;
 
-    protected virtual IQueryable<TEntity> AddInclude(IQueryable<TEntity> query) => query;
+    protected virtual IQueryable<TEntity> AddInclude(IQueryable<TEntity> query, params string[] includeProperties)
+    {
+        foreach (string includeProperty in includeProperties!)
+        {
+            query = query.Include(includeProperty);
+        }
+
+        return query;
+    }
 
     protected virtual IQueryable<TEntity> AddPrimaryWhere(IQueryable<TEntity> query, TKey key)
     {

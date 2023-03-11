@@ -56,7 +56,7 @@ public class CrudRepositoryTests<TDbContext, TEntity, TKey, TIRepository> : GetR
         using (var trans = ctx.UnitOfWork.BeginTransaction())
         {
             var entityToAdd = createTestEntity();
-            ctx.Repository.Add(entityToAdd);
+            await ctx.Repository.AddAsync(entityToAdd);
 
             await ctx.UnitOfWork.SaveChangesAsync();
             await trans.CommitTransactionAsync();
@@ -146,7 +146,7 @@ public class CrudRepositoryTests<TDbContext, TEntity, TKey, TIRepository> : GetR
         using (var trans = ctx.UnitOfWork.BeginTransaction())
         {
             var entitiesToAdd = createTestEntities();
-            ctx.Repository.AddRange(entitiesToAdd);
+            await ctx.Repository.AddRangeAsync(entitiesToAdd);
 
             await ctx.UnitOfWork.SaveChangesAsync();
             await trans.CommitTransactionAsync();
@@ -227,7 +227,7 @@ public class CrudRepositoryTests<TDbContext, TEntity, TKey, TIRepository> : GetR
         using (var trans = ctx.UnitOfWork.BeginTransaction())
         {
             var entityToAdd = createTestEntity();
-            ctx.Repository.Add(entityToAdd);
+            await ctx.Repository.AddAsync(entityToAdd);
 
             await ctx.UnitOfWork.SaveChangesAsync();
 

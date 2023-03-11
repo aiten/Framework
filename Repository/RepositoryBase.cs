@@ -19,6 +19,7 @@ namespace Framework.Repository;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 using Microsoft.EntityFrameworkCore;
 
@@ -39,7 +40,7 @@ public abstract class RepositoryBase<TDbContext>
 
     #endregion
 
-    public void Sync<TEntity>(ICollection<TEntity> inDb, ICollection<TEntity> toDb, Func<TEntity, TEntity, bool> compareEntities, Action<TEntity> prepareForAdd)
+    public async Task SyncAsync<TEntity>(ICollection<TEntity> inDb, ICollection<TEntity> toDb, Func<TEntity, TEntity, bool> compareEntities, Action<TEntity> prepareForAdd)
         where TEntity : class
     {
         //// 1. DeleteEntity from DB (in DB) and update
@@ -78,7 +79,7 @@ public abstract class RepositoryBase<TDbContext>
         foreach (var add in toAdd)
         {
             prepareForAdd(add);
-            AddEntity(add);
+            await AddEntityAsync(add);
         }
     }
 
@@ -176,16 +177,16 @@ public abstract class RepositoryBase<TDbContext>
         SetEntityState(entity, EntityState.Modified);
     }
 
-    protected virtual void AddEntity<TEntity>(TEntity entity)
+    protected virtual async Task AddEntityAsync<TEntity>(TEntity entity)
         where TEntity : class
     {
-        Context.Add(entity);
+        await Context.AddAsync(entity);
     }
 
-    protected virtual void AddEntities<TEntity>(IEnumerable<TEntity> entities)
+    protected virtual async Task AddEntitiesAsync<TEntity>(IEnumerable<TEntity> entities)
         where TEntity : class
     {
-        Context.AddRange(entities);
+        await Context.AddRangeAsync(entities);
     }
 
     protected virtual void DeleteEntity<TEntity>(TEntity entity)

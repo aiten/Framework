@@ -23,15 +23,15 @@ using System.Threading.Tasks;
 public interface ICrudRepository<TEntity, TKey> : IGetRepository<TEntity, TKey>
     where TEntity : class
 {
-    Task<IList<TEntity>> GetTrackingAllAsync();
+    Task<IList<TEntity>> GetTrackingAllAsync(params string[] includeProperties);
 
-    Task<TEntity> GetTrackingAsync(TKey key);
+    Task<TEntity> GetTrackingAsync(TKey key, params string[] includeProperties);
 
-    Task<IList<TEntity>> GetTrackingAsync(IEnumerable<TKey> keys);
+    Task<IList<TEntity>> GetTrackingAsync(IEnumerable<TKey> keys, params string[] includeProperties);
 
-    void Add(TEntity entity);
+    Task AddAsync(TEntity entity);
 
-    void AddRange(IEnumerable<TEntity> entities);
+    Task AddRangeAsync(IEnumerable<TEntity> entities);
 
     void Delete(TEntity entity);
 
@@ -43,5 +43,5 @@ public interface ICrudRepository<TEntity, TKey> : IGetRepository<TEntity, TKey>
 
     void SetState(TEntity entity, MyEntityState state);
 
-    void Sync(ICollection<TEntity> inDb, ICollection<TEntity> toDb, Func<TEntity, TEntity, bool> compareEntities, Action<TEntity> prepareForAdd);
+    Task SyncAsync(ICollection<TEntity> inDb, ICollection<TEntity> toDb, Func<TEntity, TEntity, bool> compareEntities, Action<TEntity> prepareForAdd);
 }

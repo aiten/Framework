@@ -31,7 +31,7 @@ public static class CrudRepositoryExtensions
         var entityInDb = await repository.GetTrackingAsync(key);
         if (entityInDb == default(TEntity))
         {
-            repository.Add(entity);
+            await repository.AddAsync(entity);
         }
         else
         {

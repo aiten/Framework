@@ -33,39 +33,39 @@ public abstract class CrudRepository<TDbContext, TEntity, TKey> : GetRepository<
     {
     }
 
-    protected IQueryable<TEntity> TrackingQueryWithInclude => AddInclude(TrackingQuery);
+    protected IQueryable<TEntity> TrackingQueryWithInclude(params string[] includeProperties) => AddInclude(TrackingQuery, includeProperties);
 
     protected IQueryable<TEntity> TrackingQueryWithOptional => AddOptionalWhere(TrackingQuery);
 
     #region GetAsync Tracking
 
-    public async Task<IList<TEntity>> GetTrackingAllAsync()
+    public async Task<IList<TEntity>> GetTrackingAllAsync(params string[] includeProperties)
     {
         return await GetAllAsync(AddInclude(TrackingQueryWithOptional));
     }
 
-    public async Task<TEntity> GetTrackingAsync(TKey key)
+    public async Task<TEntity> GetTrackingAsync(TKey key, params string[] includeProperties)
     {
-        return await GetAsync(TrackingQueryWithInclude, key);
+        return await GetAsync(TrackingQueryWithInclude(includeProperties), key);
     }
 
-    public async Task<IList<TEntity>> GetTrackingAsync(IEnumerable<TKey> keys)
+    public async Task<IList<TEntity>> GetTrackingAsync(IEnumerable<TKey> keys, params string[] includeProperties)
     {
-        return await GetAsync(TrackingQueryWithInclude, keys);
+        return await GetAsync(TrackingQueryWithInclude(includeProperties), keys);
     }
 
     #endregion
 
     #region CRUD
 
-    public void Add(TEntity entity)
+    public async Task AddAsync(TEntity entity)
     {
-        AddEntity(entity);
+        await AddEntityAsync(entity);
     }
 
-    public void AddRange(IEnumerable<TEntity> entities)
+    public async Task AddRangeAsync(IEnumerable<TEntity> entities)
     {
-        AddEntities(entities);
+        await AddEntitiesAsync(entities);
     }
 
     public void Delete(TEntity entity)
@@ -105,11 +105,11 @@ public abstract class CrudRepository<TDbContext, TEntity, TKey> : GetRepository<
 
     #endregion
 
-    public void Sync(ICollection<TEntity> inDb,
+    public async Task SyncAsync(ICollection<TEntity> inDb,
         ICollection<TEntity>              toDb,
         Func<TEntity, TEntity, bool>      compareEntity,
         Action<TEntity>                   prepareForAdd)
     {
-        Sync<TEntity>(inDb, toDb, compareEntity, prepareForAdd);
+        await SyncAsync<TEntity>(inDb, toDb, compareEntity, prepareForAdd);
     }
 }

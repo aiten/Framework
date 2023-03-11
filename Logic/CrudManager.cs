@@ -69,7 +69,7 @@ public abstract class CrudManager<T, TKey, TEntity> : GetManager<T, TKey, TEntit
                 AddEntity(entity);
             }
 
-            _repository.AddRange(entities);
+            await _repository.AddRangeAsync(entities);
 
             await CommitTransactionAsync(trans);
 

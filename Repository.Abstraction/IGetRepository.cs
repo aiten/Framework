@@ -22,9 +22,11 @@ using System.Threading.Tasks;
 public interface IGetRepository<TEntity, TKey> : IQueryRepository<TEntity>
     where TEntity : class
 {
-    Task<IList<TEntity>> GetAllAsync();
+    Task<IList<TEntity>> GetAllAsync(params string[] includeProperties);
 
-    Task<TEntity> GetAsync(TKey key);
+    Task<TEntity> GetAsync(TKey key, params string[] includeProperties);
 
-    Task<IList<TEntity>> GetAsync(IEnumerable<TKey> keys);
+    Task<IList<TEntity>> GetAsync(IEnumerable<TKey> keys, params string[] includeProperties);
+
+    bool Exist(TKey key);
 }

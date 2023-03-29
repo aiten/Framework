@@ -31,9 +31,9 @@ public class Pbkdf2PasswordProvider : IOneWayPasswordProvider
 
     public string GetPasswordHash(string password)
     {
-        var cryptoProvider = new RNGCryptoServiceProvider();
-        var salt           = new byte[SaltByteSize];
-        cryptoProvider.GetBytes(salt);
+        using var rng            = RandomNumberGenerator.Create();
+        var       salt           = new byte[SaltByteSize];
+        rng.GetBytes(salt);
 
         var hash = GetPbkdf2Bytes(password, salt, Pbkdf2Iterations, HashByteSize);
         return Pbkdf2Iterations + ":" +
@@ -67,8 +67,7 @@ public class Pbkdf2PasswordProvider : IOneWayPasswordProvider
 
     private static byte[] GetPbkdf2Bytes(string password, byte[] salt, int iterations, int outputBytes)
     {
-        var pbkdf2 = new Rfc2898DeriveBytes(password, salt);
-        pbkdf2.IterationCount = iterations;
+        var pbkdf2 = new Rfc2898DeriveBytes(password, salt, iterations, HashAlgorithmName.SHA256);
         return pbkdf2.GetBytes(outputBytes);
     }
 }

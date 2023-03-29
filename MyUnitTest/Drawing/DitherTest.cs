@@ -25,6 +25,8 @@ using Framework.Drawing;
 
 using Xunit;
 
+#pragma warning disable CA1416  // This call site is reachable on all platforms. 'Bitmap' is only supported on: 'windows'.
+
 public class DitherTest
 {
     public class DitherTestClass : DitherBase

@@ -52,7 +52,7 @@ public class AesPasswordProvider : ITwoWayPasswordProvider
         {
             _ = encryptor ?? throw new ArgumentNullException(nameof(encryptor));
 
-            var pdb = new Rfc2898DeriveBytes(_key, new byte[] { 0x49, 0x76, 0x61, 0x6e, 0x20, 0x4d, 0x65, 0x64, 0x76, 0x65, 0x64, 0x65, 0x76 });
+            var pdb = new Rfc2898DeriveBytes(_key, new byte[] { 0x49, 0x76, 0x61, 0x6e, 0x20, 0x4d, 0x65, 0x64, 0x76, 0x65, 0x64, 0x65, 0x76 }, 1000, HashAlgorithmName.SHA256);
             encryptor.Key = pdb.GetBytes(32);
             encryptor.IV  = pdb.GetBytes(16);
             using (var ms = new MemoryStream())
@@ -77,7 +77,7 @@ public class AesPasswordProvider : ITwoWayPasswordProvider
         {
             _ = encryptor ?? throw new ArgumentNullException(nameof(encryptor));
 
-            var pdb = new Rfc2898DeriveBytes(_key, new byte[] { 0x49, 0x76, 0x61, 0x6e, 0x20, 0x4d, 0x65, 0x64, 0x76, 0x65, 0x64, 0x65, 0x76 });
+            var pdb = new Rfc2898DeriveBytes(_key, new byte[] { 0x49, 0x76, 0x61, 0x6e, 0x20, 0x4d, 0x65, 0x64, 0x76, 0x65, 0x64, 0x65, 0x76 }, 1000, HashAlgorithmName.SHA256);
             encryptor.Key = pdb.GetBytes(32);
             encryptor.IV  = pdb.GetBytes(16);
             using (var ms = new MemoryStream())

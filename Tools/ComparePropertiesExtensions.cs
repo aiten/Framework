@@ -130,7 +130,7 @@ public static class ComparePropertiesExtensions
 
     private static bool CanDirectlyCompare(Type type)
     {
-        return type != null && (typeof(IComparable).IsAssignableFrom((Type?)type) || type.IsPrimitive || type.IsValueType);
+        return type != null && (typeof(IComparable).IsAssignableFrom(type) || type.IsPrimitive || type.IsValueType);
     }
 
     ////////////////////////////////////////////////////////

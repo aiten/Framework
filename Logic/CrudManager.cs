@@ -100,7 +100,7 @@ public abstract class CrudManager<T, TKey, TEntity> : GetManager<T, TKey, TEntit
                 DeleteEntity(entity);
             }
 
-            _repository.DeleteRange(entities);
+            await _repository.DeleteRangeAsync(entities);
 
             await CommitTransactionAsync(trans);
         }
@@ -122,7 +122,7 @@ public abstract class CrudManager<T, TKey, TEntity> : GetManager<T, TKey, TEntit
                 DeleteEntity(entity);
             }
 
-            _repository.DeleteRange(entities);
+            await _repository.DeleteRangeAsync(entities);
 
             await CommitTransactionAsync(trans);
         }
@@ -167,7 +167,7 @@ public abstract class CrudManager<T, TKey, TEntity> : GetManager<T, TKey, TEntit
 
         foreach (var merged in mergeJoin)
         {
-            UpdateEntity(myValues, merged.EntityInDb, merged.Entity);
+            await UpdateEntityAsync(myValues, merged.EntityInDb, merged.Entity);
         }
 
         await Task.CompletedTask;
@@ -248,14 +248,14 @@ public abstract class CrudManager<T, TKey, TEntity> : GetManager<T, TKey, TEntit
     {
     }
 
-    protected virtual void UpdateEntity(IEnumerable<T> dtos, TEntity entityInDb, TEntity entity)
+    protected virtual async Task UpdateEntityAsync(IEnumerable<T> dtos, TEntity entityInDb, TEntity entity)
     {
-        UpdateEntity(entityInDb, entity);
+        await UpdateEntityAsync(entityInDb, entity);
     }
 
-    protected virtual void UpdateEntity(TEntity entityInDb, TEntity values)
+    protected virtual async Task UpdateEntityAsync(TEntity entityInDb, TEntity values)
     {
-        _repository.SetValueGraph(entityInDb, values);
+        await _repository.SetValueGraphAsync(entityInDb, values);
     }
 
     protected virtual async Task ModifyingAsync()

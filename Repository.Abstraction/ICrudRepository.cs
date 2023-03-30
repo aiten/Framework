@@ -33,13 +33,13 @@ public interface ICrudRepository<TEntity, TKey> : IGetRepository<TEntity, TKey>
 
     Task AddRangeAsync(IEnumerable<TEntity> entities);
 
-    void Delete(TEntity entity);
+    Task DeleteAsync(TEntity entity);
 
-    void DeleteRange(IEnumerable<TEntity> entities);
+    Task DeleteRangeAsync(IEnumerable<TEntity> entities);
 
-    void SetValue(TEntity trackingEntity, TEntity values);
+    Task SetValueAsync(TEntity trackingEntity, TEntity values);
 
-    void SetValueGraph(TEntity trackingEntity, TEntity values);
+    Task SetValueGraphAsync(TEntity trackingEntity, TEntity values);
 
     void SetState(TEntity entity, MyEntityState state);
 

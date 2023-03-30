@@ -68,7 +68,7 @@ public class CrudManagerTest
         _repository = Substitute.For<ICrudRepository<MyEntity, int>>();
 
         _repository
-            .When(x => x.SetValueGraph(Arg.Any<MyEntity>(), Arg.Any<MyEntity>()))
+            .When(x => x.SetValueGraphAsync(Arg.Any<MyEntity>(), Arg.Any<MyEntity>()))
             .Do(
                 Callback.Always(x => ((MyEntity)x[0]).CopyProperties((MyEntity)x[1]))
             );

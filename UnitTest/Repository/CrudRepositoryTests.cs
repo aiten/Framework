@@ -119,7 +119,7 @@ public class CrudRepositoryTests<TDbContext, TEntity, TKey, TIRepository> : GetR
             var compareEntity = createTestEntity();
             CompareEntity(compareEntity, entity).Should().BeTrue();
 
-            ctx.Repository.Delete(entity);
+            await ctx.Repository.DeleteAsync(entity);
 
             await ctx.UnitOfWork.SaveChangesAsync();
             await trans.CommitTransactionAsync();
@@ -203,7 +203,7 @@ public class CrudRepositoryTests<TDbContext, TEntity, TKey, TIRepository> : GetR
                 CompareEntity(compareEntities.ElementAt(i), entities.ElementAt(i)).Should().BeTrue();
             }
 
-            ctx.Repository.DeleteRange(entities);
+            await ctx.Repository.DeleteRangeAsync(entities);
 
             await ctx.UnitOfWork.SaveChangesAsync();
             await trans.CommitTransactionAsync();
@@ -311,7 +311,7 @@ public class CrudRepositoryTests<TDbContext, TEntity, TKey, TIRepository> : GetR
 
             CompareEntity(entityToCompare, entityInDb).Should().BeTrue();
 
-            ctx.Repository.Delete(entityInDb);
+            await ctx.Repository.DeleteAsync(entityInDb);
 
             await ctx.UnitOfWork.SaveChangesAsync();
             await trans.CommitTransactionAsync();

@@ -68,14 +68,16 @@ public abstract class CrudRepository<TDbContext, TEntity, TKey> : GetRepository<
         await AddEntitiesAsync(entities);
     }
 
-    public void Delete(TEntity entity)
+    public async Task DeleteAsync(TEntity entity)
     {
         DeleteEntity(entity);
+        await Task.CompletedTask;
     }
 
-    public void DeleteRange(IEnumerable<TEntity> entities)
+    public async Task DeleteRangeAsync(IEnumerable<TEntity> entities)
     {
         DeleteEntities(entities);
+        await Task.CompletedTask;
     }
 
     public void SetState(TEntity entity, MyEntityState state)
@@ -83,24 +85,26 @@ public abstract class CrudRepository<TDbContext, TEntity, TKey> : GetRepository<
         SetEntityState(entity, (Microsoft.EntityFrameworkCore.EntityState)state);
     }
 
-    public void SetValue(TEntity entity, TEntity values)
+    public async Task SetValueAsync(TEntity entity, TEntity values)
     {
         AssignValues(entity, values);
         base.SetValue(entity, values);
+        await Task.CompletedTask;
     }
 
-    public void SetValueGraph(TEntity trackingEntity, TEntity values)
+    public async Task SetValueGraphAsync(TEntity trackingEntity, TEntity values)
     {
-        AssignValuesGraph(trackingEntity, values);
+        await AssignValuesGraphAsync(trackingEntity, values);
     }
 
     protected virtual void AssignValues(TEntity trackingEntity, TEntity values)
     {
     }
 
-    protected virtual void AssignValuesGraph(TEntity trackingEntity, TEntity values)
+    protected virtual async Task AssignValuesGraphAsync(TEntity trackingEntity, TEntity values)
     {
         SetValue(trackingEntity, values);
+        await Task.CompletedTask;
     }
 
     #endregion

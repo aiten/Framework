@@ -36,7 +36,7 @@ public static class CrudRepositoryExtensions
         else
         {
             // syn with existing
-            repository.SetValue(entityInDb, entity);
+            await repository.SetValueAsync(entityInDb, entity);
         }
     }
 
@@ -49,6 +49,6 @@ public static class CrudRepositoryExtensions
             throw new DBConcurrencyException(ErrorMessages.ResourceManager.ToLocalizable(nameof(ErrorMessages.Framework_Repository_TrackingEntityNotFound)).Message());
         }
 
-        repository.SetValueGraph(entityInDb, values);
+        await repository.SetValueGraphAsync(entityInDb, values);
     }
 }

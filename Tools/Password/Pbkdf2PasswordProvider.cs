@@ -36,9 +36,7 @@ public class Pbkdf2PasswordProvider : IOneWayPasswordProvider
         rng.GetBytes(salt);
 
         var hash = GetPbkdf2Bytes(password, salt, Pbkdf2Iterations, HashByteSize);
-        return Pbkdf2Iterations + ":" +
-               Convert.ToBase64String(salt) + ":" +
-               Convert.ToBase64String(hash);
+        return $"{Pbkdf2Iterations}:{Convert.ToBase64String(salt)}:{Convert.ToBase64String(hash)}";
     }
 
     public bool ValidatePassword(string password, string correctHash)
@@ -67,7 +65,7 @@ public class Pbkdf2PasswordProvider : IOneWayPasswordProvider
 
     private static byte[] GetPbkdf2Bytes(string password, byte[] salt, int iterations, int outputBytes)
     {
-        var pbkdf2 = new Rfc2898DeriveBytes(password, salt, iterations, HashAlgorithmName.SHA256);
+        var pbkdf2 = new Rfc2898DeriveBytes(password, salt, iterations, HashAlgorithmName.SHA1);
         return pbkdf2.GetBytes(outputBytes);
     }
 }

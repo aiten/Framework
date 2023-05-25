@@ -16,6 +16,8 @@
 
 namespace Framework.Drawing;
 
+using SkiaSharp;
+
 public class NewspaperDither : FloydSteinbergDither
 {
     #region private members
@@ -57,8 +59,8 @@ public class NewspaperDither : FloydSteinbergDither
             {
                 if (IsPixel(x + ix, y + iy))
                 {
-                    Color currentPixel = GetPixel(x + ix, y + iy);
-                    if (currentPixel.R == 0)
+                    var currentPixel = GetPixel(x + ix, y + iy);
+                    if (currentPixel.Red == 0)
                     {
                         count++;
                     }
@@ -90,8 +92,8 @@ public class NewspaperDither : FloydSteinbergDither
 
     private void FillBlack(int x, int y, int count)
     {
-        var black = new Color { R = 0, G   = 0, B   = 0, A   = 0 };
-        var white = new Color { R = 255, G = 255, B = 255, A = 255 };
+        var black = new SKColor(0,   0,   0,   255);
+        var white = new SKColor(255, 255, 255, 255);
 
         for (int i = 0; i < DotSize * DotSize; i++)
         {

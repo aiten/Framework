@@ -38,16 +38,15 @@ public class FloydSteinbergDither : DitherBase
         {
             for (int x = 0; x < Width; x++)
             {
-                Color currentPixel = GetPixel(x, y);
-                currentPixel.Saturation();
+                var currentPixel = GetPixel(x, y);
 
                 // Color bestColorRGB = FindNearestColorBW(currentPixel);
-                Color bestColorRGB = FindNearestColorGrayScale(currentPixel);
+                var bestColorRGB = currentPixel.FindNearestColorGrayScale(GrayThreshold);
                 SetPixel(x, y, bestColorRGB);
 
-                int errorR = (currentPixel.R) - (bestColorRGB.R);
-                int errorG = (currentPixel.G) - (bestColorRGB.G);
-                int errorB = (currentPixel.B) - (bestColorRGB.B);
+                int errorR = (currentPixel.Red) - (bestColorRGB.Red);
+                int errorG = (currentPixel.Green) - (bestColorRGB.Green);
+                int errorB = (currentPixel.Blue) - (bestColorRGB.Blue);
 
                 if (x + 1 < Width)
                 {

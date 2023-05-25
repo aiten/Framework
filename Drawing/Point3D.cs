@@ -102,11 +102,6 @@ public class Point3D
         }
     }
 
-    public static implicit operator System.Drawing.Point(Point3D sc)
-    {
-        return new System.Drawing.Point((int)(sc.X0), (int)(sc.Y0));
-    }
-
     public void Offset(Point3D p)
     {
         if (X.HasValue && p.X.HasValue)

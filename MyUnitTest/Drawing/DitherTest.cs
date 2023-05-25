@@ -16,16 +16,13 @@
 
 namespace Framework.MyUnitTest.Drawing;
 
-using System.Drawing;
-using System.Drawing.Imaging;
-
 using FluentAssertions;
 
 using Framework.Drawing;
 
-using Xunit;
+using SkiaSharp;
 
-#pragma warning disable CA1416  // This call site is reachable on all platforms. 'Bitmap' is only supported on: 'windows'.
+using Xunit;
 
 public class DitherTest
 {
@@ -60,26 +57,26 @@ public class DitherTest
         const int WIDTH  = 100;
         const int HEIGHT = 100;
 
-        var b1 = new Bitmap(WIDTH, HEIGHT);
+        var b1 = new SKBitmap(WIDTH, HEIGHT);
         var b2 = dt.Process(b1);
 
         for (int x = 0; x < WIDTH; x++)
         {
             for (int y = 0; y < HEIGHT; y++)
             {
-                Color col = b2.GetPixel(x, y);
+                var col = b2.GetPixel(x, y);
 
                 if ((x + y) % 2 == 0)
                 {
-                    col.R.Should().Be(255);
-                    col.G.Should().Be(255);
-                    col.B.Should().Be(255);
+                    col.Red.Should().Be(255);
+                    col.Green.Should().Be(255);
+                    col.Blue.Should().Be(255);
                 }
                 else
                 {
-                    col.R.Should().Be(0);
-                    col.G.Should().Be(0);
-                    col.B.Should().Be(0);
+                    col.Red.Should().Be(0);
+                    col.Green.Should().Be(0);
+                    col.Blue.Should().Be(0);
                 }
             }
         }
@@ -93,9 +90,9 @@ public class DitherTest
         const int WIDTH  = 100;
         const int HEIGHT = 100;
 
-        var b1 = new Bitmap(WIDTH, HEIGHT);
+        var b1 = new SKBitmap(WIDTH, HEIGHT);
 
-        b1.SetPixel(50, 50, Color.FromArgb(255, 255, 255, 255));
+        b1.SetPixel(50, 50, new SKColor(255, 255, 255, 255));
 
         var b2 = dt.Process(b1);
 
@@ -103,22 +100,22 @@ public class DitherTest
         {
             for (int y = 0; y < HEIGHT; y++)
             {
-                Color col = b2.GetPixel(x, y);
+                var col = b2.GetPixel(x, y);
 
-                if (col.R != 0)
+                if (col.Red != 0)
                 {
-                    col.R.Should().Be(255);
-                    col.G.Should().Be(255);
-                    col.B.Should().Be(255);
+                    col.Red.Should().Be(255);
+                    col.Green.Should().Be(255);
+                    col.Blue.Should().Be(255);
 
                     x.Should().Be(50);
                     y.Should().Be(50);
                 }
                 else
                 {
-                    col.R.Should().Be(0);
-                    col.G.Should().Be(0);
-                    col.B.Should().Be(0);
+                    col.Red.Should().Be(0);
+                    col.Green.Should().Be(0);
+                    col.Blue.Should().Be(0);
                 }
             }
         }
@@ -132,12 +129,12 @@ public class DitherTest
         const int WIDTH  = 100;
         const int HEIGHT = 100;
 
-        var b1 = new Bitmap(WIDTH, HEIGHT, PixelFormat.Format32bppArgb);
+        var b1 = new SKBitmap(WIDTH, HEIGHT);
 
-        b1.SetPixel(50, 50, Color.FromArgb(255, 127, 127, 127));
-        b1.SetPixel(50, 51, Color.FromArgb(255, 127, 127, 127));
-        b1.SetPixel(50, 52, Color.FromArgb(255, 127, 127, 127));
-        b1.SetPixel(50, 53, Color.FromArgb(255, 127, 127, 127));
+        b1.SetPixel(50, 50, new SKColor(127, 127, 127, 255));
+        b1.SetPixel(50, 51, new SKColor(127, 127, 127, 255));
+        b1.SetPixel(50, 52, new SKColor(127, 127, 127, 255));
+        b1.SetPixel(50, 53, new SKColor(127, 127, 127, 255));
 
         var b2 = dt.Process(b1);
 
@@ -145,22 +142,22 @@ public class DitherTest
         {
             for (int y = 0; y < HEIGHT; y++)
             {
-                Color col = b2.GetPixel(x, y);
+                var col = b2.GetPixel(x, y);
 
-                if (col.R != 0)
+                if (col.Red != 0)
                 {
-                    col.R.Should().Be(255);
-                    col.G.Should().Be(255);
-                    col.B.Should().Be(255);
+                    col.Red.Should().Be(255);
+                    col.Green.Should().Be(255);
+                    col.Blue.Should().Be(255);
 
                     x.Should().Be(50);
                     y.Should().BeOneOf(53, 51);
                 }
                 else
                 {
-                    col.R.Should().Be(0);
-                    col.G.Should().Be(0);
-                    col.B.Should().Be(0);
+                    col.Red.Should().Be(0);
+                    col.Green.Should().Be(0);
+                    col.Blue.Should().Be(0);
                 }
             }
         }

@@ -2,10 +2,10 @@
 	<PropertyGroup>
 		<TargetFramework>$(TargetFrameworkForProject)</TargetFramework>
 	</PropertyGroup>
-	<PropertyGroup>
-		<NoWarn>CA1416</NoWarn>
-	</PropertyGroup>
 	<ItemGroup>
-		<PackageReference Include="System.Drawing.Common" Version="7.0.0" />
+		<PackageReference Include="SkiaSharp" Version="2.88.3" />
+	</ItemGroup>
+	<ItemGroup Condition="$(RuntimeIdentifier.StartsWith('linux'))" >
+		<PackageReference Include="SkiaSharp.NativeAssets.Linux.NoDependencies" Version="2.88.3" />
 	</ItemGroup>
 </Project>

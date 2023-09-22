@@ -152,7 +152,7 @@ public class CsvImport<T> : CsvImportBase where T : new()
     private object? GetValue(string valueAsString, Type type)
 #pragma warning restore 8632
     {
-        if (type.IsGenericType && type.Name.StartsWith(@"Nullable"))
+        if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>))
         {
             if (string.IsNullOrEmpty(valueAsString))
             {

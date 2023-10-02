@@ -30,6 +30,8 @@ public class CsvImport<T> : CsvImportBase where T : new()
         public PropertyInfo MapTo      { get; set; }
         public bool         Ignore     { get; set; }
 
+        public string CsvFormat { get; set; }
+
 #pragma warning disable CS8632 // The annotation for nullable reference types should only be used in code within a '#nullable' annotations context.
         public Func<string, object?>  GetValue    { get; set; }
         public Func<object?, object?> AdjustValue { get; set; }
@@ -126,6 +128,12 @@ public class CsvImport<T> : CsvImportBase where T : new()
             MapTo      = ignoreColumn ? null : GetPropertyInfo(mapToColumn),
         };
 
+        if (columnMapping.MapTo != null)
+        {
+            var first = columnMapping.MapTo.GetCustomAttributes(typeof(CsvImportFormatAttribute)).FirstOrDefault();
+            columnMapping.CsvFormat = ((CsvImportFormatAttribute)first)?.Format;
+        }
+
         ConfigureColumnMapping?.Invoke(columnMapping);
         return columnMapping;
     }
@@ -149,7 +157,7 @@ public class CsvImport<T> : CsvImportBase where T : new()
     }
 
 #pragma warning disable 8632
-    private object? GetValue(string valueAsString, Type type)
+    private object? GetValue(string valueAsString, Type type, string format)
 #pragma warning restore 8632
     {
         if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>))
@@ -204,7 +212,9 @@ public class CsvImport<T> : CsvImportBase where T : new()
         }
         else if (type == typeof(DateTime))
         {
-            return ExcelDateOrDateTime(valueAsString);
+            if (string.IsNullOrEmpty(format))
+                return ExcelDateOrDateTime(valueAsString);
+            return ExcelDate(valueAsString, format);
         }
         else if (type == typeof(TimeSpan))
         {
@@ -238,7 +248,7 @@ public class CsvImport<T> : CsvImportBase where T : new()
 #pragma warning disable 8632
             object? val = mapping.GetValue != null
                 ? mapping.GetValue(valueAsString)
-                : GetValue(valueAsString, mapTo.PropertyType);
+                : GetValue(valueAsString, mapTo.PropertyType, mapping.CsvFormat);
 #pragma warning restore 8632
 
             if (mapping.AdjustValue != null)

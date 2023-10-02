@@ -19,6 +19,7 @@ namespace Framework.MyUnitTest.Tools.Csv;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 
 using FluentAssertions;
 using FluentAssertions.Extensions;
@@ -545,6 +546,35 @@ public class CsvImportTest
         var str2 = System.Text.Encoding.UTF8.GetString(img1);
 
         str2.Should().Be(fromBase64);
+    }
+
+    #endregion
+
+    #region Format Attribute
+
+    public class CsvImportAttributeClass
+    {
+        [CsvImportFormat(Format = "yyyy/MM/dd")]
+        public DateTime Date1 { get; set; }
+
+        [CsvImportFormat(Format = "MM/dd/yyyy")]
+        public DateTime Date2 { get; set; }
+    }
+
+    [Fact]
+    public void CsvImportFormatAttributeTest()
+    {
+        var lines = new[]
+        {
+            "Date1;Date2",
+            "2023/12/31;12/31/2023"
+        };
+
+        var csvList = new CsvImport<CsvImportAttributeClass>().Read(lines);
+
+        csvList.Should().HaveCount(lines.Length - 1);
+        csvList.First().Date1.Should().Be(31.December(2023));
+        csvList.First().Date2.Should().Be(31.December(2023));
     }
 
     #endregion

@@ -3,15 +3,15 @@
 
   Copyright (c) Herbert Aitenbichler
 
-  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), 
-  to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, 
+  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
+  to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
   and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
   The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
-  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, 
-  WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+  WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
 namespace Framework.CsvImport;
@@ -26,16 +26,17 @@ public class CsvImport<T> : CsvImportBase where T : new()
 {
     public class ColumnMapping
     {
-        public string       ColumnName { get; set; }
-        public PropertyInfo MapTo      { get; set; }
-        public bool         Ignore     { get; set; }
+        public required string ColumnName { get; set; }
 
-        public string CsvFormat { get; set; }
+        public PropertyInfo? MapTo  { get; set; }
+        public bool          Ignore { get; set; }
+
+        public string? CsvFormat { get; set; }
 
 #pragma warning disable CS8632 // The annotation for nullable reference types should only be used in code within a '#nullable' annotations context.
-        public Func<string, object?>  GetValue    { get; set; }
-        public Func<object?, object?> AdjustValue { get; set; }
-        public Action<T, string>      SetValue    { get; set; }
+        public Func<string, object?>?  GetValue    { get; set; }
+        public Func<object?, object?>? AdjustValue { get; set; }
+        public Action<T, string>?      SetValue    { get; set; }
 
 #pragma warning restore CS8632
 
@@ -44,8 +45,8 @@ public class CsvImport<T> : CsvImportBase where T : new()
         public bool IsSetValue   => !Ignore && SetValue != null;
     }
 
-    public ICollection<string>         IgnoreColumns { get; set; }
-    public IDictionary<string, string> MapColumns    { get; set; }
+    public ICollection<string>?         IgnoreColumns { get; set; }
+    public IDictionary<string, string>? MapColumns    { get; set; }
 
     public IList<T> Read(string[] csvLines)
     {
@@ -95,11 +96,24 @@ public class CsvImport<T> : CsvImportBase where T : new()
         var notConfigured = mapping.Where(m => !m.IsConfigured).ToList();
         if (notConfigured.Any())
         {
+            foreach (var col in notConfigured)
+            {
+                if (typeof(T).GetField(col.ColumnName, BindingFlags.IgnoreCase | BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public) != null)
+                {
+                    throw new ArgumentException($"Column ist mapped to field instead of a property: {col.ColumnName}");
+                }
+
+                if (typeof(T).GetProperty(col.ColumnName, BindingFlags.IgnoreCase | BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public) != null)
+                {
+                    throw new ArgumentException($"Column ist mapped to none public property: {col.ColumnName}");
+                }
+            }
+
             var columnList = string.Join(", ", notConfigured.Select(m => m.ColumnName));
             throw new ArgumentException($"Column cannot be mapped: {columnList}");
         }
 
-        var notCanWrite = mapping.Where(x => x.IsMapped && !x.MapTo.CanWrite).ToList();
+        var notCanWrite = mapping.Where(x => x.IsMapped && !x.MapTo!.CanWrite).ToList();
         if (notCanWrite.Any())
         {
             var columnList = string.Join(", ", notCanWrite.Select(m => m.ColumnName));
@@ -114,7 +128,7 @@ public class CsvImport<T> : CsvImportBase where T : new()
             .ToArray();
     }
 
-    public Action<ColumnMapping> ConfigureColumnMapping { get; set; }
+    public Action<ColumnMapping>? ConfigureColumnMapping { get; set; }
 
     protected virtual ColumnMapping GetColumnMapping(string columnName)
     {
@@ -131,14 +145,14 @@ public class CsvImport<T> : CsvImportBase where T : new()
         if (columnMapping.MapTo != null)
         {
             var first = columnMapping.MapTo.GetCustomAttributes(typeof(CsvImportFormatAttribute)).FirstOrDefault();
-            columnMapping.CsvFormat = ((CsvImportFormatAttribute)first)?.Format;
+            columnMapping.CsvFormat = ((CsvImportFormatAttribute)first!)?.Format;
         }
 
         ConfigureColumnMapping?.Invoke(columnMapping);
         return columnMapping;
     }
 
-    public static PropertyInfo GetPropertyInfo(string columnName)
+    public static PropertyInfo? GetPropertyInfo(string columnName)
     {
         return typeof(T).GetProperty(columnName, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
     }
@@ -146,6 +160,12 @@ public class CsvImport<T> : CsvImportBase where T : new()
     private T Map(IList<string> line, ColumnMapping[] mapping)
     {
         var newT = new T();
+
+        if (mapping.Length < line.Count)
+        {
+            var message = $"Line '{string.Join(",", line)}' has to many columns";
+            throw new ArgumentException(message);
+        }
 
         var idx = 0;
         foreach (var column in line)
@@ -157,7 +177,7 @@ public class CsvImport<T> : CsvImportBase where T : new()
     }
 
 #pragma warning disable 8632
-    private object? GetValue(string valueAsString, Type type, string format)
+    private object? GetValue(string valueAsString, Type type, string? format, string columnName)
 #pragma warning restore 8632
     {
         if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>))
@@ -170,77 +190,84 @@ public class CsvImport<T> : CsvImportBase where T : new()
             type = type.GenericTypeArguments[0];
         }
 
-        if (type == typeof(string))
+        try
         {
-            return ExcelString(valueAsString);
+            if (type == typeof(string))
+            {
+                return ExcelString(valueAsString);
+            }
+            else if (type == typeof(int))
+            {
+                return ExcelInt(valueAsString);
+            }
+            else if (type == typeof(long))
+            {
+                return ExcelLong(valueAsString);
+            }
+            else if (type == typeof(short))
+            {
+                return ExcelShort(valueAsString);
+            }
+            else if (type == typeof(uint))
+            {
+                return ExcelUInt(valueAsString);
+            }
+            else if (type == typeof(ulong))
+            {
+                return ExcelULong(valueAsString);
+            }
+            else if (type == typeof(ushort))
+            {
+                return ExcelUShort(valueAsString);
+            }
+            else if (type == typeof(decimal))
+            {
+                return ExcelDecimal(valueAsString);
+            }
+            else if (type == typeof(byte))
+            {
+                return ExcelByte(valueAsString);
+            }
+            else if (type == typeof(bool))
+            {
+                return ExcelBool(valueAsString);
+            }
+            else if (type == typeof(DateTime))
+            {
+                if (string.IsNullOrEmpty(format))
+                    return ExcelDateOrDateTime(valueAsString);
+                return ExcelDate(valueAsString, format);
+            }
+            else if (type == typeof(TimeSpan))
+            {
+                return ExcelTimeSpan(valueAsString);
+            }
+            else if (type == typeof(double))
+            {
+                return ExcelDouble(valueAsString);
+            }
+            else if (type.IsEnum)
+            {
+                return ExcelEnum(type, valueAsString);
+            }
+            else if (type == typeof(byte[]))
+            {
+                return ExcelImage(valueAsString);
+            }
         }
-        else if (type == typeof(int))
+        catch (FormatException e)
         {
-            return ExcelInt(valueAsString);
-        }
-        else if (type == typeof(long))
-        {
-            return ExcelLong(valueAsString);
-        }
-        else if (type == typeof(short))
-        {
-            return ExcelShort(valueAsString);
-        }
-        else if (type == typeof(uint))
-        {
-            return ExcelUInt(valueAsString);
-        }
-        else if (type == typeof(ulong))
-        {
-            return ExcelULong(valueAsString);
-        }
-        else if (type == typeof(ushort))
-        {
-            return ExcelUShort(valueAsString);
-        }
-        else if (type == typeof(decimal))
-        {
-            return ExcelDecimal(valueAsString);
-        }
-        else if (type == typeof(byte))
-        {
-            return ExcelByte(valueAsString);
-        }
-        else if (type == typeof(bool))
-        {
-            return ExcelBool(valueAsString);
-        }
-        else if (type == typeof(DateTime))
-        {
-            if (string.IsNullOrEmpty(format))
-                return ExcelDateOrDateTime(valueAsString);
-            return ExcelDate(valueAsString, format);
-        }
-        else if (type == typeof(TimeSpan))
-        {
-            return ExcelTimeSpan(valueAsString);
-        }
-        else if (type == typeof(double))
-        {
-            return ExcelDouble(valueAsString);
-        }
-        else if (type.IsEnum)
-        {
-            return ExcelEnum(type, valueAsString);
-        }
-        else if (type == typeof(byte[]))
-        {
-            return ExcelImage(valueAsString);
+            throw new ArgumentException($"Illegal value for column '{columnName}:{type.Name}': {valueAsString}", e);
         }
 
-        throw new NotImplementedException();
+        throw new ArgumentException($"Illegal type of column '{columnName}': {type.Name}");
     }
 
     private void AssignProperty(object obj, string valueAsString, ColumnMapping mapping)
     {
         if (mapping.IsSetValue)
         {
-            mapping.SetValue((T)obj, valueAsString);
+            mapping.SetValue!((T)obj, valueAsString);
         }
         else if (mapping.IsMapped)
         {
@@ -248,7 +275,7 @@ public class CsvImport<T> : CsvImportBase where T : new()
 #pragma warning disable 8632
             object? val = mapping.GetValue != null
                 ? mapping.GetValue(valueAsString)
-                : GetValue(valueAsString, mapTo.PropertyType, mapping.CsvFormat);
+                : GetValue(valueAsString, mapTo!.PropertyType, mapping.CsvFormat, mapping.ColumnName);
 #pragma warning restore 8632
 
             if (mapping.AdjustValue != null)
@@ -256,7 +283,7 @@ public class CsvImport<T> : CsvImportBase where T : new()
                 val = mapping.AdjustValue(val);
             }
 
-            mapTo.SetValue(obj, val);
+            mapTo!.SetValue(obj, val);
         }
     }
 }

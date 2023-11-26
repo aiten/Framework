@@ -34,17 +34,17 @@ public class CsvImportBase
     public string Fraction3Format { get; set; } = ".fff";
     public string Fraction5Format { get; set; } = ".fffff";
 
-    public string DateTimeFormat          => GetDateTimeFormat(DateFormat, TimeFormat);
-    public string DateTimeFraction1Format => GetDateTimeFormat(DateFormat, TimeFormat, Fraction3Format);
-    public string DateTimeFraction5Format => GetDateTimeFormat(DateFormat, TimeFormat, Fraction5Format);
+    public string? DateTimeFormat          => GetDateTimeFormat(DateFormat, TimeFormat);
+    public string? DateTimeFraction1Format => GetDateTimeFormat(DateFormat, TimeFormat, Fraction3Format);
+    public string? DateTimeFraction5Format => GetDateTimeFormat(DateFormat, TimeFormat, Fraction5Format);
 
-    public string GetDateTimeFormat(string dateFormat, string timeFormat, string fractionFormat = null) => $"{dateFormat} {timeFormat}{fractionFormat ?? ""}";
+    public string GetDateTimeFormat(string dateFormat, string timeFormat, string? fractionFormat = null) => $"{dateFormat} {timeFormat}{fractionFormat ?? ""}";
 
-    public event EventHandler<IList<string>> ReadFirstLine;
+    public event EventHandler<IList<string>>? ReadFirstLine;
 
     public char ListSeparatorChar { get; set; } = ';';
 
-    public string NewLineInString { get; set; } = "\n";
+    public string? NewLineInString { get; set; } = "\n";
 
     public CsvImportBase()
     {
@@ -76,13 +76,13 @@ public class CsvImportBase
             {
                 if (readLineIdx >= lines.Length)
                 {
-                    return null;
+                    return null!;
                 }
 
                 return lines[readLineIdx++];
             });
 
-            if (row == null)
+            if (row == null!)
             {
                 break;
             }
@@ -120,7 +120,7 @@ public class CsvImportBase
         var line = getNextLine();
         if (line == null)
         {
-            return null;
+            return null!;
         }
 
         var columns     = new List<string>();
@@ -181,7 +181,7 @@ public class CsvImportBase
 
     #region convert
 
-    public string ExcelString(string excelField)
+    public string? ExcelString(string excelField)
     {
         return excelField;
     }

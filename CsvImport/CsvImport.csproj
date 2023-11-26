@@ -1,5 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <TargetFramework>$(TargetFrameworkForProject)</TargetFramework>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>$(TargetFrameworkForProject)</TargetFramework>
+		<Nullable>enable</Nullable>
+	</PropertyGroup>
 </Project>

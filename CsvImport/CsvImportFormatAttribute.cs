@@ -20,5 +20,5 @@ using System;
 
 public class CsvImportFormatAttribute : Attribute
 {
-    public string Format { get; set; }
+    public string? Format { get; set; }
 }

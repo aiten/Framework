@@ -20,6 +20,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Text;
 
 using FluentAssertions;
 using FluentAssertions.Extensions;
@@ -193,7 +194,7 @@ public class CsvImportTest
         {
             if (c.ColumnName == "ColDate")
             {
-                c.GetValue    = (val) => string.IsNullOrEmpty(val) ? null : csvImporter.ExcelDate(val, "dd/yyyy/MM");
+                c.GetValue    = (val) => string.IsNullOrEmpty(val) ? null : csvImporter.ExcelDateTime(val, "dd/yyyy/MM", CultureInfo.InvariantCulture);
                 c.AdjustValue = (val) => val == null ? null : ((DateTime)val).AddDays(1);
             }
         };
@@ -223,7 +224,7 @@ public class CsvImportTest
                 {
                     if (!string.IsNullOrEmpty(str))
                     {
-                        obj.ColDate = csvImporter.ExcelDate(str, "dd/yyyy/MM");
+                        obj.ColDate = csvImporter.ExcelDateTime(str, "dd/yyyy/MM", CultureInfo.InvariantCulture);
                         obj.ColBool = obj.ColDate.Value.DayOfWeek == DayOfWeek.Wednesday;
                     }
                 };
@@ -365,6 +366,61 @@ public class CsvImportTest
         csvImport.ExcelDateTime(timeLongFraction.ToString($"{format} HH:mm:ss.fffff", CultureInfo.InvariantCulture)).Should().Be(timeLongFraction);
     }
 
+    public class DateOnlyTimeOnly
+    {
+        public DateTime? DateTime { get; set; }
+        public DateOnly? Date     { get; set; }
+        public TimeOnly? Time     { get; set; }
+    };
+
+    [Fact]
+    public void LocalDateTest()
+    {
+        var lines = new[]
+        {
+            "DateTime;Date",
+            "October 22, 1959;October 1, 1959"
+        };
+
+        var csvList = new CsvImport<DateOnlyTimeOnly>()
+        {
+            DateFormat = "MMMM d, yyyy",
+            Encoding   = Encoding.Unicode
+        }.Read(lines);
+
+        csvList.Should().HaveCount(lines.Length - 1);
+
+        csvList.Should().HaveCount(lines.Length - 1);
+        var first = csvList.First();
+        first.Date.Should().Be(DateOnly.FromDateTime(1.October(1959)));
+        first.DateTime.Should().Be(22.October(1959));
+
+    }
+
+    [Fact]
+    public void LocalDateDeTest()
+    {
+        var lines = new[]
+        {
+            "DateTime;Date",
+            "Oktober 22, 1959;Oktober 1, 1959"
+        };
+
+        var csvList = new CsvImport<DateOnlyTimeOnly>()
+        {
+            DateFormat = "MMMM d, yyyy",
+            Encoding   = Encoding.Unicode,
+            DateTimeCultureInfo = CultureInfo.GetCultureInfo("de")
+        }.Read(lines);
+
+        csvList.Should().HaveCount(lines.Length - 1);
+
+        csvList.Should().HaveCount(lines.Length - 1);
+        var first = csvList.First();
+        first.Date.Should().Be(DateOnly.FromDateTime(1.October(1959)));
+        first.DateTime.Should().Be(22.October(1959));
+    }
+
     #endregion
 
     #region CsvImport
@@ -390,6 +446,8 @@ public class CsvImportTest
         public DateTime  ColDateAndTime             { get; set; }
         public DateTime  ColDateAndTimeFraction     { get; set; }
         public TimeSpan  ColTimeSpan                { get; set; }
+        public DateOnly  ColDateOnly                { get; set; }
+        public TimeOnly  ColTimeOnly                { get; set; }
         public int?      ColIntNull                 { get; set; }
         public short?    ColShortNull               { get; set; }
         public decimal?  ColDecimalNull             { get; set; }
@@ -402,6 +460,8 @@ public class CsvImportTest
         public DateTime? ColDateAndTimeNull         { get; set; }
         public DateTime? ColDateAndTimeFractionNull { get; set; }
         public TimeSpan? ColTimeSpanNull            { get; set; }
+        public DateOnly? ColDateOnlyNull            { get; set; }
+        public TimeOnly? ColTimeOnlyNull            { get; set; }
         public byte[]    ColByteArr                 { get; set; }
     }
 
@@ -410,9 +470,9 @@ public class CsvImportTest
     {
         var lines = new[]
         {
-            "ColString;ColInt;ColShort;ColDecimal;ColByte;ColBool;ColLong;ColEnum;ColDate;ColDateAndTime;ColDateAndTimeFraction;ColTimeSpan;ColDouble;ColIntNull;ColShortNull;ColDecimalNull;ColByteNull;ColBoolNull;ColLongNull;ColEnumNull;ColDateNull;ColDateAndTimeNull;ColDateAndTimeFractionNull;ColDoubleNull;ColTimeSpanNull;ColByteArr",
-            "Str;1;2;2.5;127;true;1234567890;EnumValue1;2018/12/31;2018/12/31 15:56:45;2018/12/31 15:56:45.123;15:56:45;34.12;1;2;2.5;127;false;9876543210;EnumValue1;2018/12/31;2018/12/31 15:56:45;2018/12/31 15:56:45.123;34.12;15:56:45;0x12345678",
-            ";1;2;2.5;127;true;1234567890;EnumValue2;2018/12/31;2018/12/31 15:56:45;2018/12/31 15:56:45.123;15:56:45.123;34.12;;;;;;;;;;;;"
+            "ColString;ColInt;ColShort;ColDecimal;ColByte;ColBool;ColLong;ColEnum;ColDate;ColDateAndTime;ColDateAndTimeFraction;ColTimeSpan;ColDateOnly;ColTimeOnly;ColDouble;ColIntNull;ColShortNull;ColDecimalNull;ColByteNull;ColBoolNull;ColLongNull;ColEnumNull;ColDateNull;ColDateAndTimeNull;ColDateAndTimeFractionNull;ColDoubleNull;ColTimeSpanNull;ColDateOnlyNull;ColTimeOnlyNull;ColByteArr",
+            "Str;1;2;2.5;127;true;1234567890;EnumValue1;2018/12/31;2018/12/31 15:56:45;2018/12/31 15:56:45.123;15:56:45;1999/12/24;23:59:50;34.12;1;2;2.5;127;false;9876543210;EnumValue1;2018/12/31;2018/12/31 15:56:45;2018/12/31 15:56:45.123;34.12;15:56:45;1999/12/24;23:59:50;0x12345678",
+            ";1;2;2.5;127;true;1234567890;EnumValue2;2018/12/31;2018/12/31 15:56:45;2018/12/31 15:56:45.123;15:56:45.123;1999/12/24;23:59:50;34.12;;;;;;;;;;;;;;"
         };
 
         var csvList = new CsvImport<CsvImportClass>().Read(lines);
@@ -433,6 +493,8 @@ public class CsvImportTest
             ColDateAndTime             = new DateTime(2018, 12, 31, 15, 56, 45),
             ColDateAndTimeFraction     = new DateTime(2018, 12, 31, 15, 56, 45, 123),
             ColTimeSpan                = new TimeSpan(15, 56, 45),
+            ColDateOnly                = DateOnly.FromDateTime(24.December(1999)),
+            ColTimeOnly                = new TimeOnly(23, 59, 50),
             ColDouble                  = 34.12,
             ColIntNull                 = 1,
             ColShortNull               = 2,
@@ -445,6 +507,8 @@ public class CsvImportTest
             ColDateAndTimeNull         = new DateTime(2018, 12, 31, 15, 56, 45),
             ColDateAndTimeFractionNull = new DateTime(2018, 12, 31, 15, 56, 45, 123),
             ColTimeSpanNull            = new TimeSpan(15, 56, 45),
+            ColDateOnlyNull            = DateOnly.FromDateTime(24.December(1999)),
+            ColTimeOnlyNull            = new TimeOnly(23, 59, 50),
             ColDoubleNull              = 34.12,
             ColByteArr                 = new byte[] { 0x12, 0x34, 0x56, 0x78 }
         };
@@ -462,6 +526,8 @@ public class CsvImportTest
             ColDateAndTime         = new DateTime(2018, 12, 31, 15, 56, 45),
             ColDateAndTimeFraction = new DateTime(2018, 12, 31, 15, 56, 45, 123),
             ColTimeSpan            = new TimeSpan(0, 15, 56, 45, 123),
+            ColDateOnly            = DateOnly.FromDateTime(24.December(1999)),
+            ColTimeOnly            = new TimeOnly(23, 59, 50),
             ColDouble              = 34.12,
         };
 
@@ -567,7 +633,10 @@ public class CsvImportTest
             "ignore;ignore",
         };
 
-        var action = () => { var csvList = new CsvImport<FieldOrProperty>().Read(lines); };
+        var action = () =>
+        {
+            var csvList = new CsvImport<FieldOrProperty>().Read(lines);
+        };
 
         action.Should()
             .ThrowExactly<ArgumentException>()
@@ -576,7 +645,7 @@ public class CsvImportTest
 
     public class PropertyIsProtected
     {
-        public string ColProperty  { get; set; }
+        public    string ColProperty  { get; set; }
         protected string ColProtected { get; set; }
     };
 
@@ -589,7 +658,10 @@ public class CsvImportTest
             "ignore;ignore",
         };
 
-        var action = () => { var csvList = new CsvImport<PropertyIsProtected>().Read(lines); };
+        var action = () =>
+        {
+            var csvList = new CsvImport<PropertyIsProtected>().Read(lines);
+        };
 
         action.Should()
             .ThrowExactly<ArgumentException>()
@@ -598,8 +670,8 @@ public class CsvImportTest
 
     public class PropertyIllegalType
     {
-        public    string ColProperty { get; set; }
-        public ArgumentException  IllegalTypeProperty { get; set; }
+        public string            ColProperty         { get; set; }
+        public ArgumentException IllegalTypeProperty { get; set; }
     };
 
     [Fact]
@@ -611,7 +683,10 @@ public class CsvImportTest
             "ignore;ignore",
         };
 
-        var action = () => { var csvList = new CsvImport<PropertyIllegalType>().Read(lines); };
+        var action = () =>
+        {
+            var csvList = new CsvImport<PropertyIllegalType>().Read(lines);
+        };
 
         action.Should()
             .ThrowExactly<ArgumentException>()
@@ -622,7 +697,7 @@ public class CsvImportTest
     {
         public string Col1 { get; set; }
         public string Col2 { get; set; }
-        public int Col3 { get; set; }
+        public int    Col3 { get; set; }
     };
 
     [Fact]
@@ -634,7 +709,10 @@ public class CsvImportTest
             "ignore;ignore;ignore",
         };
 
-        var action = () => { var csvList = new CsvImport<PropertyMissing>().Read(lines); };
+        var action = () =>
+        {
+            var csvList = new CsvImport<PropertyMissing>().Read(lines);
+        };
 
         action.Should()
             .ThrowExactly<ArgumentException>()
@@ -650,12 +728,16 @@ public class CsvImportTest
             "ignore;ignore;ignore",
         };
 
-        var action = () => { var csvList = new CsvImport<PropertyMissing>().Read(lines); };
+        var action = () =>
+        {
+            var csvList = new CsvImport<PropertyMissing>().Read(lines);
+        };
 
         action.Should()
             .ThrowExactly<ArgumentException>()
             .WithMessage("Illegal value for column 'Col3:Int32': ignore");
     }
+
     #endregion
 
     #region Format Attribute
@@ -667,6 +749,24 @@ public class CsvImportTest
 
         [CsvImportFormat(Format = "MM/dd/yyyy")]
         public DateTime Date2 { get; set; }
+
+        [CsvImportFormat(Format = "yyyy/MM/dd")]
+        public DateOnly DateOnly1 { get; set; }
+
+        [CsvImportFormat(Format = "MM/dd/yyyy")]
+        public DateOnly DateOnly2 { get; set; }
+
+        [CsvImportFormat(Format = "HH:mm")]
+        public TimeOnly TimeOnly1 { get; set; }
+    }
+
+    public class CsvImportAttribute2Class
+    {
+        [CsvImportFormat(Format = "MMMM d, yyyy", Culture = "de")]
+        public DateTime DateTime { get; set; }
+
+        [CsvImportFormat(Format = "MMMM d, yyyy", Culture = "de")]
+        public DateOnly DateOnly { get; set; }
     }
 
     [Fact]
@@ -674,15 +774,16 @@ public class CsvImportTest
     {
         var lines = new[]
         {
-            "Date1;Date2",
-            "2023/12/31;12/31/2023"
+            "DateTime;DateOnly",
+            "Oktober 22, 1959;Oktober 1, 1959"
         };
 
-        var csvList = new CsvImport<CsvImportAttributeClass>().Read(lines);
+        var csvList = new CsvImport<CsvImportAttribute2Class>().Read(lines);
 
         csvList.Should().HaveCount(lines.Length - 1);
-        csvList.First().Date1.Should().Be(31.December(2023));
-        csvList.First().Date2.Should().Be(31.December(2023));
+        var first = csvList.First();
+        first.DateOnly.Should().Be(DateOnly.FromDateTime(1.October(1959)));
+        first.DateTime.Should().Be(22.October(1959));
     }
 
     #endregion

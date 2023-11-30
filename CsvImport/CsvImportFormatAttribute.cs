@@ -17,8 +17,10 @@
 namespace Framework.CsvImport;
 
 using System;
+using System.Globalization;
 
 public class CsvImportFormatAttribute : Attribute
 {
     public string? Format { get; set; }
+    public string? Culture { get; set; }
 }

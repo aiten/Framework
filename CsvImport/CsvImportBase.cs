@@ -3,15 +3,15 @@
 
   Copyright (c) Herbert Aitenbichler
 
-  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), 
-  to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, 
+  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
+  to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
   and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
   The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
-  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, 
-  WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+  WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
 namespace Framework.CsvImport;
@@ -39,6 +39,8 @@ public class CsvImportBase
     public string? DateTimeFraction5Format => GetDateTimeFormat(DateFormat, TimeFormat, Fraction5Format);
 
     public string GetDateTimeFormat(string dateFormat, string timeFormat, string? fractionFormat = null) => $"{dateFormat} {timeFormat}{fractionFormat ?? ""}";
+
+    public CultureInfo DateTimeCultureInfo { get; set; } = CultureInfo.InvariantCulture;
 
     public event EventHandler<IList<string>>? ReadFirstLine;
 
@@ -251,21 +253,50 @@ public class CsvImportBase
         return double.Parse(excelField, NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint | NumberStyles.AllowThousands, _nfi);
     }
 
-    public DateTime ExcelDateOrDateTime(string excelField)
+    public DateTime ExcelDateOrDateTime(string excelField, string? format, CultureInfo culture)
     {
-        if (excelField.Length > DateFormat.Length)
+        if (string.IsNullOrEmpty(format))
         {
+            if (DateTime.TryParseExact(excelField, DateFormat, culture, DateTimeStyles.None, out DateTime result))
+            {
+                return result;
+            }
+
             return ExcelDateTime(excelField, DateFormat, TimeFormat, Fraction3Format, Fraction3Format);
         }
 
-        return ExcelDate(excelField, DateFormat);
+        return ExcelDateTime(excelField, format, culture);
     }
 
-    public DateTime ExcelDate(string excelField, string format)
+    public DateTime ExcelDateTime(string excelField, string format, CultureInfo culture)
     {
         try
         {
-            return DateTime.ParseExact(excelField, format, CultureInfo.InvariantCulture);
+            return DateTime.ParseExact(excelField, format, culture);
+        }
+        catch (Exception)
+        {
+            throw;
+        }
+    }
+
+    public DateOnly ExcelDateOnly(string excelField, string format, CultureInfo culture)
+    {
+        try
+        {
+            return DateOnly.ParseExact(excelField, format, culture);
+        }
+        catch (Exception)
+        {
+            throw;
+        }
+    }
+
+    public TimeOnly ExcelTimeOnly(string excelField, string format, CultureInfo culture)
+    {
+        try
+        {
+            return TimeOnly.ParseExact(excelField, format, culture);
         }
         catch (Exception)
         {
@@ -275,21 +306,21 @@ public class CsvImportBase
 
     public DateTime ExcelDate(string excelField)
     {
-        return ExcelDate(excelField, DateFormat);
+        return ExcelDateTime(excelField, DateFormat, DateTimeCultureInfo);
     }
 
     public DateTime ExcelDateDMY(string excelField)
     {
         // Parse date and time with custom specifier.
         // e.g. string dateString = "19.01.2018";
-        return ExcelDate(excelField, "dd.MM.yyyy");
+        return ExcelDateTime(excelField, "dd.MM.yyyy", DateTimeCultureInfo);
     }
 
     public DateTime ExcelDateYMD(string excelField)
     {
         // Parse date and time with custom specifier.
         // e.g. string dateString = "19.01.2018";
-        return ExcelDate(excelField, "yyyy/MM/dd");
+        return ExcelDateTime(excelField, "yyyy/MM/dd", DateTimeCultureInfo);
     }
 
     public object ExcelTimeSpan(string excelField)

@@ -18,6 +18,7 @@ namespace Framework.CsvImport;
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -32,6 +33,8 @@ public class CsvImport<T> : CsvImportBase where T : new()
         public bool          Ignore { get; set; }
 
         public string? CsvFormat { get; set; }
+
+        public CultureInfo? DateTimeCultureInfo { get; set; }
 
 #pragma warning disable CS8632 // The annotation for nullable reference types should only be used in code within a '#nullable' annotations context.
         public Func<string, object?>?  GetValue    { get; set; }
@@ -144,8 +147,14 @@ public class CsvImport<T> : CsvImportBase where T : new()
 
         if (columnMapping.MapTo != null)
         {
-            var first = columnMapping.MapTo.GetCustomAttributes(typeof(CsvImportFormatAttribute)).FirstOrDefault();
-            columnMapping.CsvFormat = ((CsvImportFormatAttribute)first!)?.Format;
+            if (columnMapping.MapTo.GetCustomAttributes(typeof(CsvImportFormatAttribute)).FirstOrDefault() is CsvImportFormatAttribute formatAttribute)
+            {
+                columnMapping.CsvFormat = formatAttribute.Format;
+                if (!string.IsNullOrEmpty(formatAttribute.Culture))
+                {
+                    columnMapping.DateTimeCultureInfo = CultureInfo.GetCultureInfo(formatAttribute.Culture);
+                }
+            }
         }
 
         ConfigureColumnMapping?.Invoke(columnMapping);
@@ -177,90 +186,96 @@ public class CsvImport<T> : CsvImportBase where T : new()
     }
 
 #pragma warning disable 8632
-    private object? GetValue(string valueAsString, Type type, string? format, string columnName)
+    private object? GetValue(string valueAsString, Type asType, ColumnMapping mapping)
 #pragma warning restore 8632
     {
-        if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>))
+        if (asType.IsGenericType && asType.GetGenericTypeDefinition() == typeof(Nullable<>))
         {
             if (string.IsNullOrEmpty(valueAsString))
             {
                 return null;
             }
 
-            type = type.GenericTypeArguments[0];
+            asType = asType.GenericTypeArguments[0];
         }
 
         try
         {
-            if (type == typeof(string))
+            if (asType == typeof(string))
             {
                 return ExcelString(valueAsString);
             }
-            else if (type == typeof(int))
+            else if (asType == typeof(int))
             {
                 return ExcelInt(valueAsString);
             }
-            else if (type == typeof(long))
+            else if (asType == typeof(long))
             {
                 return ExcelLong(valueAsString);
             }
-            else if (type == typeof(short))
+            else if (asType == typeof(short))
             {
                 return ExcelShort(valueAsString);
             }
-            else if (type == typeof(uint))
+            else if (asType == typeof(uint))
             {
                 return ExcelUInt(valueAsString);
             }
-            else if (type == typeof(ulong))
+            else if (asType == typeof(ulong))
             {
                 return ExcelULong(valueAsString);
             }
-            else if (type == typeof(ushort))
+            else if (asType == typeof(ushort))
             {
                 return ExcelUShort(valueAsString);
             }
-            else if (type == typeof(decimal))
+            else if (asType == typeof(decimal))
             {
                 return ExcelDecimal(valueAsString);
             }
-            else if (type == typeof(byte))
+            else if (asType == typeof(byte))
             {
                 return ExcelByte(valueAsString);
             }
-            else if (type == typeof(bool))
+            else if (asType == typeof(bool))
             {
                 return ExcelBool(valueAsString);
             }
-            else if (type == typeof(DateTime))
+            else if (asType == typeof(DateTime))
             {
-                if (string.IsNullOrEmpty(format))
-                    return ExcelDateOrDateTime(valueAsString);
-                return ExcelDate(valueAsString, format);
+                return ExcelDateOrDateTime(valueAsString, mapping.CsvFormat, mapping.DateTimeCultureInfo ?? DateTimeCultureInfo);
             }
-            else if (type == typeof(TimeSpan))
+            else if (asType == typeof(DateOnly))
+            {
+                return ExcelDateOnly(valueAsString, mapping.CsvFormat ?? DateFormat, mapping.DateTimeCultureInfo ?? DateTimeCultureInfo);
+            }
+            else if (asType == typeof(TimeOnly))
+            {
+                return ExcelTimeOnly(valueAsString, mapping.CsvFormat ?? TimeFormat, mapping.DateTimeCultureInfo ?? DateTimeCultureInfo);
+            }
+            else if (asType == typeof(TimeSpan))
             {
                 return ExcelTimeSpan(valueAsString);
             }
-            else if (type == typeof(double))
+            else if (asType == typeof(double))
             {
                 return ExcelDouble(valueAsString);
             }
-            else if (type.IsEnum)
+            else if (asType.IsEnum)
             {
-                return ExcelEnum(type, valueAsString);
+                return ExcelEnum(asType, valueAsString);
             }
-            else if (type == typeof(byte[]))
+            else if (asType == typeof(byte[]))
             {
                 return ExcelImage(valueAsString);
             }
         }
         catch (FormatException e)
         {
-            throw new ArgumentException($"Illegal value for column '{columnName}:{type.Name}': {valueAsString}", e);
+            throw new ArgumentException($"Illegal value for column '{mapping.ColumnName}:{asType.Name}': {valueAsString}", e);
         }
 
-        throw new ArgumentException($"Illegal type of column '{columnName}': {type.Name}");
+        throw new ArgumentException($"Illegal type of column '{mapping.ColumnName}': {asType.Name}");
     }
 
     private void AssignProperty(object obj, string valueAsString, ColumnMapping mapping)
@@ -275,7 +290,7 @@ public class CsvImport<T> : CsvImportBase where T : new()
 #pragma warning disable 8632
             object? val = mapping.GetValue != null
                 ? mapping.GetValue(valueAsString)
-                : GetValue(valueAsString, mapTo!.PropertyType, mapping.CsvFormat, mapping.ColumnName);
+                : GetValue(valueAsString, mapTo!.PropertyType, mapping);
 #pragma warning restore 8632
 
             if (mapping.AdjustValue != null)

@@ -394,7 +394,6 @@ public class CsvImportTest
         var first = csvList.First();
         first.Date.Should().Be(DateOnly.FromDateTime(1.October(1959)));
         first.DateTime.Should().Be(22.October(1959));
-
     }
 
     [Fact]
@@ -408,8 +407,8 @@ public class CsvImportTest
 
         var csvList = new CsvImport<DateOnlyTimeOnly>()
         {
-            DateFormat = "MMMM d, yyyy",
-            Encoding   = Encoding.Unicode,
+            DateFormat          = "MMMM d, yyyy",
+            Encoding            = Encoding.Unicode,
             DateTimeCultureInfo = CultureInfo.GetCultureInfo("de")
         }.Read(lines);
 
@@ -420,6 +419,98 @@ public class CsvImportTest
         first.Date.Should().Be(DateOnly.FromDateTime(1.October(1959)));
         first.DateTime.Should().Be(22.October(1959));
     }
+
+    #endregion
+
+    #region NumberFormat
+
+    public class NumberFormatTest
+    {
+        public decimal ColDecimal { get; set; }
+        public double  ColDouble  { get; set; }
+        public float  ColFloat  { get; set; }
+    };
+
+    [Fact]
+    public void NumberDecimalSeparatorTest()
+    {
+        var lines = new[]
+        {
+            "ColDecimal;ColDouble;ColFloat",
+            "3,14;1,41;1,73"
+        };
+
+        var csvList = new CsvImport<NumberFormatTest>()
+        {
+            Encoding         = Encoding.Unicode,
+            DecimalSeparator = ","
+        }.Read(lines);
+
+        csvList.Should().HaveCount(lines.Length - 1);
+        var first = csvList.First();
+        first.ColDecimal.Should().Be(3.14m);
+        first.ColDouble.Should().Be(1.41);
+        first.ColFloat.Should().Be(1.73f);
+    }
+
+    [Fact]
+    public void NumberDecimal2SeparatorTest()
+    {
+        var lines = new[]
+        {
+            "ColDecimal;ColDouble;ColFloat",
+            "3,14;1,41;1,73"
+        };
+
+
+        var importer = new CsvImport<NumberFormatTest>()
+        {
+            Encoding = Encoding.Unicode
+
+        };
+        importer.SetAustriaNumberFormat();
+        var csvList = importer.Read(lines);
+
+        csvList.Should().HaveCount(lines.Length - 1);
+        var first = csvList.First();
+        first.ColDecimal.Should().Be(3.14m);
+        first.ColDouble.Should().Be(1.41);
+        first.ColFloat.Should().Be(1.73f);
+    }
+
+    [Fact]
+    public void NumberDecimalMappingSeparatorTest()
+    {
+        var lines = new[]
+        {
+            "ColDecimal;ColDouble;ColFloat",
+            "3,14;1,41;1,73"
+        };
+        
+        var de_DE = CultureInfo.CreateSpecificCulture("de-DE").NumberFormat;
+
+        var csvList = new CsvImport<NumberFormatTest>()
+        {
+            Encoding         = Encoding.Unicode,
+            ConfigureColumnMapping = (c) =>
+            {
+                if (c.ColumnName == nameof(NumberFormatTest.ColDouble) || 
+                    c.ColumnName == nameof(NumberFormatTest.ColFloat) ||
+                    c.ColumnName == nameof(NumberFormatTest.ColDecimal))
+                {
+                    c.NumberFormat = de_DE;
+                }
+            }
+
+        }.Read(lines);
+
+        csvList.Should().HaveCount(lines.Length - 1);
+        var first = csvList.First();
+        first.ColDecimal.Should().Be(3.14m);
+        first.ColDouble.Should().Be(1.41);
+        first.ColFloat.Should().Be(1.73f);
+    }
+
 
     #endregion
 

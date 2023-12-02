@@ -36,6 +36,8 @@ public class CsvImport<T> : CsvImportBase where T : new()
 
         public CultureInfo? DateTimeCultureInfo { get; set; }
 
+        public NumberFormatInfo? NumberFormat { get; set; }
+
 #pragma warning disable CS8632 // The annotation for nullable reference types should only be used in code within a '#nullable' annotations context.
         public Func<string, object?>?  GetValue    { get; set; }
         public Func<object?, object?>? AdjustValue { get; set; }
@@ -231,7 +233,7 @@ public class CsvImport<T> : CsvImportBase where T : new()
             }
             else if (asType == typeof(decimal))
             {
-                return ExcelDecimal(valueAsString);
+                return ExcelDecimal(valueAsString, mapping.NumberFormat ?? NumberFormat);
             }
             else if (asType == typeof(byte))
             {
@@ -257,9 +259,13 @@ public class CsvImport<T> : CsvImportBase where T : new()
             {
                 return ExcelTimeSpan(valueAsString);
             }
+            else if (asType == typeof(float))
+            {
+                return ExcelFloat(valueAsString, mapping.NumberFormat ?? NumberFormat);
+            }
             else if (asType == typeof(double))
             {
-                return ExcelDouble(valueAsString);
+                return ExcelDouble(valueAsString, mapping.NumberFormat ?? NumberFormat);
             }
             else if (asType.IsEnum)
             {

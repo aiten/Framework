@@ -57,6 +57,16 @@ public class CsvImportBase
 
     public NumberFormatInfo NumberFormat => _nfi;
 
+    public string DecimalSeparator
+    {
+        get => _nfi.NumberDecimalSeparator;
+        set
+        {
+            _nfi.NumberDecimalSeparator = value;
+            _nfi.NumberGroupSeparator   = value == "." ? "," : ".";
+        }
+    }
+
     public void SetAustriaNumberFormat()
     {
         _nfi.NumberDecimalSeparator = ",";
@@ -218,11 +228,6 @@ public class CsvImportBase
         return ulong.Parse(excelField);
     }
 
-    public float ExcelFloat(string excelField)
-    {
-        return float.Parse(excelField, NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint | NumberStyles.AllowThousands, _nfi);
-    }
-
     public byte ExcelByte(string excelField)
     {
         return byte.Parse(excelField);
@@ -243,14 +248,19 @@ public class CsvImportBase
         }
     }
 
-    public decimal ExcelDecimal(string excelField)
+    public decimal ExcelDecimal(string excelField, NumberFormatInfo nfi)
     {
-        return decimal.Parse(excelField, NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint | NumberStyles.AllowThousands, _nfi);
+        return decimal.Parse(excelField, NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint | NumberStyles.AllowThousands, nfi);
     }
 
-    public double ExcelDouble(string excelField)
+    public double ExcelDouble(string excelField, NumberFormatInfo nfi)
     {
-        return double.Parse(excelField, NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint | NumberStyles.AllowThousands, _nfi);
+        return double.Parse(excelField, NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint | NumberStyles.AllowThousands, nfi);
+    }
+
+    public float ExcelFloat(string excelField, NumberFormatInfo nfi)
+    {
+        return float.Parse(excelField, NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint | NumberStyles.AllowThousands, nfi);
     }
 
     public DateTime ExcelDateOrDateTime(string excelField, string? format, CultureInfo culture)

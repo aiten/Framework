@@ -36,9 +36,8 @@ public class BasicAuthenticationHandler : AuthenticationHandler<AuthenticationSc
         IOptionsMonitor<AuthenticationSchemeOptions> options,
         ILoggerFactory                               logger,
         UrlEncoder                                   encoder,
-        ISystemClock                                 clock,
         IAuthenticationManager                       authenticationManager)
-        : base(options, logger, encoder, clock)
+        : base(options, logger, encoder)
     {
         _authenticationManager = authenticationManager;
     }

@@ -174,7 +174,7 @@ public class CsvImport<T> : CsvImportBase where T : class
         // var  newT = new T();
         // now create it with reflection
 
-        var newT = (T) Activator.CreateInstance(typeof(T))!;
+        var newT = (T)Activator.CreateInstance(typeof(T))!;
 
         if (mapping.Length < line.Count)
         {

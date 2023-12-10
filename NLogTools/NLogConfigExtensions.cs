@@ -31,7 +31,7 @@ using NLog.Web;
 
 public static class NLogConfigExtensions
 {
-    private static string BaseDirectory => Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!;
+    private static string BaseDirectory => System.AppContext.BaseDirectory;
 
     public static WebApplicationBuilder UseNLog(this WebApplicationBuilder builder)
     {

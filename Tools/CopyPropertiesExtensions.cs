@@ -3,15 +3,15 @@
 
   Copyright (c) Herbert Aitenbichler
 
-  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), 
-  to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, 
+  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
+  to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
   and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
   The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
-  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, 
-  WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+  WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
 namespace Framework.Tools;
@@ -35,7 +35,7 @@ public static class CopyPropertiesExtensions
 
     public static IList<PropertyInfo> CopyChangedProperties<T>(this T dest, T src, params string[] excludeList)
     {
-        var propertyInfos = GetCanWriteProperties(dest.GetType(), excludeList);
+        var propertyInfos = GetCanWriteProperties(typeof(T), excludeList);
 
         var assigned = new List<PropertyInfo>();
 
@@ -90,14 +90,14 @@ public static class CopyPropertiesExtensions
             .ToList();
     }
 
-    private static bool AssignValues(Type type, PropertyInfo propertyInfo, object dest, object valueDesc, object valueSrc)
+    private static bool AssignValues(Type type, PropertyInfo propertyInfo, object? dest, object? valueDesc, object? valueSrc)
     {
         if (!typeof(IComparable).IsAssignableFrom(type))
         {
             throw new ArgumentException($@"{propertyInfo.Name}: cannot compare property, please exclude this property from assignment");
         }
 
-        if ((valueDesc as IComparable).CompareTo(valueSrc) == 0)
+        if (valueDesc != null && (valueDesc as IComparable)?.CompareTo(valueSrc) == 0)
         {
             // no change
             return false;

@@ -3,15 +3,15 @@
 
   Copyright (c) Herbert Aitenbichler
 
-  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), 
-  to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, 
+  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
+  to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
   and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
   The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
-  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, 
-  WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+  WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
 namespace Framework.Logic;
@@ -26,7 +26,7 @@ using AutoMapper;
 
 using Repository.Abstraction;
 
-public abstract class GetManager<T, TKey, TEntity> : ManagerBase, IGetManager<T, TKey> where T : class where TEntity : class
+public abstract class GetManager<T, TKey, TEntity> : ManagerBase, IGetManager<T, TKey> where T : class where TEntity : class where TKey : notnull
 {
     private readonly IMapper                       _mapper;
     private readonly IGetRepository<TEntity, TKey> _repository;
@@ -41,17 +41,17 @@ public abstract class GetManager<T, TKey, TEntity> : ManagerBase, IGetManager<T,
 
     public async Task<IEnumerable<T>> GetAllAsync()
     {
-        return await MapToDtoAsync(PrepareEntities(await GetAllEntitiesAsync()));
+        return await MapToDtoAsync(PrepareEntities((await GetAllEntitiesAsync())!));
     }
 
-    public async Task<T> GetAsync(TKey key)
+    public async Task<T?> GetAsync(TKey key)
     {
-        return await MapToDtoAsync(PrepareEntity(await _repository.GetAsync(key)));
+        return await MapToDtoAsync(PrepareEntity(await _repository.GetAsync(key))!);
     }
 
     public async Task<IEnumerable<T>> GetAsync(IEnumerable<TKey> keys)
     {
-        return await MapToDtoAsync(PrepareEntities(await _repository.GetAsync(keys)));
+        return await MapToDtoAsync(PrepareEntities((await _repository.GetAsync(keys))!));
     }
 
     protected virtual async Task<IList<TEntity>> GetAllEntitiesAsync()
@@ -59,14 +59,14 @@ public abstract class GetManager<T, TKey, TEntity> : ManagerBase, IGetManager<T,
         return await _repository.GetAllAsync();
     }
 
-    protected virtual TEntity PrepareEntity(TEntity entity)
+    protected virtual TEntity? PrepareEntity(TEntity? entity)
     {
         return entity;
     }
 
-    protected virtual IList<TEntity> PrepareEntities(IList<TEntity> entities)
+    protected virtual IList<TEntity> PrepareEntities(IList<TEntity?> entities)
     {
-        return entities.Where(entity => PrepareEntity(entity) != null).ToList();
+        return entities.Where(entity => PrepareEntity(entity) != null).ToList()!;
     }
 
     protected virtual async Task<T> SetDtoAsync(T dto)
@@ -90,8 +90,13 @@ public abstract class GetManager<T, TKey, TEntity> : ManagerBase, IGetManager<T,
         return await SetDtoAsync(dtos.ToList());
     }
 
-    protected async Task<T> MapToDtoAsync(TEntity entity)
+    protected async Task<T?> MapToDtoAsync(TEntity? entity)
     {
+        if (entity == null)
+        {
+            return null;
+        }
+
         var dto = _mapper.Map<TEntity, T>(entity);
         return await SetDtoAsync(dto);
     }

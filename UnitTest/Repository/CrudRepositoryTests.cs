@@ -3,15 +3,15 @@
 
   Copyright (c) Herbert Aitenbichler
 
-  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), 
-  to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, 
+  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
+  to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
   and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
   The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
-  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, 
-  WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+  WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
 namespace Framework.UnitTest.Repository;
@@ -29,7 +29,7 @@ using Framework.Repository.Abstraction;
 using Microsoft.EntityFrameworkCore;
 
 public class CrudRepositoryTests<TDbContext, TEntity, TKey, TIRepository> : GetRepositoryTests<TDbContext, TEntity, TKey, TIRepository>
-    where TEntity : class where TIRepository : ICrudRepository<TEntity, TKey> where TDbContext : DbContext
+    where TEntity : class where TIRepository : ICrudRepository<TEntity, TKey> where TKey : notnull where TDbContext : DbContext
 {
     public async Task<TEntity> GetTrackingOK(TKey key)
     {
@@ -38,7 +38,7 @@ public class CrudRepositoryTests<TDbContext, TEntity, TKey, TIRepository> : GetR
             var entity = await ctx.Repository.GetTrackingAsync(key);
             entity.Should().NotBeNull();
             entity.Should().BeOfType(typeof(TEntity));
-            return entity;
+            return entity!;
         }
     }
 
@@ -75,9 +75,10 @@ public class CrudRepositoryTests<TDbContext, TEntity, TKey, TIRepository> : GetR
         using (var trans = ctx.UnitOfWork.BeginTransaction())
         {
             var entity = await ctx.Repository.GetTrackingAsync(key);
-            GetEntityKey(entity).Should().Be(key);
-            CompareEntity(createTestEntity(), entity).Should().BeTrue();
-            updateEntity(entity);
+            entity.Should().NotBe(null);
+            GetEntityKey(entity!).Should().Be(key);
+            CompareEntity(createTestEntity(), entity!).Should().BeTrue();
+            updateEntity(entity!);
 
             await ctx.UnitOfWork.SaveChangesAsync();
             await trans.CommitTransactionAsync();
@@ -89,8 +90,9 @@ public class CrudRepositoryTests<TDbContext, TEntity, TKey, TIRepository> : GetR
         using (var trans = ctx.UnitOfWork.BeginTransaction())
         {
             var entity = await ctx.Repository.GetAsync(key);
-            GetEntityKey(entity).Should().Be(key);
-            entityState = GetEntityState(entity);
+            entity.Should().NotBeNull();
+            GetEntityKey(entity!).Should().Be(key);
+            entityState = GetEntityState(entity!);
         }
 
         // update (with method update)
@@ -114,12 +116,13 @@ public class CrudRepositoryTests<TDbContext, TEntity, TKey, TIRepository> : GetR
         using (var trans = ctx.UnitOfWork.BeginTransaction())
         {
             var entity = await ctx.Repository.GetTrackingAsync(key);
-            GetEntityKey(entity).Should().Be(key);
+            entity.Should().NotBeNull();
+            GetEntityKey(entity!).Should().Be(key);
 
             var compareEntity = createTestEntity();
-            CompareEntity(compareEntity, entity).Should().BeTrue();
+            CompareEntity(compareEntity, entity!).Should().BeTrue();
 
-            await ctx.Repository.DeleteAsync(entity);
+            await ctx.Repository.DeleteAsync(entity!);
 
             await ctx.UnitOfWork.SaveChangesAsync();
             await trans.CommitTransactionAsync();
@@ -164,7 +167,7 @@ public class CrudRepositoryTests<TDbContext, TEntity, TKey, TIRepository> : GetR
         {
             var entities        = await ctx.Repository.GetTrackingAsync(keys);
             var compareEntities = createTestEntities();
-            for (var i = 0; i < compareEntities.Count(); i++)
+            for (var i = 0; i < compareEntities.Count; i++)
             {
                 GetEntityKey(entities.ElementAt(i)).Should().Be(keys.ElementAt(i));
                 CompareEntity(compareEntities.ElementAt(i), entities.ElementAt(i)).Should().BeTrue();
@@ -181,7 +184,7 @@ public class CrudRepositoryTests<TDbContext, TEntity, TKey, TIRepository> : GetR
         using (var trans = ctx.UnitOfWork.BeginTransaction())
         {
             var entities = await ctx.Repository.GetAsync(keys);
-            for (var i = 0; i < entities.Count(); i++)
+            for (var i = 0; i < entities.Count; i++)
             {
                 GetEntityKey(entities.ElementAt(i)).Should().Be(keys.ElementAt(i));
             }
@@ -281,7 +284,7 @@ public class CrudRepositoryTests<TDbContext, TEntity, TKey, TIRepository> : GetR
         {
             var entityInDb = await ctx.Repository.GetAsync(key);
             entityInDb.Should().NotBeNull();
-            CompareEntity(createTestEntity(), entityInDb).Should().BeTrue();
+            CompareEntity(createTestEntity(), entityInDb!).Should().BeTrue();
         }
 
         // modify existing
@@ -309,9 +312,9 @@ public class CrudRepositoryTests<TDbContext, TEntity, TKey, TIRepository> : GetR
             var entityToCompare = createTestEntity();
             updateEntity(entityToCompare);
 
-            CompareEntity(entityToCompare, entityInDb).Should().BeTrue();
+            CompareEntity(entityToCompare, entityInDb!).Should().BeTrue();
 
-            await ctx.Repository.DeleteAsync(entityInDb);
+            await ctx.Repository.DeleteAsync(entityInDb!);
 
             await ctx.UnitOfWork.SaveChangesAsync();
             await trans.CommitTransactionAsync();

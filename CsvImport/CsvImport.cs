@@ -23,7 +23,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 
-public class CsvImport<T> : CsvImportBase where T : new()
+public class CsvImport<T> : CsvImportBase where T : class
 {
     public class ColumnMapping
     {
@@ -170,7 +170,11 @@ public class CsvImport<T> : CsvImportBase where T : new()
 
     private T Map(IList<string> line, ColumnMapping[] mapping)
     {
-        var newT = new T();
+        // because the T may be with "required", we cant use new() any more 
+        // var  newT = new T();
+        // now create it with reflection
+
+        var newT = (T) Activator.CreateInstance(typeof(T))!;
 
         if (mapping.Length < line.Count)
         {

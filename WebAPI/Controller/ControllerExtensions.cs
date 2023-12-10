@@ -3,15 +3,15 @@
 
   Copyright (c) Herbert Aitenbichler
 
-  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), 
-  to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, 
+  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
+  to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
   and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
   The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
-  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, 
-  WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+  WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
 namespace Framework.WebAPI.Controller;
@@ -96,7 +96,7 @@ public static class ControllerExtensions
     public static async Task<ActionResult<T>> Get<T, TKey>(this Controller controller, IGetManager<T, TKey> manager, TKey id) where T : class where TKey : IComparable
     {
         var dto = await manager.GetAsync(id);
-        return await controller.NotFoundOrOk(dto);
+        return (await controller.NotFoundOrOk(dto))!;
     }
 
     public static async Task<ActionResult<IEnumerable<T>>> GetAll<T, TKey>(this Controller controller, IGetManager<T, TKey> manager) where T : class where TKey : IComparable
@@ -158,15 +158,15 @@ public static class ControllerExtensions
     {
         var newIds = (await manager.AddAsync(values)).ToICollection();
 
-        Func<T, TKey, T> mySetFunc = (v, k) =>
+        T MySetFunc(T v, TKey k)
         {
             setIdFunc(v, k);
             return v;
-        };
+        }
 
         var uri     = controller.GetCurrentUri("/bulk");
         var newUris = newIds.Select(id => uri + "/" + id).ToICollection();
-        var results = newIds.Select((id, idx) => new UriAndValue<T>() { Uri = uri + "/" + id, Value = mySetFunc(values.ElementAt(idx), id) });
+        var results = newIds.Select((id, idx) => new UriAndValue<T>() { Uri = uri + "/" + id, Value = MySetFunc(values.ElementAt(idx), id) });
         return results;
     }
 
@@ -232,9 +232,9 @@ public static class ControllerExtensions
     {
         var types = controller.GetMimeTypes();
         var ext   = Path.GetExtension(path).ToLowerInvariant();
-        if (types.ContainsKey(ext))
+        if (types.TryGetValue(ext, out var type))
         {
-            return types[ext];
+            return type;
         }
 
         return defaultMine;

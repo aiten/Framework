@@ -36,7 +36,7 @@ public class CsvImportTest
 
     public class CsvMappingImportClass
     {
-        public string    ColString { get; set; }
+        public string?   ColString { get; set; }
         public int?      ColInt    { get; set; }
         public DateTime? ColDate   { get; set; }
         public bool?     ColBool   { get; set; }
@@ -244,7 +244,7 @@ public class CsvImportTest
 
         var csv = csvImporter.Read(lines);
         csv.Should().HaveCount(2);
-        csv.Should().Contain(x => x.ColDate == 10.March(2021) && x.ColBool.Value && x.ColInt == 1000);
+        csv.Should().Contain(x => x.ColDate == 10.March(2021) && x.ColBool!.Value && x.ColInt == 1000);
         csv.Should().Contain(x => !x.ColDate.HasValue);
     }
 
@@ -262,7 +262,7 @@ public class CsvImportTest
         {
             ConfigureColumnMapping = (c) =>
             {
-                if (c.MapTo.PropertyType == typeof(string))
+                if (c.MapTo!.PropertyType == typeof(string))
                 {
                     c.AdjustValue = (val) => val == null || ((string)val) == "NULL" ? null : val;
                 }
@@ -282,8 +282,8 @@ public class CsvImportTest
 
     public class CsvCanWriteImportClass
     {
-        public string ColString { get; }
-        public int    ColInt    { get; set; }
+        public string? ColString { get; }
+        public int     ColInt    { get; set; }
     }
 
     [Fact]
@@ -428,7 +428,7 @@ public class CsvImportTest
     {
         public decimal ColDecimal { get; set; }
         public double  ColDouble  { get; set; }
-        public float  ColFloat  { get; set; }
+        public float   ColFloat   { get; set; }
     };
 
     [Fact]
@@ -466,7 +466,6 @@ public class CsvImportTest
         var importer = new CsvImport<NumberFormatTest>()
         {
             Encoding = Encoding.Unicode
-
         };
         importer.SetAustriaNumberFormat();
         var csvList = importer.Read(lines);
@@ -486,22 +485,21 @@ public class CsvImportTest
             "ColDecimal;ColDouble;ColFloat",
             "3,14;1,41;1,73"
         };
-        
+
         var de_DE = CultureInfo.CreateSpecificCulture("de-DE").NumberFormat;
 
         var csvList = new CsvImport<NumberFormatTest>()
         {
-            Encoding         = Encoding.Unicode,
+            Encoding = Encoding.Unicode,
             ConfigureColumnMapping = (c) =>
             {
-                if (c.ColumnName == nameof(NumberFormatTest.ColDouble) || 
+                if (c.ColumnName == nameof(NumberFormatTest.ColDouble) ||
                     c.ColumnName == nameof(NumberFormatTest.ColFloat) ||
                     c.ColumnName == nameof(NumberFormatTest.ColDecimal))
                 {
                     c.NumberFormat = de_DE;
                 }
             }
-
         }.Read(lines);
 
         csvList.Should().HaveCount(lines.Length - 1);
@@ -510,7 +508,6 @@ public class CsvImportTest
         first.ColDouble.Should().Be(1.41);
         first.ColFloat.Should().Be(1.73f);
     }
-
 
     #endregion
 
@@ -524,7 +521,7 @@ public class CsvImportTest
             EnumValue2
         }
 
-        public string    ColString                  { get; set; }
+        public string?   ColString                  { get; set; }
         public int       ColInt                     { get; set; }
         public short     ColShort                   { get; set; }
         public decimal   ColDecimal                 { get; set; }
@@ -553,7 +550,7 @@ public class CsvImportTest
         public TimeSpan? ColTimeSpanNull            { get; set; }
         public DateOnly? ColDateOnlyNull            { get; set; }
         public TimeOnly? ColTimeOnlyNull            { get; set; }
-        public byte[]    ColByteArr                 { get; set; }
+        public byte[]?   ColByteArr                 { get; set; }
     }
 
     [Fact]
@@ -635,8 +632,8 @@ public class CsvImportTest
 
     public class CsvImportStringClass
     {
-        public string ColString1 { get; set; }
-        public string ColString2 { get; set; }
+        public string? ColString1 { get; set; }
+        public string? ColString2 { get; set; }
     }
 
     [Fact]
@@ -711,8 +708,8 @@ public class CsvImportTest
 
     public class FieldOrProperty
     {
-        public string ColProperty { get; set; }
-        public string ColField;
+        public string? ColProperty { get; set; }
+        public string? ColField;
     };
 
     [Fact]
@@ -736,8 +733,8 @@ public class CsvImportTest
 
     public class PropertyIsProtected
     {
-        public    string ColProperty  { get; set; }
-        protected string ColProtected { get; set; }
+        public    string? ColProperty  { get; set; }
+        protected string? ColProtected { get; set; }
     };
 
     [Fact]
@@ -761,8 +758,8 @@ public class CsvImportTest
 
     public class PropertyIllegalType
     {
-        public string            ColProperty         { get; set; }
-        public ArgumentException IllegalTypeProperty { get; set; }
+        public string?            ColProperty         { get; set; }
+        public ArgumentException? IllegalTypeProperty { get; set; }
     };
 
     [Fact]
@@ -786,9 +783,9 @@ public class CsvImportTest
 
     public class PropertyMissing
     {
-        public string Col1 { get; set; }
-        public string Col2 { get; set; }
-        public int    Col3 { get; set; }
+        public string? Col1 { get; set; }
+        public string? Col2 { get; set; }
+        public int     Col3 { get; set; }
     };
 
     [Fact]

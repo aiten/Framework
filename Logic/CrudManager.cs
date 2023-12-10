@@ -3,15 +3,15 @@
 
   Copyright (c) Herbert Aitenbichler
 
-  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), 
-  to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, 
+  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
+  to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
   and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
   The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
-  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, 
-  WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+  WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
 namespace Framework.Logic;
@@ -32,7 +32,7 @@ using Microsoft.AspNetCore.JsonPatch;
 
 using Repository.Abstraction;
 
-public abstract class CrudManager<T, TKey, TEntity> : GetManager<T, TKey, TEntity>, ICrudManager<T, TKey> where T : class where TEntity : class
+public abstract class CrudManager<T, TKey, TEntity> : GetManager<T, TKey, TEntity>, ICrudManager<T, TKey> where T : class where TEntity : class where TKey : notnull
 {
     #region private /ctr
 
@@ -115,7 +115,7 @@ public abstract class CrudManager<T, TKey, TEntity> : GetManager<T, TKey, TEntit
     {
         using (var trans = _unitOfWork.BeginTransaction())
         {
-            var entities = PrepareEntities(await _repository.GetTrackingAsync(keys));
+            var entities = PrepareEntities((await _repository.GetTrackingAsync(keys))!);
 
             foreach (var entity in entities)
             {
@@ -146,7 +146,7 @@ public abstract class CrudManager<T, TKey, TEntity> : GetManager<T, TKey, TEntit
             await ValidateDtoAsync(myValues, ValidationType.UpdateValidation);
 
             var entities     = MapFromDtos(myValues, ValidationType.UpdateValidation).ToICollection();
-            var entitiesInDb = PrepareEntities(await _repository.GetTrackingAsync(entities.Select(GetKey)));
+            var entitiesInDb = PrepareEntities((await _repository.GetTrackingAsync(entities.Select(GetKey)))!);
 
             await UpdateAsync(myValues, entitiesInDb, entities);
             await CommitTransactionAsync(trans);
@@ -183,7 +183,7 @@ public abstract class CrudManager<T, TKey, TEntity> : GetManager<T, TKey, TEntit
 
         if (value == null)
         {
-            throw new ArgumentException(ErrorMessages.ResourceManager.ToLocalizable(nameof(ErrorMessages.Framework_Logic_ObjectNotFound), new object[] { key }).Message());
+            throw new ArgumentException(ErrorMessages.ResourceManager.ToLocalizable(nameof(ErrorMessages.Framework_Logic_ObjectNotFound), new object[] { key! }).Message());
         }
 
         ApplyToPatch(value, patch);

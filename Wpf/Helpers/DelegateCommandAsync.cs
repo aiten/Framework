@@ -3,15 +3,15 @@
 
   Copyright (c) Herbert Aitenbichler
 
-  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), 
-  to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, 
+  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
+  to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
   and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
   The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
-  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, 
-  WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+  WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
 namespace Framework.Wpf.Helpers;
@@ -24,10 +24,10 @@ using System.Windows.Input;
 public class DelegateCommandAsync<T> : ICommand
 {
     private readonly Func<CancellationToken, Task<T>> _command;
-    private readonly Func<bool>                       _canExecute;
-    private readonly CancelAsyncCommand               _cancelCommand = new CancelAsyncCommand();
+    private readonly Func<bool>?                      _canExecute;
+    private readonly CancelAsyncCommand               _cancelCommand = new();
 
-    public event EventHandler CanExecuteChanged
+    public event EventHandler? CanExecuteChanged
     {
         add => CommandManager.RequerySuggested += value;
         remove => CommandManager.RequerySuggested -= value;
@@ -38,13 +38,13 @@ public class DelegateCommandAsync<T> : ICommand
         CommandManager.InvalidateRequerySuggested();
     }
 
-    public DelegateCommandAsync(Func<CancellationToken, Task<T>> command, Func<bool> canExecute = null)
+    public DelegateCommandAsync(Func<CancellationToken, Task<T>> command, Func<bool>? canExecute = null)
     {
         _command    = command;
         _canExecute = canExecute;
     }
 
-    public async void Execute(object parameter)
+    public async void Execute(object? parameter)
     {
         _cancelCommand.NotifyCommandStarting();
         RaiseCanExecuteChanged();
@@ -55,17 +55,17 @@ public class DelegateCommandAsync<T> : ICommand
 
     public ICommand CancelCommand => _cancelCommand;
 
-    public bool CanExecute(object parameter)
+    public bool CanExecute(object? parameter)
     {
         return _canExecute == null || _canExecute();
     }
 
     private sealed class CancelAsyncCommand : ICommand
     {
-        private CancellationTokenSource _cts = new CancellationTokenSource();
+        private CancellationTokenSource _cts = new();
         private bool                    _commandExecuting;
 
-        public event EventHandler CanExecuteChanged
+        public event EventHandler? CanExecuteChanged
         {
             add => CommandManager.RequerySuggested += value;
             remove => CommandManager.RequerySuggested -= value;
@@ -96,12 +96,12 @@ public class DelegateCommandAsync<T> : ICommand
             RaiseCanExecuteChanged();
         }
 
-        public bool CanExecute(object parameter)
+        public bool CanExecute(object? parameter)
         {
             return _commandExecuting && !_cts.IsCancellationRequested;
         }
 
-        public void Execute(object parameter)
+        public void Execute(object? parameter)
         {
             _cts.Cancel();
             RaiseCanExecuteChanged();

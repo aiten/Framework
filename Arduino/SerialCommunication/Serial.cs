@@ -3,15 +3,15 @@
 
   Copyright (c) Herbert Aitenbichler
 
-  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), 
-  to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, 
+  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
+  to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
   and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
   The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
-  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, 
-  WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+  WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
 namespace Framework.Arduino.SerialCommunication;
@@ -35,19 +35,19 @@ public class Serial : ISerial
 {
     #region Private Members
 
-    ISerialPort             _serialPort;
-    IFactory<ISerialPort>   _serialPortFactory;
-    IScope<ISerialPort>     _serialPortScope;
-    CancellationTokenSource _serialPortCancellationTokenSource;
-    Thread                  _readThread;
-    Thread                  _writeThread;
-    int                     _commandSeqId;
+    ISerialPort?             _serialPort;
+    IFactory<ISerialPort>    _serialPortFactory;
+    IScope<ISerialPort>?     _serialPortScope;
+    CancellationTokenSource? _serialPortCancellationTokenSource;
+    Thread?                  _readThread;
+    Thread?                  _writeThread;
+    int                      _commandSeqId;
 
-    readonly AutoResetEvent      _autoEvent       = new AutoResetEvent(false);
-    readonly List<SerialCommand> _pendingCommands = new List<SerialCommand>();
+    readonly AutoResetEvent      _autoEvent       = new(false);
+    readonly List<SerialCommand> _pendingCommands = new();
 
-    object _pendingCommandsLock = new Object();
-    object _commandsLock        = new Object();
+    readonly object _pendingCommandsLock = new();
+    readonly object _commandsLock        = new();
 
     #endregion
 
@@ -64,17 +64,17 @@ public class Serial : ISerial
     #region Events
 
     // The event we publish
-    public event CommandEventHandler WaitForSend;
-    public event CommandEventHandler CommandSending;
-    public event CommandEventHandler CommandSent;
-    public event CommandEventHandler WaitCommandSent;
-    public event CommandEventHandler ReplyReceived;
-    public event CommandEventHandler ReplyOk;
-    public event CommandEventHandler ReplyError;
-    public event CommandEventHandler ReplyInfo;
-    public event CommandEventHandler ReplyUnknown;
-    public event CommandEventHandler CommandQueueChanged;
-    public event CommandEventHandler CommandQueueEmpty;
+    public event CommandEventHandler? WaitForSend;
+    public event CommandEventHandler? CommandSending;
+    public event CommandEventHandler? CommandSent;
+    public event CommandEventHandler? WaitCommandSent;
+    public event CommandEventHandler? ReplyReceived;
+    public event CommandEventHandler? ReplyOk;
+    public event CommandEventHandler? ReplyError;
+    public event CommandEventHandler? ReplyInfo;
+    public event CommandEventHandler? ReplyUnknown;
+    public event CommandEventHandler? CommandQueueChanged;
+    public event CommandEventHandler? CommandQueueEmpty;
 
     #endregion
 
@@ -139,7 +139,7 @@ public class Serial : ISerial
     /// <param name="serverName">e.g. uri, must be null or empty</param>
     /// <param name="userName"></param>
     /// <param name="password"></param>
-    public async Task ConnectAsync(string portName, string serverName, string userName, string password)
+    public async Task ConnectAsync(string portName, string? serverName, string? userName, string? password)
     {
         await Task.CompletedTask; // avoid CS1998
         Logger?.LogInformation($@"Connect: {portName}");
@@ -151,7 +151,7 @@ public class Serial : ISerial
 
         _serialPortCancellationTokenSource = new CancellationTokenSource();
 
-        _serialPort.Open();
+        _serialPort!.Open();
 
         _readThread  = new Thread(Read);
         _writeThread = new Thread(Write);
@@ -344,7 +344,7 @@ public class Serial : ISerial
     /// </summary>
     /// <param name="commands"></param>
     /// <param name="waitForMilliseconds"></param>
-    public async Task<IEnumerable<SerialCommand>> SendCommandsAsync(IEnumerable<string> commands, int waitForMilliseconds)
+    public async Task<IEnumerable<SerialCommand>> SendCommandsAsync(IEnumerable<string>? commands, int waitForMilliseconds)
     {
         if (commands != null)
         {
@@ -360,7 +360,7 @@ public class Serial : ISerial
     /// Send multiple command lines to the arduino. Do no wait
     /// </summary>
     /// <param name="commands"></param>
-    public async Task<IEnumerable<SerialCommand>> QueueCommandsAsync(IEnumerable<string> commands)
+    public async Task<IEnumerable<SerialCommand>> QueueCommandsAsync(IEnumerable<string>? commands)
     {
         var list = new List<SerialCommand>();
 
@@ -399,10 +399,10 @@ public class Serial : ISerial
     /// </summary>
     /// <param name="maxMilliseconds"></param>
     /// <returns></returns>
-    public async Task<string> WaitUntilResponseAsync(int maxMilliseconds)
+    public async Task<string?> WaitUntilResponseAsync(int maxMilliseconds)
     {
-        string message       = null;
-        var    checkResponse = new CommandEventHandler((obj, e) => { message = e.Info; });
+        string? message       = null;
+        var     checkResponse = new CommandEventHandler((obj, e) => { message = e.Info; });
 
         try
         {
@@ -431,11 +431,11 @@ public class Serial : ISerial
 
     private IEnumerable<SerialCommand> SplitAndQueueCommand(string line)
     {
-        var      cmdList = new List<SerialCommand>();
-        string[] cmds    = SplitCommand(line);
+        var cmdList = new List<SerialCommand>();
+        var cmds    = SplitCommand(line);
         foreach (string cmd in cmds)
         {
-            SerialCommand cmdToQueue = QueueCommandString(cmd);
+            var cmdToQueue = QueueCommandString(cmd);
             if (cmdToQueue != null)
             {
                 // sending is done in Write-Thread
@@ -446,7 +446,7 @@ public class Serial : ISerial
         return cmdList;
     }
 
-    private SerialCommand QueueCommandString(string cmd)
+    private SerialCommand? QueueCommandString(string cmd)
     {
         if (string.IsNullOrEmpty(cmd))
         {
@@ -502,7 +502,7 @@ public class Serial : ISerial
             _commands.Add(cmd);
         }
 
-        string commandText = cmd.CommandText;
+        var commandText = cmd.CommandText ?? string.Empty;
 
         const int CRLF_SIZE = 2;
 
@@ -542,7 +542,7 @@ public class Serial : ISerial
         {
             if (addNewLine)
             {
-                commandText = commandText + _serialPort.NewLine;
+                commandText = commandText + _serialPort!.NewLine;
             }
 
             WriteToSerialAsync(commandText).ConfigureAwait(false).GetAwaiter().GetResult();
@@ -570,9 +570,12 @@ public class Serial : ISerial
     {
         try
         {
-            _serialPort.Close();
-            _serialPort.DtrEnable = false;
-            _serialPort.Open();
+            if (_serialPort != null)
+            {
+                _serialPort.Close();
+                _serialPort.DtrEnable = false;
+                _serialPort.Open();
+            }
         }
         catch (Exception)
         {
@@ -590,10 +593,10 @@ public class Serial : ISerial
         var sw = Stopwatch.StartNew();
         while (Continue)
         {
-            SerialCommand cmd;
+            SerialCommand? cmd;
             lock (_pendingCommandsLock)
             {
-                cmd = _pendingCommands.FirstOrDefault();
+                cmd = _pendingCommands!.FirstOrDefault();
             }
 
             if (cmd == null)
@@ -665,19 +668,19 @@ public class Serial : ISerial
 
         while (Continue)
         {
-            SerialCommand nextCmd         = null;
-            int           queuedCmdLength = 0;
+            SerialCommand? nextCmd         = null;
+            int            queuedCmdLength = 0;
 
             // commands are sent to the arduino until the buffer is full
             // In the _pendingCommand list also the commands are still stored with no reply.
 
             lock (_pendingCommandsLock)
             {
-                foreach (SerialCommand cmd in _pendingCommands)
+                foreach (var cmd in _pendingCommands)
                 {
                     if (cmd.SentTime.HasValue)
                     {
-                        queuedCmdLength += cmd.CommandText.Length;
+                        queuedCmdLength += (cmd.CommandText ?? string.Empty).Length;
                         queuedCmdLength += 2; // CRLF
                     }
                     else
@@ -695,7 +698,7 @@ public class Serial : ISerial
             {
                 Logger?.LogTrace($"Write: L:{queuedCmdLength}");
 
-                if (queuedCmdLength == 0 || queuedCmdLength + nextCmd.CommandText.Length + 2 < ArduinoBufferSize)
+                if (queuedCmdLength == 0 || queuedCmdLength + (nextCmd.CommandText ?? string.Empty).Length + 2 < ArduinoBufferSize)
                 {
                     // send everything if queue is empty
                     // or send command if pending commands + this fit into arduino queue
@@ -731,9 +734,9 @@ public class Serial : ISerial
 
     public async Task WriteToSerialAsync(string str)
     {
-        byte[] encodedStr = _serialPort.Encoding.GetBytes(str);
+        byte[] encodedStr = _serialPort!.Encoding.GetBytes(str);
 
-        await _serialPort.BaseStream.WriteAsync(encodedStr, 0, encodedStr.Length, _serialPortCancellationTokenSource.Token);
+        await _serialPort.BaseStream.WriteAsync(encodedStr, 0, encodedStr.Length, _serialPortCancellationTokenSource!.Token);
         if (Environment.OSVersion.Platform != PlatformID.Unix)
         {
             // linux: with flush we may delete our recent WriteAsync (see SerialStream.Unix.cs)
@@ -749,7 +752,7 @@ public class Serial : ISerial
         // int readSize = await _serialPort.BaseStream.ReadAsync(buffer, 0, readMaxSize, _serialPortCancellationTokenSource.Token);
         // above code does not work: after Token.Cancel() not exit of call.
 
-        var readTask = _serialPort.BaseStream.ReadAsync(buffer, 0, readMaxSize, _serialPortCancellationTokenSource.Token);
+        var readTask = _serialPort!.BaseStream.ReadAsync(buffer, 0, readMaxSize, _serialPortCancellationTokenSource!.Token);
         await await Task.WhenAny(
             readTask,
             Task.Delay(-1, _serialPortCancellationTokenSource.Token));
@@ -806,7 +809,7 @@ public class Serial : ISerial
 
     private void MessageReceived(string message)
     {
-        SerialCommand cmd;
+        SerialCommand? cmd;
         lock (_pendingCommandsLock)
         {
             cmd = _pendingCommands.FirstOrDefault();
@@ -824,7 +827,7 @@ public class Serial : ISerial
             {
                 SetSystemKeepAlive();
 
-                string result = cmd.ResultText;
+                string result = cmd.ResultText ?? String.Empty;
                 if (string.IsNullOrEmpty(result))
                 {
                     result = message;
@@ -1017,7 +1020,7 @@ public class Serial : ISerial
 
     #region Command History
 
-    readonly List<SerialCommand> _commands = new List<SerialCommand>();
+    readonly List<SerialCommand> _commands = new();
 
     public List<SerialCommand> CommandHistoryCopy
     {

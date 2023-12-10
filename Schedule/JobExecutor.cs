@@ -3,15 +3,15 @@
 
   Copyright (c) Herbert Aitenbichler
 
-  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), 
-  to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, 
+  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
+  to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
   and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
   The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
-  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, 
-  WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+  WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
 namespace Framework.Schedule;
@@ -39,13 +39,13 @@ internal abstract class JobExecutor : IJobExecutor
 
     protected bool IsDisposed => _disposed;
 
-    public CancellationTokenSource CtSource { get; set; } = new CancellationTokenSource();
+    public CancellationTokenSource CtSource { get; set; } = new();
 
-    public string JobName        { get; set; }
-    public Type   ParamContainer { get; set; } = typeof(JobParamContainer);
-    public object Param          { get; set; }
+    public string  JobName        { get; set; }
+    public Type    ParamContainer { get; set; } = typeof(JobParamContainer);
+    public object? Param          { get; set; }
 
-    public Timer     Timer                { get; set; }
+    public Timer?    Timer                { get; set; }
     public DateTime? NextExecutionRequest { get; private set; }
 
     protected JobExecutor(IServiceProvider serviceProvider, ILoggerFactory loggerFactory, ICurrentDateTime currentDateTime, Type job)
@@ -145,9 +145,9 @@ internal abstract class JobExecutor : IJobExecutor
         return random.Next(from, to);
     }
 
-    protected static async Task CastAndRunJob(object state)
+    protected static async Task CastAndRunJob(object? state)
     {
-        var jobExecutor = (JobExecutor)state;
+        var jobExecutor = state as JobExecutor;
         _ = jobExecutor ?? throw new ArgumentNullException(nameof(jobExecutor));
         await jobExecutor.Execute();
     }

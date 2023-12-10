@@ -19,6 +19,7 @@
 	</PropertyGroup>
 
 	<PropertyGroup Label="Compiler Settings">
+		<Nullable>enable</Nullable>
 		<LangVersion>latest</LangVersion>
 		<AssemblyName>$(SolutionNamespace).$(MSBuildProjectName)</AssemblyName>
 		<RootNamespace>$(SolutionNamespace).$(MSBuildProjectName)</RootNamespace>

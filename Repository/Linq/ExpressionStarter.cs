@@ -3,15 +3,15 @@
 
   Copyright (c) Herbert Aitenbichler
 
-  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), 
-  to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, 
+  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
+  to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
   and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
   The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
-  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, 
-  WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+  WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
 // see: https://github.com/scottksmith95/LINQKit
@@ -49,9 +49,9 @@ public class ExpressionStarter<T>
     }
 
     /// <summary>The actual Predicate. It can only be set by calling Start.</summary>
-    private Expression<Func<T, bool>> Predicate => (IsStarted || !UseDefaultExpression) ? _predicate : DefaultExpression;
+    private Expression<Func<T, bool>>? Predicate => (IsStarted || !UseDefaultExpression) ? _predicate : DefaultExpression;
 
-    private Expression<Func<T, bool>> _predicate;
+    private Expression<Func<T, bool>>? _predicate;
 
     /// <summary>Determines if the predicate is started.</summary>
     public bool IsStarted => _predicate != null;
@@ -60,7 +60,7 @@ public class ExpressionStarter<T>
     public bool UseDefaultExpression => DefaultExpression != null;
 
     /// <summary>The default expression</summary>
-    public Expression<Func<T, bool>> DefaultExpression { get; set; }
+    public Expression<Func<T, bool>>? DefaultExpression { get; set; }
 
     /// <summary>Set the Expression predicate</summary>
     /// <param name="exp">The first expression</param>
@@ -75,19 +75,19 @@ public class ExpressionStarter<T>
     /// <summary>Or</summary>
     public Expression<Func<T, bool>> Or([NotNull] Expression<Func<T, bool>> expr2)
     {
-        return (IsStarted) ? _predicate = Predicate.Or(expr2) : Start(expr2);
+        return (IsStarted) ? _predicate = Predicate!.Or(expr2) : Start(expr2);
     }
 
     /// <summary>And</summary>
     public Expression<Func<T, bool>> And([NotNull] Expression<Func<T, bool>> expr2)
     {
-        return (IsStarted) ? _predicate = Predicate.And(expr2) : Start(expr2);
+        return (IsStarted) ? _predicate = Predicate!.And(expr2) : Start(expr2);
     }
 
     /// <summary> Show predicate string </summary>
     public override string ToString()
     {
-        return Predicate?.ToString();
+        return Predicate?.ToString()!;
     }
 
     #region Implicit Operators
@@ -98,23 +98,23 @@ public class ExpressionStarter<T>
     /// <param name="right"></param>
     public static implicit operator Expression<Func<T, bool>>(ExpressionStarter<T> right)
     {
-        return right?.Predicate;
+        return right.Predicate!;
     }
 
     /// <summary>
     /// Allows this object to be implicitely converted to an Expression{Func{T, bool}}.
     /// </summary>
     /// <param name="right"></param>
-    public static implicit operator Func<T, bool>(ExpressionStarter<T> right)
+    public static implicit operator Func<T, bool>?(ExpressionStarter<T>? right)
     {
-        return right == null ? null : (right.IsStarted || right.UseDefaultExpression) ? right.Predicate.Compile() : null;
+        return right == null ? null : (right.IsStarted || right.UseDefaultExpression) ? right.Predicate!.Compile() : null;
     }
 
     /// <summary>
     /// Allows this object to be implicitely converted to an Expression{Func{T, bool}}.
     /// </summary>
     /// <param name="right"></param>
-    public static implicit operator ExpressionStarter<T>(Expression<Func<T, bool>> right)
+    public static implicit operator ExpressionStarter<T>?(Expression<Func<T, bool>>? right)
     {
         return right == null ? null : new ExpressionStarter<T>(right);
     }
@@ -125,42 +125,42 @@ public class ExpressionStarter<T>
 
     public Func<T, bool> Compile()
     {
-        return Predicate.Compile();
+        return Predicate!.Compile();
     }
 
     public Func<T, bool> Compile(DebugInfoGenerator debugInfoGenerator)
     {
-        return Predicate.Compile(debugInfoGenerator);
+        return Predicate!.Compile(debugInfoGenerator);
     }
 
     public Expression<Func<T, bool>> Update(Expression body, IEnumerable<ParameterExpression> parameters)
     {
-        return Predicate.Update(body, parameters);
+        return Predicate!.Update(body, parameters);
     }
 
     #endregion
 
     #region Implement LamdaExpression methods and properties
 
-    public Expression Body => Predicate.Body;
+    public Expression Body => Predicate!.Body;
 
-    public ExpressionType NodeType => Predicate.NodeType;
+    public ExpressionType NodeType => Predicate!.NodeType;
 
-    public ReadOnlyCollection<ParameterExpression> Parameters => Predicate.Parameters;
+    public ReadOnlyCollection<ParameterExpression> Parameters => Predicate!.Parameters;
 
-    public Type Type => Predicate.Type;
+    public Type Type => Predicate!.Type;
 
-    public string Name => Predicate.Name;
+    public string Name => Predicate!.Name!;
 
-    public Type ReturnType => Predicate.ReturnType;
+    public Type ReturnType => Predicate!.ReturnType;
 
-    public bool TailCall => Predicate.TailCall;
+    public bool TailCall => Predicate!.TailCall;
 
     #endregion
 
     #region Implement Expression methods and properties
 
-    public virtual bool CanReduce => Predicate.CanReduce;
+    public virtual bool CanReduce => Predicate!.CanReduce;
 
     #endregion
 }

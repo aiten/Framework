@@ -39,7 +39,7 @@ public class DbImporter
 
     public IList<T> Read<T>(string fileName) where T : class
     {
-        return ReadFromCsv<T>($@"{CsvDir}\{fileName}");
+        return ReadFromCsv<T>($@"{CsvDir}/{fileName}");
     }
 
     protected Dictionary<TKey, TEntity> ImportCsv<TKey, TEntity>(string fileName, Func<TEntity, TKey> getKey, Action<TEntity, TKey> setKey) where TEntity : class where TKey : notnull

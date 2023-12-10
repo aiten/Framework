@@ -66,7 +66,7 @@ public static class NLogConfigExtensions
 
             if (Microsoft.Azure.Web.DataProtection.Util.IsAzureEnvironment())
             {
-                localAppData = $"{BaseDirectory}/data/logs";
+                localAppData = $"{BaseDirectory}data/logs";
             }
             else if (!Directory.Exists(localAppData) || WindowsServiceHelpers.IsWindowsService())
             {

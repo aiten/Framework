@@ -142,7 +142,7 @@ public class Serial : ISerial
     public async Task ConnectAsync(string portName, string? serverName, string? userName, string? password)
     {
         await Task.CompletedTask; // avoid CS1998
-        Logger?.LogInformation($@"Connect: {portName}");
+        Logger.LogInformation($@"Connect: {portName}");
 
         // Create a new SerialPort object with default settings.
         Aborted = false;
@@ -206,7 +206,7 @@ public class Serial : ISerial
     private async Task Disconnect(bool join)
     {
         await Task.Delay(5);
-        Logger?.LogInformation($"Disconnecting: {join.ToString()}");
+        Logger.LogInformation($"Disconnecting: {join.ToString()}");
         Aborted = true;
         _serialPortCancellationTokenSource?.Cancel();
 
@@ -248,7 +248,7 @@ public class Serial : ISerial
             _serialPortCancellationTokenSource = null;
         }
 
-        Logger?.LogInformation($"Disconnected: {join.ToString()}");
+        Logger.LogInformation($"Disconnected: {join.ToString()}");
     }
 
     /// <summary>
@@ -257,7 +257,7 @@ public class Serial : ISerial
     /// </summary>
     public void AbortCommands()
     {
-        Logger?.LogInformation("Aborting");
+        Logger.LogInformation("Aborting");
         bool wasEmpty;
         lock (_pendingCommandsLock)
         {
@@ -273,7 +273,7 @@ public class Serial : ISerial
         OnCommandQueueChanged(new SerialEventArgs(0, null));
 
         Aborted = true;
-        Logger?.LogInformation("Aborted");
+        Logger.LogInformation("Aborted");
     }
 
     /// <summary>
@@ -286,7 +286,7 @@ public class Serial : ISerial
             return;
         }
 
-        Logger?.LogInformation("Resume");
+        Logger.LogInformation("Resume");
 
         while (true)
         {
@@ -318,7 +318,7 @@ public class Serial : ISerial
         _serialPort.ReadTimeout  = 500;
         _serialPort.WriteTimeout = 500;
 
-        Logger?.LogInformation($"Setup: Port:{portName}, Baud:{BaudRate}");
+        Logger.LogInformation($"Setup: Port:{portName}, Baud:{BaudRate}");
     }
 
     public void Dispose()
@@ -475,7 +475,7 @@ public class Serial : ISerial
             queueLength++;
         }
 
-        Logger?.LogInformation($"Queue: {cmd}");
+        Logger.LogInformation($"Queue: {cmd}");
         OnCommandQueueChanged(new SerialEventArgs(queueLength, c));
         return c;
     }
@@ -537,7 +537,7 @@ public class Serial : ISerial
 
     private bool WriteSerial(string commandText, bool addNewLine)
     {
-        Logger?.LogInformation($"Write: {commandText}");
+        Logger.LogInformation($"Write: {commandText}");
         try
         {
             if (addNewLine)
@@ -550,17 +550,17 @@ public class Serial : ISerial
         }
         catch (InvalidOperationException e)
         {
-            Logger?.LogError($"WriteInvalidOperationException: {commandText} => {e.Message}");
+            Logger.LogError($"WriteInvalidOperationException: {commandText} => {e.Message}");
             Disconnect(false).ConfigureAwait(false).GetAwaiter().GetResult();
         }
         catch (IOException e)
         {
-            Logger?.LogError($"WriteIOException: {commandText} => {e.Message}");
+            Logger.LogError($"WriteIOException: {commandText} => {e.Message}");
             ErrorSerial();
         }
         catch (Exception e)
         {
-            Logger?.LogError($"WriteException: {commandText} => {e.GetType()} {e.Message}");
+            Logger.LogError($"WriteException: {commandText} => {e.GetType()} {e.Message}");
         }
 
         return false;
@@ -696,7 +696,7 @@ public class Serial : ISerial
 
             if (nextCmd != null && (!Pause || SendNext))
             {
-                Logger?.LogTrace($"Write: L:{queuedCmdLength}");
+                Logger.LogTrace($"Write: L:{queuedCmdLength}");
 
                 if (queuedCmdLength == 0 || queuedCmdLength + (nextCmd.CommandText ?? string.Empty).Length + 2 < ArduinoBufferSize)
                 {
@@ -775,7 +775,7 @@ public class Serial : ISerial
             }
             catch (InvalidOperationException e)
             {
-                Logger?.LogError($"ReadInvalidOperationException: {e.Message}");
+                Logger.LogError($"ReadInvalidOperationException: {e.Message}");
                 Thread.Sleep(250);
             }
             catch (ThreadAbortException)
@@ -785,12 +785,12 @@ public class Serial : ISerial
             }
             catch (IOException e)
             {
-                Logger?.LogError($"ReadIOException: {e.Message}");
+                Logger.LogError($"ReadIOException: {e.Message}");
                 Thread.Sleep(250);
             }
             catch (Exception e)
             {
-                Logger?.LogError($"ReadException: {e.Message}");
+                Logger.LogError($"ReadException: {e.Message}");
                 Thread.Sleep(250);
             }
 
@@ -817,7 +817,7 @@ public class Serial : ISerial
 
         if (string.IsNullOrEmpty(message) == false)
         {
-            Logger?.LogInformation($"Read: {message.Replace("\n", @"\n").Replace("\r", @"\r").Replace("\t", @"\t")}");
+            Logger.LogInformation($"Read: {message.Replace("\n", @"\n").Replace("\r", @"\r").Replace("\t", @"\t")}");
 
             bool endCommand = false;
 
@@ -900,7 +900,7 @@ public class Serial : ISerial
                     _autoEvent.Set();
                 }
 
-                Logger?.LogDebug($"DeQueue: {cmd.CommandText}");
+                Logger.LogDebug($"DeQueue: {cmd.CommandText}");
 
                 OnCommandQueueChanged(new SerialEventArgs(queueLength, cmd));
 

@@ -96,8 +96,7 @@ public class SerialTest : UnitTestBase
 
     private ILogger<Serial> CreateLogger()
     {
-        // ReSharper disable once SuspiciousTypeConversion.Global
-        return (LogManager.CreateNullLogger() as ILogger<Serial>)!;
+        return Substitute.For<ILogger<Serial>>();
     }
 
     [Fact]

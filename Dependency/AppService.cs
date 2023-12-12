@@ -22,7 +22,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 public static class AppService
 {
-    public static IServiceCollection ServiceCollection { get; set; } = new ServiceCollection();
+    public static IServiceCollection ServiceCollection { get; set; } = default!;
 
     public static void BuildServiceProvider()
     {
@@ -33,6 +33,6 @@ public static class AppService
 
     public static T GetRequiredService<T>() where T : notnull
     {
-        return ServiceProvider!.GetRequiredService<T>();
+        return ServiceProvider.GetRequiredService<T>();
     }
 }

@@ -33,7 +33,7 @@ public static class NLogConfigExtensions
 {
     private static string BaseDirectory => System.AppContext.BaseDirectory;
 
-    public static WebApplicationBuilder UseNLog(this WebApplicationBuilder builder)
+    public static WebApplicationBuilder UseFrwNLog(this WebApplicationBuilder builder)
     {
         builder.Logging.ClearProviders();
         builder.Logging.SetMinimumLevel(Microsoft.Extensions.Logging.LogLevel.Trace);
@@ -99,5 +99,6 @@ public static class NLogConfigExtensions
 #endif
 
         return NLog.LogManager.Setup().LoadConfigurationFromAppSettings().GetCurrentClassLogger();
+//        return NLog.LogManager.Setup().LoadConfigurationFromFile("nlog.config").GetCurrentClassLogger();
     }
 }

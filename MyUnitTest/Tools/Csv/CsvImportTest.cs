@@ -828,7 +828,7 @@ public class CsvImportTest
 
     #endregion
 
-    #region Format Attribute
+    #region Format/Culture Attribute
 
     public class CsvImportAttributeClass
     {
@@ -848,6 +848,26 @@ public class CsvImportTest
         public TimeOnly TimeOnly1 { get; set; }
     }
 
+    [Fact]
+    public void CsvImportFormatAttributeTest()
+    {
+        var lines = new[]
+        {
+            "Date1;Date2;DateOnly1;DateOnly2;TimeOnly1",
+            "1959/10/22;10/22/1959;1959/10/21;10/21/1959;23:59"
+        };
+
+        var csvList = new CsvImport<CsvImportAttributeClass>().Read(lines);
+
+        csvList.Should().HaveCount(lines.Length - 1);
+        var first = csvList.First();
+        first.Date1.Should().Be(22.October(1959));
+        first.Date2.Should().Be(22.October(1959));
+        first.DateOnly1.Should().Be(DateOnly.FromDateTime(21.October(1959)));
+        first.DateOnly2.Should().Be(DateOnly.FromDateTime(21.October(1959)));
+        first.TimeOnly1.Should().Be(new TimeOnly(23,59));
+    }
+
     public class CsvImportAttribute2Class
     {
         [CsvImportFormat(Format = "MMMM d, yyyy", Culture = "de")]
@@ -858,7 +878,7 @@ public class CsvImportTest
     }
 
     [Fact]
-    public void CsvImportFormatAttributeTest()
+    public void CsvImportFormatLongDateAttributeTest()
     {
         var lines = new[]
         {
@@ -872,6 +892,69 @@ public class CsvImportTest
         var first = csvList.First();
         first.DateOnly.Should().Be(DateOnly.FromDateTime(1.October(1959)));
         first.DateTime.Should().Be(22.October(1959));
+    }
+
+    public class CsvImportAttribute3Class
+    {
+        public double DoubleUs { get; set; }
+        [CsvImportFormat(Culture = "de")]
+        public double Double { get;  set; }
+        public double FloatUs { get; set; }
+        [CsvImportFormat(Culture = "de")]
+        public double Float { get;     set; }
+        public decimal DecimalUs { get; set; }
+        [CsvImportFormat(Culture = "de")]
+        public decimal Decimal { get; set; }
+    }
+
+    [Fact]
+    public void CsvImportFormatDoubleAttributeTest()
+    {
+        var lines = new[]
+        {
+            "DoubleUs;Double;FloatUs;Float;DecimalUs;Decimal",
+            "14.12;14,12;13.12;13,12;11.12;11,12"
+        };
+
+        var csvList = new CsvImport<CsvImportAttribute3Class>().Read(lines);
+
+        csvList.Should().HaveCount(lines.Length - 1);
+        var first = csvList.First();
+        first.DoubleUs.Should().Be(14.12);
+        first.Double.Should().Be(14.12);
+        first.FloatUs.Should().Be(13.12);
+        first.Float.Should().Be(13.12);
+        first.DecimalUs.Should().Be(11.12m);
+        first.Decimal.Should().Be(11.12m);
+    }
+
+    [CsvImportFormat(Culture = "de")]
+    public class CsvImportAttribute4Class
+    {
+        public double   Double  { get; set; }
+        public double   Float   { get; set; }
+        public decimal  Decimal { get; set; }
+        public DateTime DateTime   { get; set; }
+        public DateOnly DateOnly { get; set; }
+        public TimeOnly TimeOnly { get; set; }
+    }
+
+    [Fact]
+    public void CsvImportFormatClassAttributeTest()
+    {
+        var lines = new[]
+        {
+            "Double;Float;Decimal",
+            "14,11;13,11;12,11"
+        };
+
+        var csvList = new CsvImport<CsvImportAttribute4Class>().Read(lines);
+
+        csvList.Should().HaveCount(lines.Length - 1);
+        var first = csvList.First();
+        first.Double.Should().Be(14.11);
+        first.Float.Should().Be(13.11);
+        first.Decimal.Should().Be(12.11m);
     }
 
     #endregion

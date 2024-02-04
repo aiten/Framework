@@ -25,6 +25,19 @@ using System.Threading.Tasks;
 
 public class CsvImport<T> : CsvImportBase where T : class
 {
+    public CsvImport()
+    {
+        if (typeof(T).GetCustomAttributes(typeof(CsvImportFormatAttribute)).FirstOrDefault() is CsvImportFormatAttribute formatAttribute)
+        {
+            if (!string.IsNullOrEmpty(formatAttribute.Format)) throw new ArgumentException("cannot use format for class attribute");
+            if (!string.IsNullOrEmpty(formatAttribute.Culture))
+            {
+                DateTimeCultureInfo = CultureInfo.GetCultureInfo(formatAttribute.Culture);
+                NumberFormat        = DateTimeCultureInfo.NumberFormat;
+            }
+        }
+    }
+
     public class ColumnMapping
     {
         public required string ColumnName { get; set; }
@@ -155,6 +168,7 @@ public class CsvImport<T> : CsvImportBase where T : class
                 if (!string.IsNullOrEmpty(formatAttribute.Culture))
                 {
                     columnMapping.DateTimeCultureInfo = CultureInfo.GetCultureInfo(formatAttribute.Culture);
+                    columnMapping.NumberFormat        = columnMapping.DateTimeCultureInfo.NumberFormat;
                 }
             }
         }

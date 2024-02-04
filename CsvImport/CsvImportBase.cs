@@ -25,7 +25,7 @@ using System.Threading.Tasks;
 
 public class CsvImportBase
 {
-    private readonly NumberFormatInfo _nfi;
+    private NumberFormatInfo _nfi;
 
     public Encoding Encoding { get; set; } = Encoding.Default;
 
@@ -55,7 +55,11 @@ public class CsvImportBase
         _nfi = enUS.NumberFormat;
     }
 
-    public NumberFormatInfo NumberFormat => _nfi;
+    public NumberFormatInfo NumberFormat
+    {
+        get => _nfi;
+        protected set => _nfi = value;
+    }
 
     public string DecimalSeparator
     {

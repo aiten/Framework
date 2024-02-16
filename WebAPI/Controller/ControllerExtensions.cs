@@ -67,7 +67,7 @@ public static class ControllerExtensions
 
     #region Result
 
-    public static async Task<ActionResult<T>> NotFoundOrOk<T>(this Controller controller, T obj)
+    public static async Task<ActionResult<T>> NotFoundOrOk<T>(this Controller controller, T? obj)
     {
         if (obj == null)
         {
@@ -78,7 +78,7 @@ public static class ControllerExtensions
         return controller.Ok(obj);
     }
 
-    public static async Task<ActionResult<IEnumerable<T>>> NotFoundOrOk<T>(this Controller controller, IEnumerable<T> list)
+    public static async Task<ActionResult<IEnumerable<T>>> NotFoundOrOk<T>(this Controller controller, IEnumerable<T>? list)
     {
         if (list == null)
         {

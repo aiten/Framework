@@ -54,6 +54,7 @@ public static class ImageHelperExtensions
 
     public static SKBitmap ScaleTo(this SKBitmap image, int resizedWidth, int resizedHeight)
     {
-        return image.Resize(new SKSizeI(resizedWidth, resizedHeight), SKFilterQuality.High);
+        // obsolete: replaced with the next line: return image.Resize(new SKSizeI(resizedWidth, resizedHeight), SKFilterQuality.High);
+        return image.Resize(new SKSizeI(resizedWidth, resizedHeight), new SKSamplingOptions(SKCubicResampler.Mitchell));
     }
 }

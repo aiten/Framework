@@ -210,7 +210,7 @@ public class SerialTest : UnitTestBase
             eventCalls.EventWaitForSend.Should().Be(0);
             eventCalls.EventCommandSending.Should().Be(1);
             eventCalls.EventCommandSent.Should().Be(1);
-            eventCalls.EventWaitCommandSent.Should().BeGreaterOrEqualTo(1);
+            eventCalls.EventWaitCommandSent.Should().BeGreaterThanOrEqualTo(1);
             eventCalls.EventReplyReceived.Should().Be(1);
             eventCalls.EventReplyOK.Should().Be(1);
             eventCalls.EventReplyError.Should().Be(0);
@@ -244,7 +244,7 @@ public class SerialTest : UnitTestBase
             eventCalls.EventWaitForSend.Should().Be(0);
             eventCalls.EventCommandSending.Should().Be(1);
             eventCalls.EventCommandSent.Should().Be(1);
-            eventCalls.EventWaitCommandSent.Should().BeGreaterOrEqualTo(1);
+            eventCalls.EventWaitCommandSent.Should().BeGreaterThanOrEqualTo(1);
             eventCalls.EventReplyReceived.Should().Be(2);
             eventCalls.EventReplyOK.Should().Be(1);
             eventCalls.EventReplyError.Should().Be(0);
@@ -280,7 +280,7 @@ public class SerialTest : UnitTestBase
             eventCalls.EventWaitForSend.Should().Be(0);
             eventCalls.EventCommandSending.Should().Be(1);
             eventCalls.EventCommandSent.Should().Be(1);
-            eventCalls.EventWaitCommandSent.Should().BeGreaterOrEqualTo(1);
+            eventCalls.EventWaitCommandSent.Should().BeGreaterThanOrEqualTo(1);
             eventCalls.EventReplyReceived.Should().Be(2);
             eventCalls.EventReplyOK.Should().Be(1);
             eventCalls.EventReplyError.Should().Be(1);
@@ -316,7 +316,7 @@ public class SerialTest : UnitTestBase
             eventCalls.EventWaitForSend.Should().Be(0);
             eventCalls.EventCommandSending.Should().Be(1);
             eventCalls.EventCommandSent.Should().Be(1);
-            eventCalls.EventWaitCommandSent.Should().BeGreaterOrEqualTo(1);
+            eventCalls.EventWaitCommandSent.Should().BeGreaterThanOrEqualTo(1);
             eventCalls.EventReplyReceived.Should().Be(1);
             eventCalls.EventReplyOK.Should().Be(0);
             eventCalls.EventReplyError.Should().Be(1);
@@ -350,7 +350,7 @@ public class SerialTest : UnitTestBase
             eventCalls.EventWaitForSend.Should().Be(0);
             eventCalls.EventCommandSending.Should().Be(1);
             eventCalls.EventCommandSent.Should().Be(1);
-            eventCalls.EventWaitCommandSent.Should().BeGreaterOrEqualTo(1);
+            eventCalls.EventWaitCommandSent.Should().BeGreaterThanOrEqualTo(1);
             eventCalls.EventReplyReceived.Should().Be(2);
             eventCalls.EventReplyOK.Should().Be(1);
             eventCalls.EventReplyError.Should().Be(0);

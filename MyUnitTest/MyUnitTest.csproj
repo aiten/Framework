@@ -6,10 +6,10 @@
     <None Remove="Drawing\Bitmap\Preview3D.jpg" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
-    <PackageReference Include="NLog" Version="5.3.4" />
-    <PackageReference Include="xunit.v3" Version="1.0.1" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="3.0.1">
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+    <PackageReference Include="NLog" Version="5.5.0" />
+    <PackageReference Include="xunit.v3" Version="2.0.2" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>

@@ -773,7 +773,18 @@ public class Serial : ISerial
         {
             try
             {
-                sb.Append(ReadFromSerialAsync().ConfigureAwait(false).GetAwaiter().GetResult());
+                string read = ReadFromSerialAsync().ConfigureAwait(false).GetAwaiter().GetResult();
+                if (string.IsNullOrEmpty(read))
+                {
+                    // some usb drivers have calling read to often!
+                    // wait
+                    Thread.Sleep(2);
+                    // Task.Delay(2).ConfigureAwait(false).GetAwaiter().GetResult();
+                }
+                else
+                {
+                    sb.Append(read);
+                }
             }
             catch (InvalidOperationException e)
             {

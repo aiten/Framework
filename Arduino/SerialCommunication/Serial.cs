@@ -776,7 +776,7 @@ public class Serial : ISerial
                 string read = ReadFromSerialAsync().ConfigureAwait(false).GetAwaiter().GetResult();
                 if (string.IsNullOrEmpty(read))
                 {
-                    // some usb drivers have calling read to often!
+                    // some usb drivers have calling read too often!
                     // wait
                     Thread.Sleep(2);
                     // Task.Delay(2).ConfigureAwait(false).GetAwaiter().GetResult();

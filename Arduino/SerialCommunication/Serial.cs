@@ -104,10 +104,8 @@ public class Serial : ISerial
         }
     }
 
-    // public bool IsConnected { get { return true; }  }
-    public bool IsConnected => _serialPort != null && _serialPort.IsOpen;
-
-    public bool Aborted { get; protected set; }
+    public bool Aborted     { get; protected set; }
+    public bool IsConnected { get; protected set; } = false;
 
     public int  BaudRate       { get; set; } = 115200;
     public bool ResetOnConnect { get; set; } = false;
@@ -193,6 +191,8 @@ public class Serial : ISerial
         }
 
         OnCommandQueueEmpty(new SerialEventArgs(0, null));
+
+        IsConnected = true;
     }
 
     /// <summary>
@@ -249,6 +249,8 @@ public class Serial : ISerial
         }
 
         Logger.LogInformation($"Disconnected: {join.ToString()}");
+
+        IsConnected = false;
     }
 
     /// <summary>

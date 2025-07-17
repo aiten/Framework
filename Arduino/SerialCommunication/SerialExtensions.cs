@@ -156,4 +156,44 @@ public static class SerialExtensions
             }
         }
     }
+
+    private const int MaxMessageLength = 60;
+
+    public static IEnumerable<string> SplitHpglCommands(IEnumerable<string> commands)
+    {
+        var cmdList = new List<string>();
+
+        foreach (var command in commands)
+        {
+            var cmds = command.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
+
+            foreach (string l in cmds)
+            {
+                var message = l;
+                while (message.Length > MaxMessageLength)
+                {
+                    var cmd = message.Substring(0, 2);
+                    var idx = 0;
+                    while (idx < MaxMessageLength && idx != -1)
+                    {
+                        idx = message.IndexOf(',', idx + 1);
+                        idx = message.IndexOf(',', idx + 1);
+                    }
+
+                    if (idx == -1)
+                    {
+                        break;
+                    }
+
+                    string sendMessage = message.Substring(0, idx);
+                    message = cmd + message.Substring(idx + 1);
+                    cmdList.Add(sendMessage);
+                }
+
+                cmdList.Add(message);
+            }
+        }
+
+        return cmdList;
+    }
 }

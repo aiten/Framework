@@ -477,7 +477,7 @@ public class Serial : ISerial
             queueLength++;
         }
 
-        Logger.LogInformation($"Queue: {cmd}");
+        Logger.LogInformation($"Queue: {ToLogString(cmd)}");
         OnCommandQueueChanged(new SerialEventArgs(queueLength, c));
         return c;
     }
@@ -539,7 +539,7 @@ public class Serial : ISerial
 
     private bool WriteSerial(string commandText, bool addNewLine)
     {
-        Logger.LogInformation($"Write: {commandText}");
+        Logger.LogInformation($"Write: {ToLogString(commandText)}");
         try
         {
             if (addNewLine)
@@ -552,17 +552,17 @@ public class Serial : ISerial
         }
         catch (InvalidOperationException e)
         {
-            Logger.LogError($"WriteInvalidOperationException: {commandText} => {e.Message}");
+            Logger.LogError($"WriteInvalidOperationException: {ToLogString(commandText)} => {e.Message}");
             Disconnect(false).ConfigureAwait(false).GetAwaiter().GetResult();
         }
         catch (IOException e)
         {
-            Logger.LogError($"WriteIOException: {commandText} => {e.Message}");
+            Logger.LogError($"WriteIOException: {ToLogString(commandText)} => {e.Message}");
             ErrorSerial();
         }
         catch (Exception e)
         {
-            Logger.LogError($"WriteException: {commandText} => {e.GetType()} {e.Message}");
+            Logger.LogError($"WriteException: {ToLogString(commandText)} => {e.GetType()} {e.Message}");
         }
 
         return false;
@@ -830,7 +830,7 @@ public class Serial : ISerial
 
         if (string.IsNullOrEmpty(message) == false)
         {
-            Logger.LogInformation($"Read: {message.Replace("\n", @"\n").Replace("\r", @"\r").Replace("\t", @"\t")}");
+            Logger.LogInformation($"Read: {ToLogString(message)}");
 
             bool endCommand = false;
 
@@ -913,7 +913,7 @@ public class Serial : ISerial
                     _autoEvent.Set();
                 }
 
-                Logger.LogDebug($"DeQueue: {cmd.CommandText}");
+                Logger.LogDebug($"DeQueue: {ToLogString(cmd.CommandText)}");
 
                 OnCommandQueueChanged(new SerialEventArgs(queueLength, cmd));
 
@@ -1066,4 +1066,18 @@ public class Serial : ISerial
     }
 
     #endregion
+
+    private static string ToLogString(string? str)
+    {
+        if (string.IsNullOrEmpty(str))
+        {
+            return string.Empty;
+        }
+
+        return str
+            .Replace("\u001b", @"\u001b")
+            .Replace("\n",     @"\n")
+            .Replace("\r",     @"\r")
+            .Replace("\t",     @"\t");
+    }
 }

@@ -185,6 +185,9 @@ public static class SerialExtensions
                         break;
                     }
 
+                    // TODO => idx + 3 must be < MaxMessageLength
+                    throw new NotImplementedException();
+
                     string sendMessage = message.Substring(0, idx);
                     message = cmd + message.Substring(idx + 1);
                     cmdList.Add(sendMessage);

@@ -547,7 +547,7 @@ public class Serial : ISerial
                 commandText = commandText + _serialPort!.NewLine;
             }
 
-            WriteToSerialAsync(commandText).ConfigureAwait(false).GetAwaiter().GetResult();
+            WriteToSerial(commandText);
             return true;
         }
         catch (InvalidOperationException e)
@@ -698,7 +698,7 @@ public class Serial : ISerial
 
             if (nextCmd != null && (!Pause || SendNext))
             {
-                Logger.LogTrace($"Write: L:{queuedCmdLength}");
+                // Logger.LogTrace($"Write: QueueLength:{queuedCmdLength}");
 
                 if (queuedCmdLength == 0 || queuedCmdLength + (nextCmd.CommandText ?? string.Empty).Length + 2 < ArduinoBufferSize)
                 {
@@ -713,6 +713,7 @@ public class Serial : ISerial
                     OnWaitForSend(eventArgs);
                     if (Aborted || eventArgs.Abort)
                     {
+                        Thread.Sleep(2);
                         return;
                     }
 
@@ -734,19 +735,19 @@ public class Serial : ISerial
         }
     }
 
-    public async Task WriteToSerialAsync(string str)
+    public void WriteToSerial(string str)
     {
         byte[] encodedStr = _serialPort!.Encoding.GetBytes(str);
 
-        await _serialPort.BaseStream.WriteAsync(encodedStr, 0, encodedStr.Length, _serialPortCancellationTokenSource!.Token);
+        _serialPort.BaseStream.Write(encodedStr, 0, encodedStr.Length);
         if (Environment.OSVersion.Platform != PlatformID.Unix)
         {
             // linux: with flush we may delete our recent WriteAsync (see SerialStream.Unix.cs)
-            await _serialPort.BaseStream.FlushAsync();
+            _serialPort.BaseStream.Flush();
         }
     }
 
-    private async Task<string> ReadFromSerialAsync()
+    private string ReadFromSerial()
     {
         int readMaxSize = 256;
         var buffer      = new byte[readMaxSize];
@@ -754,11 +755,7 @@ public class Serial : ISerial
         // int readSize = await _serialPort.BaseStream.ReadAsync(buffer, 0, readMaxSize, _serialPortCancellationTokenSource.Token);
         // above code does not work: after Token.Cancel() not exit of call.
 
-        var readTask = _serialPort!.BaseStream.ReadAsync(buffer, 0, readMaxSize, _serialPortCancellationTokenSource!.Token);
-        await await Task.WhenAny(
-            readTask,
-            Task.Delay(-1, _serialPortCancellationTokenSource.Token));
-        var readSize = await readTask;
+        var readSize= _serialPort!.BaseStream.Read(buffer, 0, readMaxSize);
 
         return _serialPort.Encoding.GetString(buffer, 0, readSize);
     }
@@ -773,7 +770,7 @@ public class Serial : ISerial
         {
             try
             {
-                string read = ReadFromSerialAsync().ConfigureAwait(false).GetAwaiter().GetResult();
+                string read = ReadFromSerial();
                 if (string.IsNullOrEmpty(read))
                 {
                     // some usb drivers have calling read too often!
@@ -800,6 +797,10 @@ public class Serial : ISerial
             {
                 Logger.LogError($"ReadIOException: {e.Message}");
                 Thread.Sleep(250);
+            }
+            catch (TimeoutException e)
+            {
+                // timeout is OK, see ReadTimeout in ISerialPort
             }
             catch (Exception e)
             {

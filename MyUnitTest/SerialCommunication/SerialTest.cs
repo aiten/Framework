@@ -59,37 +59,38 @@ public class SerialTest : UnitTestBase
         _resultIdx = 0;
         _sendReply = false;
 
-        baseStream.WriteAsync(Arg.Any<byte[]>(), Arg.Any<int>(), Arg.Any<int>(), Arg.Any<System.Threading.CancellationToken>()).ReturnsForAnyArgs(
-            async x =>
+        baseStream.When(x => x.Write(Arg.Any<byte[]>(), Arg.Any<int>(), Arg.Any<int>()))
+            .Do(x =>
             {
                 _sendReply = true;
-                var cancellationToken = (CancellationToken)x[3];
-                await Task.Delay(0, cancellationToken);
+                /*
+                                var cancellationToken = (CancellationToken)x[3];
+                                while (!cancellationToken.IsCancellationRequested)
+                                {
+                                    Thread.Sleep(10);
+                                }
+                */
             });
 
-        baseStream.ReadAsync(Arg.Any<byte[]>(), Arg.Any<int>(), Arg.Any<int>(), Arg.Any<System.Threading.CancellationToken>()).ReturnsForAnyArgs(
-            async x =>
+        baseStream.Read(Arg.Any<byte[]>(), Arg.Any<int>(), Arg.Any<int>()).ReturnsForAnyArgs(x =>
+        {
+            if (_sendReply)
             {
-                var cancellationToken = (CancellationToken)x[3];
-                while (!cancellationToken.IsCancellationRequested)
+                _sendReply = false;
+                byte[] encodedStr = encoding.GetBytes(responseStrings[_resultIdx++]);
+                for (int i = 0; i < encodedStr.Length; i++)
                 {
-                    if (_sendReply)
-                    {
-                        _sendReply = false;
-                        byte[] encodedStr = encoding.GetBytes(responseStrings[_resultIdx++]);
-                        for (int i = 0; i < encodedStr.Length; i++)
-                        {
-                            ((byte[])x[0])[i] = encodedStr[i];
-                        }
-
-                        return encodedStr.Length;
-                    }
-
-                    await Task.Delay(1, cancellationToken);
+                    ((byte[])x[0])[i] = encodedStr[i];
                 }
 
-                return 0;
-            });
+                return encodedStr.Length;
+            }
+
+
+            Thread.Sleep(100);
+
+            return 0;
+        });
 
         return serialPort;
     }
@@ -128,7 +129,7 @@ public class SerialTest : UnitTestBase
 
             await serial.DisconnectAsync();
 
-            await serialPort.BaseStream.Received(1).WriteAsync(Arg.Is<byte[]>(e => (char)e[0] == '?'), 0, 2, Arg.Any<System.Threading.CancellationToken>());
+            serialPort.BaseStream.Received(1).Write(Arg.Is<byte[]>(e => (char)e[0] == '?'), 0, 2);
             await Task.FromResult(0);
         }
     }
@@ -149,7 +150,7 @@ public class SerialTest : UnitTestBase
             await serial.SendCommandAsync("?");
 
             await serial.DisconnectAsync();
-            await serialPort.BaseStream.Received(2).WriteAsync(Arg.Is<byte[]>(e => (char)e[0] == '?'), 0, 2, Arg.Any<System.Threading.CancellationToken>());
+            serialPort.BaseStream.Received(2).Write(Arg.Is<byte[]>(e => (char)e[0] == '?'), 0, 2);
             await Task.FromResult(0);
         }
     }

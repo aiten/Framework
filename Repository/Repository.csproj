@@ -3,8 +3,8 @@
     <TargetFramework>$(TargetFrameworkForProject)</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.7" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="9.0.7" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.8" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="9.0.8" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CsvImport\CsvImport.csproj" />

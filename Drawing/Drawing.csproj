@@ -3,7 +3,7 @@
 		<TargetFramework>$(TargetFrameworkForProject)</TargetFramework>
 	</PropertyGroup>
 	<ItemGroup>
-		<PackageReference Include="SkiaSharp" Version="3.119.0" />
+		<PackageReference Include="SkiaSharp" Version="3.119.1" />
 	</ItemGroup>
 	<ItemGroup Condition="$(RuntimeIdentifier.StartsWith('linux'))">
 		<PackageReference Include="SkiaSharp.NativeAssets.Linux.NoDependencies" Version="3.119.0" />

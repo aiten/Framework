@@ -28,6 +28,7 @@ using Framework.Logic.Abstraction;
 using Framework.Tools;
 
 using Microsoft.AspNetCore.JsonPatch;
+using Microsoft.Extensions.Logging;
 
 using NSubstitute;
 
@@ -73,7 +74,7 @@ public class CrudManagerTest
                 Callback.Always(x => ((MyEntity)x[0]).CopyProperties((MyEntity)x[1]))
             );
 
-        var configuration = new MapperConfiguration(cfg => { cfg.CreateMap<MyEntity, MyDto>().ReverseMap(); });
+        var configuration = new MapperConfiguration(cfg => { cfg.CreateMap<MyEntity, MyDto>().ReverseMap(); },new LoggerFactory());
 
         return new MyCrudManager(_unitOfWork, _repository, configuration.CreateMapper());
     }

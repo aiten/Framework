@@ -27,6 +27,8 @@ using FluentAssertions;
 using Framework.Logic;
 using Framework.Logic.Abstraction;
 
+using Microsoft.Extensions.Logging;
+
 using NSubstitute;
 
 using Repository.Abstraction;
@@ -74,7 +76,7 @@ public class GetManagerTest
     {
         _unitOfWork = Substitute.For<IUnitOfWork>();
         _repository = Substitute.For<IGetRepository<MyEntity, int>>();
-        var configuration = new MapperConfiguration(cfg => { cfg.CreateMap<MyEntity, MyDto>(); });
+        var configuration = new MapperConfiguration(cfg => { cfg.CreateMap<MyEntity, MyDto>(); }, new LoggerFactory());
 
         return new MyGetManager(_unitOfWork, _repository, configuration.CreateMapper());
     }
